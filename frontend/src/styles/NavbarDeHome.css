@@ -1,0 +1,157 @@
+.navbar {
+  width: 100%;
+  height: 80px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 2rem;
+
+  border-bottom: 1px solid #e5e5e5;
+  background-color: white;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-logo{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-logo img{
+  height: 68px;
+}
+
+.logo-texto h1{
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #0b1e4d;
+}
+
+.parteQ{
+  color: #45b08c;
+}
+
+.subtitulo-logo{
+  font-size: 0.75rem;
+  color: black;
+}
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  font: 2px;
+
+  list-style: none;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #0d1b4c;
+  font-weight: 700;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  padding: 0.8rem 1.5rem;
+
+  border: 1px solid #1d5fa7;
+  border-radius: 16px;
+
+  background: white;
+  cursor: pointer;
+}
+
+.login-btn span{
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0b1e4d;
+}
+
+.login-btn img{
+  width: 18px;
+  height: 18px;
+}
+
+.menu-btn {
+  display: none;
+
+  font-size: 2rem;
+  border: none;
+  background: none;
+
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .navbar-logo img{
+    height: 40px;
+  }
+
+  .logo-texto h1{
+    font-size: 1.3rem;
+  }
+
+  .subtitulo-logo{
+    font-size: 0.7rem;
+  }
+  .navbar{
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+
+  .menu-btn{
+    display: block;
+    order: -1;
+  }
+
+  .navbar-links{
+    position: absolute;
+
+    top: 80px;
+    left: 0;
+
+    width: 250px;
+
+    background: white;
+
+    display: none;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    padding: 1.5rem;
+
+    gap: 1rem;
+
+    border-right: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .navbar-links.active{
+    display: flex;
+  }
+
+  .navbar-links li{
+    width: 100%;
+    text-align: left;
+  }
+
+  .navbar-links a{
+    display: block;
+    width: 100%;
+  }
+
+  .login-btn{
+    width: 100%;
+  }
+}
