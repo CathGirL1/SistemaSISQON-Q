@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import HomeContenedor from "../pages/HomeContenedor";
+
+import Home from "../pages/Home";
 import Login from "../pages/Login"
 
 export default function AppRoutes() {
@@ -8,7 +9,7 @@ export default function AppRoutes() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomeContenedor />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
         </Routes>
       </BrowserRouter>
