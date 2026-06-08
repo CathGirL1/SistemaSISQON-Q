@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 
 import rutaPrueba from "../routes/rutaPrueba"
 
+import { connectDB } from "./database";
+
 dotenv.config();
 
 // Crear el servidor
@@ -21,7 +23,17 @@ servidor.use("/", rutaPrueba);
 // Obtener el puerto desde el archivo .env
 const puerto = process.env.PORT || 3000;
 
-// Iniciar el servidor
-servidor.listen(puerto, () => {
-    console.log(`Servidor ejecutándose en el puerto ${puerto}`);
-});
+const iniciarServidor = async () => {
+    try {
+        await connectDB();
+
+        servidor.listen(puerto, () => {
+            console.log(`Servidor ejecutándose en el puerto ${puerto}`);
+        });
+
+    } catch (error) {
+        console.error("Error al iniciar el servidor:", error);
+    }
+};
+
+iniciarServidor();
