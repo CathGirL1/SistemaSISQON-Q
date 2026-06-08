@@ -1,0 +1,137 @@
+.contenedor-botones{
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+}
+
+/* Estilo base de las cards */
+.boton-solicitarCotizacion,
+.boton-ingresarComoEmpresa,
+.boton-ingresarComoCliente{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    min-width: 240px;
+    padding: 1rem 1.5rem;
+
+    border-radius: 14px;
+    cursor: pointer;
+
+    transition: all 0.3s ease;
+}
+
+/* Card azul */
+.boton-solicitarCotizacion{
+    background-color: #0a3d91;
+    color: white;
+    border: 2px solid #0a3d91;
+}
+
+/* Card blanca azul */
+.boton-ingresarComoEmpresa{
+    background-color: white;
+    color: #0a3d91;
+    border: 2px solid #0a3d91;
+}
+
+/* Card blanca verde */
+.boton-ingresarComoCliente{
+    background-color: white;
+    color: #42b48a;
+    border: 2px solid #42b48a;
+}
+
+/* Contenedor del texto */
+.boton-solicitarCotizacion div,
+.boton-ingresarComoEmpresa div,
+.boton-ingresarComoCliente div{
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+    width: 80%;
+}
+
+/* Título */
+.boton-solicitarCotizacion h3,
+.boton-ingresarComoEmpresa h3,
+.boton-ingresarComoCliente h3{
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 200;
+}
+
+/* Descripción */
+.boton-solicitarCotizacion p,
+.boton-ingresarComoEmpresa p,
+.boton-ingresarComoCliente p{
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+}
+
+/* Iconos */
+.icono-cotizacion,
+.icono-ingresarEmpresa,
+.icono-ingresarComoCliente{
+    font-size: 2.2rem;
+    flex-shrink: 0;
+}
+
+/* Hover */
+.boton-solicitarCotizacion:hover,
+.boton-ingresarComoEmpresa:hover,
+.boton-ingresarComoCliente:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+/* =======================
+   TABLET
+======================= */
+
+@media (min-width: 769px) and (max-width: 1080px) {
+  .contenedor-botones{
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .contenidoHome-imagen img{
+    width: 100%;
+    height: 760px;
+  }
+
+  .boton-solicitarCotizacion,
+  .boton-ingresarComoEmpresa,
+  .boton-ingresarComoCliente{
+    height: 70%;
+    min-width: 100px;
+    width: 86%;
+    min-height: 70px;
+   
+  }
+}
+
+/* =======================
+   MÓVIL
+======================= */
+
+@media (max-width: 768px){
+
+    .contenedor-botones{
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+    }
+
+    .boton-solicitarCotizacion,
+    .boton-ingresarComoEmpresa,
+    .boton-ingresarComoCliente{
+        width: 100%;
+        height: 78px;
+        object-fit: cover;
+        min-width: unset;
+        box-sizing: border-box;
+    }
+
+}

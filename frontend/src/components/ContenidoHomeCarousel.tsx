@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../styles/ContenidoHomeCarousel.css"
+import BotonesContenidoHome from "../components/BotonesContenidoHome";
 
 import construccion1 from "../assets/construccion1.png";
 import construccion2 from "../assets/construccion2.png";
@@ -49,7 +50,7 @@ export default function ContenidoHomeCarousel() {
                     y recibe tu presupuesto estimado de forma rápida,
                     clara y segura.
                 </p>
-
+                <BotonesContenidoHome/>
             </div>
         
     

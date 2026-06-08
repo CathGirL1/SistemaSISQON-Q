@@ -5,6 +5,7 @@
   min-height:600px;
   padding: 0 3rem;
   gap: 3rem;
+  overflow:hidden;
  
 }
 
@@ -31,7 +32,7 @@
   right:-140px;
   
   width:900px;
-  height:1205px;
+  height:1140px;
 
   background:white;
 
@@ -114,7 +115,7 @@
   width: 106%;
   max-width: 150%;
   
-  height: 696px;
+  height: 600px;
 
   object-fit: cover;
 
