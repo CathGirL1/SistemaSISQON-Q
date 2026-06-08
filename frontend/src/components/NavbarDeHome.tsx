@@ -3,7 +3,7 @@ import "../styles/NavbarDeHome.css"
 import { useState } from "react";
 import iconoHomeMenu from "../assets/iconoHomeMenu.png"
 import iconoInicioSesion from "../assets/iconoInicioSesion.png"
-export default function(){
+export default function NavbarDeHome(){
     const [menuAbierto, setMenuAbierto] = useState(false);
     
     return(
