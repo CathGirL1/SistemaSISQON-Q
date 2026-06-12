@@ -1,12 +1,18 @@
+
+import LoginContenedor from "../layouts/LoginContenedor";
+import LoginContenido from "../components/LoginContenido";
+
+import "../styles/LoginContenido.css";
 export default function Login() {
   return (
-
     <>
-    
-      <div>
-        <h1>Login</h1>
-      </div>
+      <LoginContenedor>
+
+        <LoginContenido/>
+        
+      </LoginContenedor>
+
     </>
-    
+   
   );
 }

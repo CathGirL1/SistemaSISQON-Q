@@ -3,9 +3,13 @@ import "../styles/NavbarDeHome.css"
 import { useState } from "react";
 import iconoHomeMenu from "../assets/iconoHomeMenu.png"
 import iconoInicioSesion from "../assets/iconoInicioSesion.png"
+
+import { useNavigate } from "react-router-dom";
 export default function NavbarDeHome(){
     const [menuAbierto, setMenuAbierto] = useState(false);
     
+    const navegar = useNavigate();
+
     return(
       
         <>
@@ -35,7 +39,7 @@ export default function NavbarDeHome(){
                     <li><a href="#">Ayuda</a></li>
 
                     <li>
-                        <button className="login-btn">
+                        <button className="login-btn" onClick={() => navegar("/login")}>
                             <p>Iniciar sesión</p>
                             <img src={iconoInicioSesion} alt="IconoInicioSesion" />
                         </button>
