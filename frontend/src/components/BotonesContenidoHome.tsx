@@ -1,7 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 import "../styles/BotonesContenidoHome.css"
 import { FaClipboardList, FaBuilding, FaUser } from "react-icons/fa";
 
 export default function BotonesContenidoHome(){
+
+    const navegar = useNavigate();
 
     return(
 
@@ -17,7 +21,7 @@ export default function BotonesContenidoHome(){
                     </div>
                     
                 </div>
-                <div className="boton-ingresarComoEmpresa">
+                <div className="boton-ingresarComoEmpresa" onClick={() => navegar("/login")}>
                    <FaBuilding className="icono-ingresarEmpresa" />
                     <div>
                         <h3>Ingresar como empresa</h3>
@@ -25,7 +29,7 @@ export default function BotonesContenidoHome(){
                     </div>
                   
                 </div>
-                <div className="boton-ingresarComoCliente">
+                <div className="boton-ingresarComoCliente" onClick={() => navegar("/login")}>
                     <FaUser className="icono-ingresarComoCliente" />
                     
                     <div>
