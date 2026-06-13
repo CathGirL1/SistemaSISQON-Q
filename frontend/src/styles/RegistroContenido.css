@@ -1,0 +1,355 @@
+/* ==========================
+   CONTENEDOR PRINCIPAL
+========================== */
+
+.seccion-registro{
+    min-height: 100vh;
+    padding: 2rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedor-registro{
+    width: 100%;
+    max-width: 1400px;
+    min-height: 800px;
+
+    display: flex;
+
+    border-radius: 24px;
+    overflow: hidden;
+
+    background-color: #ffffff;
+
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+}
+
+/* ==========================
+   PANEL IZQUIERDO
+========================== */
+
+.panel-informacion-registro{
+    flex: 1;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.capa-oscura-registro{
+    width: 100%;
+    height: 100%;
+
+    padding: 3rem;
+
+    background: rgba(0,0,0,0.60);
+
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-registro{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-registro img{
+    height: 65px;
+}
+
+.texto-logo-registro h1{
+    margin: 0;
+    font-size: 2rem;
+}
+
+.texto-logo-registro p{
+    margin-top: .2rem;
+    opacity: .85;
+}
+
+/* ==========================
+   CONTENIDO IZQUIERDO
+========================== */
+
+.contenido-informacion-registro{
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.contenido-informacion-registro h2{
+    font-size: 3rem;
+    line-height: 1.2;
+
+    margin-bottom: 1rem;
+}
+
+.linea-destacada-registro{
+    width: 90px;
+    height: 5px;
+
+    background-color: #2ecc71;
+
+    border-radius: 50px;
+
+    margin-bottom: 1.5rem;
+}
+
+.descripcion-registro{
+    max-width: 500px;
+
+    font-size: 1.1rem;
+    line-height: 1.8;
+
+    margin-bottom: 2rem;
+}
+
+.item-beneficio-registro{
+    display: flex;
+    align-items: center;
+
+    gap: 1rem;
+
+    margin-bottom: 1.5rem;
+}
+
+.icono-beneficio-registro{
+    min-width: 50px;
+
+    width: 50px;
+    height: 50px;
+
+    padding: .8rem;
+
+    border-radius: 12px;
+
+    background-color: rgba(255,255,255,.15);
+}
+
+.item-beneficio-registro h3{
+    margin-bottom: .3rem;
+}
+
+.item-beneficio-registro p{
+    opacity: .9;
+}
+
+/* ==========================
+   PANEL DERECHO
+========================== */
+
+.panel-formulario-registro{
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: white;
+}
+
+.contenedor-formulario-registro{
+    width: 100%;
+    max-width: 480px;
+
+    padding: 3rem;
+}
+
+.contenedor-formulario-registro h2{
+    font-size: 2rem;
+    margin-bottom: .5rem;
+}
+
+.subtitulo-registro{
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+/* ==========================
+   SELECTOR
+========================== */
+
+.selector-tipo-cuenta{
+    display: flex;
+
+    gap: .8rem;
+
+    margin-bottom: 2rem;
+}
+
+.boton-selector{
+    flex: 1;
+
+    border: 1px solid #dcdcdc;
+
+    background-color: white;
+
+    padding: .9rem;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: .3s;
+}
+
+.boton-selector:hover{
+    border-color: #2ecc71;
+}
+
+.boton-selector.activo{
+    background-color: #2ecc71;
+    color: white;
+    border-color: #2ecc71;
+}
+
+/* ==========================
+   FORMULARIO
+========================== */
+
+.formulario-registro{
+    display: flex;
+    flex-direction: column;
+}
+
+.formulario-registro label{
+    font-weight: 600;
+    margin-bottom: .5rem;
+}
+
+.formulario-registro input{
+    padding: 1rem;
+
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+
+    margin-bottom: 1rem;
+
+    font-size: 1rem;
+}
+
+.formulario-registro input:focus{
+    outline: none;
+    border-color: #2ecc71;
+}
+
+.boton-crear-cuenta{
+    margin-top: 1rem;
+
+    border: none;
+
+    background-color: #2ecc71;
+    color: white;
+
+    padding: 1rem;
+
+    border-radius: 12px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.boton-crear-cuenta:hover{
+    transform: translateY(-2px);
+}
+
+/* ==========================
+   TABLETS
+========================== */
+
+@media (max-width: 1024px){
+
+    .contenedor-registro{
+        flex-direction: column;
+    }
+
+    .panel-informacion-registro{
+        min-height: 450px;
+    }
+
+    .contenido-informacion-registro h2{
+        font-size: 2.3rem;
+    }
+
+}
+
+/* ==========================
+   CELULARES
+========================== */
+
+@media (max-width: 768px){
+
+    .seccion-registro{
+        padding: 1rem;
+    }
+
+    .capa-oscura-registro{
+        padding: 2rem;
+    }
+
+    .logo-registro{
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contenido-informacion-registro h2{
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    .descripcion-registro{
+        text-align: center;
+        max-width: 100%;
+    }
+
+    .linea-destacada-registro{
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .item-beneficio-registro{
+        align-items: flex-start;
+    }
+
+    .contenedor-formulario-registro{
+        padding: 2rem;
+    }
+
+    .selector-tipo-cuenta{
+        flex-direction: column;
+    }
+}
+
+/* ==========================
+   CELULARES PEQUEÑOS
+========================== */
+
+@media (max-width: 480px){
+
+    .texto-logo-registro h1{
+        font-size: 1.5rem;
+    }
+
+    .contenido-informacion-registro h2{
+        font-size: 1.7rem;
+    }
+
+    .contenedor-formulario-registro{
+        padding: 1.5rem;
+    }
+
+    .formulario-registro input{
+        padding: .9rem;
+    }
+
+}

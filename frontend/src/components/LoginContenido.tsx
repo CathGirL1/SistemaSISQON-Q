@@ -5,6 +5,8 @@ import imagenLogo from "../assets/iconoHomeMenu.png";
 import { Calculator } from "lucide-react";
 import { BarChart3 } from "lucide-react";
 
+import { Link } from "react-router-dom";
+
 export default function LoginContenido() {
   return (
     <section className="seccion-login">
@@ -123,9 +125,9 @@ export default function LoginContenido() {
 
             <p className="texto-registro-login">
               ¿No tenés cuenta?
-              <a href="/register">
+              <Link to="/register">
                 Registrate aquí
-              </a>
+              </Link>
             </p>
 
           </div>

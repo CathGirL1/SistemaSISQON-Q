@@ -1,8 +1,8 @@
 import RegistroContenedor from "../layouts/RegistroContenedor";
 import RegistroContenido from "../components/RegistroContenido";
 
-import "../styles/LoginContenido.css";
-export default function Login() {
+import "../styles/RegistroContenido.css";
+export default function Register() {
   return (
     <>
       <RegistroContenedor>
