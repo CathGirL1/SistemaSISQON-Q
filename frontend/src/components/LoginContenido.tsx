@@ -1,5 +1,5 @@
 import "../styles/LoginContenido.css"
-import imagenLogin from "../assets/imagenLogin.jpg";
+import imagenLogin from "../assets/imagenLogin.png";
 import imagenLogo from "../assets/iconoHomeMenu.png";
 
 import { Calculator } from "lucide-react";
