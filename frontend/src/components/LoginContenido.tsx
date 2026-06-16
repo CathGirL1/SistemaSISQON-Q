@@ -7,7 +7,61 @@ import { BarChart3 } from "lucide-react";
 
 import { Link } from "react-router-dom";
 
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 export default function LoginContenido() {
+  const [gmail, setGmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+
+    const iniciarSesion = async (
+      e: React.FormEvent) => {
+
+      e.preventDefault();
+
+      try {
+
+        const respuesta = await fetch(
+            "http://localhost:3000/api/login/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    gmail,
+                    password
+                })
+            }
+        );
+
+         const usuarioAutenticado =
+          await respuesta.json();
+
+          console.log(usuarioAutenticado);
+
+          if (usuarioAutenticado.rol === "cliente") {
+
+              navigate("/panel-cliente");
+
+          }
+
+          if (usuarioAutenticado.rol === "empresa") {
+
+              navigate("/panel-empresa");
+
+          }
+
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+    };
+  
   return (
     <section className="seccion-login">
 
@@ -90,13 +144,15 @@ export default function LoginContenido() {
               Ingresá tus datos para acceder a tu cuenta.
             </p>
 
-            <form className="formulario-login">
+            <form className="formulario-login" onSubmit={iniciarSesion}>
 
               <label>Email</label>
 
               <input
                 type="email"
                 placeholder="tu@email.com"
+                value={gmail}
+                onChange={(e) => setGmail(e.target.value)}
               />
 
               <label>Contraseña</label>
@@ -104,6 +160,8 @@ export default function LoginContenido() {
               <input
                 type="password"
                 placeholder="Tu contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               
                 <div className="opcion-login">

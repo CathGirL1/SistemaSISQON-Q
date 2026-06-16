@@ -1,33 +1,136 @@
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function RegistroEmpresa(){
+    const [nombreEmpresa, setNombreEmpresa] = useState("");
+    const [rut, setRut] = useState("");
+
+    const [nombreUsuario, setNombreUsuario] = useState("");
+    const [telefono, setTelefono] = useState("");
+    const [direccion, setDireccion] = useState("");
+
+    const [gmail, setGmail] = useState("");
+
+    const [password, setPassword] = useState("");
+    const [confirmarPassword, setConfirmarPassword] = useState("");
+
+    const navigate = useNavigate();
+    
+    const registrarEmpresa = async (
+        e: React.FormEvent
+    ) => {
+
+        e.preventDefault();
+
+        if (password !== confirmarPassword) {
+
+            alert("Las contraseñas no coinciden");
+            return;
+
+        }
+
+        try {
+
+            const respuesta = await fetch(
+                "http://localhost:3000/api/registro/register",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        nombreUsuario,
+                        gmail,
+                        telefono,
+                        password,
+                        direccion,
+                        rol: "empresa",
+
+                        nombreEmpresa,
+                        rut
+                    })
+                }
+            );
+
+            const datos = await respuesta.json();
+
+            console.log(datos);
+
+            if (respuesta.ok) {
+
+                navigate("/panel-empresa");
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    };
 
     return(
 
         <>
         
-            <form className="formulario-registro">
+            <form className="formulario-registro" onSubmit={registrarEmpresa}>
 
                 <label>Nombre comercial</label>
-                <input type="text" />
+                <input
+                    type="text"
+                    value={nombreEmpresa}
+                    onChange={(e) => setNombreEmpresa(e.target.value)}
+                />
 
                 <label>RUT</label>
-                <input type="text" />
+                <input
+                    type="text"
+                    value={rut}
+                    onChange={(e) => setRut(e.target.value)}
+                />
 
-                <label>Rubro</label>
-                <input type="text" />
+                <label>Nombre de usuario</label>
+                <input
+                    type="text"
+                    value={nombreUsuario}
+                    onChange={(e) => setNombreUsuario(e.target.value)}
+                />
 
                 <label>Teléfono</label>
-                <input type="text" />
+                <input
+                    type="text"
+                    value={telefono}
+                    onChange={(e) => setTelefono(e.target.value)}
+                />
+
+                <label>Dirección</label>
+                <input
+                    type="text"
+                    value={direccion}
+                    onChange={(e) => setDireccion(e.target.value)}
+                />
 
                 <label>Email</label>
-                <input type="email" />
+                <input
+                    type="email"
+                    value={gmail}
+                    onChange={(e) => setGmail(e.target.value)}
+                />
 
                 <label>Contraseña</label>
-                <input type="password" />
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
 
                 <label>Confirmar contraseña</label>
-                <input type="password" />
+                <input
+                    type="password"
+                    value={confirmarPassword}
+                    onChange={(e) => setConfirmarPassword(e.target.value)}
+                />
 
                 <button
                     type="submit"
