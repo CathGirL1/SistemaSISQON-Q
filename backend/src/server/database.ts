@@ -21,6 +21,8 @@ const config: sql.config = {
 
 export const connectDB = async () => {
     try {
+        console.log("Configuración:");
+        console.log(config);
         const pool = await sql.connect(config);
 
         console.log("✅ Base de datos conectada");
