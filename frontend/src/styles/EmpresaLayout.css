@@ -1,0 +1,32 @@
+.empresa-layout {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.empresa-main {
+  margin-left: 290px;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.empresa-content {
+  padding: 2rem;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .empresa-main {
+    margin-left: 250px;
+  }
+}
+
+/* Celular */
+@media (max-width: 768px) {
+  .empresa-main {
+    margin-left: 82px;
+  }
+
+  .empresa-content {
+    padding: 1.2rem;
+  }
+}
