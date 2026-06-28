@@ -1,0 +1,46 @@
+.cotizaciones-filtros {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr 1.4fr 1.5fr auto;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cotizaciones-filtros select,
+.fecha-filtro,
+.filtros-btn {
+  height: 46px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 14px;
+  padding: 0 1rem;
+  color: #334155;
+  outline: none;
+}
+
+.fecha-filtro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #64748b;
+}
+
+.filtros-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-weight: 700;
+  color: #08255b;
+}
+
+@media (max-width: 1200px) {
+  .cotizaciones-filtros {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cotizaciones-filtros {
+    grid-template-columns: 1fr;
+  }
+}

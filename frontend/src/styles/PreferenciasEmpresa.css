@@ -1,0 +1,36 @@
+.preferencias-card {
+  background: white;
+  border-radius: 24px;
+  padding: 1.7rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.preferencias-header h2 {
+  margin: 0;
+  color: #08255b;
+}
+
+.preferencias-header p {
+  margin: 0.35rem 0 1.3rem;
+  color: #64748b;
+}
+
+.preferencias-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.preferencias-list label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.preferencias-list input {
+  width: 18px;
+  height: 18px;
+  accent-color: #42b48a;
+}

@@ -1,0 +1,61 @@
+.perfil-card {
+  background: white;
+  border-radius: 24px;
+  padding: 1.7rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+  text-align: center;
+}
+
+.perfil-avatar-empresa {
+  width: 92px;
+  height: 92px;
+  border-radius: 26px;
+  background: rgba(66, 180, 138, 0.15);
+  color: #42b48a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  margin: 0 auto 1rem;
+}
+
+.perfil-card h2 {
+  margin: 0;
+  color: #08255b;
+}
+
+.perfil-rubro {
+  margin: 0.4rem 0 1.4rem;
+  color: #64748b;
+}
+
+.perfil-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-align: left;
+  margin-bottom: 1.4rem;
+}
+
+.perfil-info-list span {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.perfil-info-list svg {
+  color: #42b48a;
+}
+
+.perfil-card-btn {
+  width: 100%;
+  border: none;
+  background: #08255b;
+  color: white;
+  padding: 0.85rem;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}

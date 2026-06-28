@@ -1,0 +1,222 @@
+.tabla-cotizaciones-card {
+  background: white;
+  border-radius: 22px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.tabla-cotizaciones-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.4rem;
+}
+
+.tabla-cotizaciones-header h2 {
+  margin: 0;
+  color: #08255b;
+  font-size: 1.25rem;
+}
+
+.tabla-cotizaciones-header p {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.tabla-cotizaciones-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla-cotizaciones {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+
+.tabla-cotizaciones th {
+  text-align: left;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabla-cotizaciones td {
+  padding: 1rem 0.9rem;
+  border-bottom: 1px solid #eef2f7;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.tabla-cotizaciones tbody tr {
+  transition: 0.2s ease;
+}
+
+.tabla-cotizaciones tbody tr:hover {
+  background: #f8fafc;
+}
+
+.cotizacion-id {
+  color: #0f4fa8;
+  font-weight: 800;
+}
+
+.cliente-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.cliente-avatar-tabla {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  color: #0f4fa8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.cliente-cell h4 {
+  margin: 0;
+  color: #08255b;
+  font-size: 0.92rem;
+}
+
+.cliente-cell p {
+  margin: 0.2rem 0 0;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+
+
+@media (max-width: 768px) {
+  .tabla-cotizaciones-card {
+    padding: 1rem;
+  }
+}
+
+.tabla-cotizaciones thead {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 5;
+}
+
+.fila-seleccionada {
+  background: rgba(66, 180, 138, 0.08) !important;
+}
+
+.acciones-masivas {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.acciones-masivas span {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.acciones-masivas button {
+  border: none;
+  background: #f1f5f9;
+  color: #08255b;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.acciones-masivas button:hover {
+  background: #dbeafe;
+}
+
+.acciones-masivas button.danger {
+  color: #ef4444;
+}
+
+.acciones-masivas button.danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.tabla-footer-info {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.detalle-cotizacion {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+.detalle-cotizacion strong {
+  color: #08255b;
+}
+
+.detalle-cotizacion p {
+  margin: 0.35rem 0 0;
+  color: #475569;
+}
+
+@media (max-width: 768px) {
+  .detalle-cotizacion {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editar-estado-modal p,
+.confirm-eliminar-modal p {
+  color: #475569;
+  line-height: 1.7;
+  margin-top: 0;
+}
+
+.editar-estado-modal select {
+  width: 100%;
+  height: 46px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 0 1rem;
+  color: #334155;
+  outline: none;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancel-btn,
+.delete-btn {
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #f1f5f9;
+  color: #08255b;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
