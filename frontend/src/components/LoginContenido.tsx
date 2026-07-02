@@ -166,9 +166,9 @@ export default function LoginContenido() {
               
                 <div className="opcion-login">
 
-                    <a href="/recuperar-password" className="enlace-recuperar-password">
-                        ¿Olvidaste tu contraseña?
-                    </a>
+                  <Link to="/recuperar-password" className="enlace-recuperar-password">
+                      ¿Olvidaste tu contraseña?
+                  </Link>
 
                 </div>
 

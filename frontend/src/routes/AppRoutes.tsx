@@ -6,7 +6,7 @@ import Login from "../pages/Login"
 import Register from "../pages/Register";
 import PanelCliente from "../pages/PanelCliente";
 import PanelEmpresa from "../pages/PanelEmpresa";
-
+import RecuperarContrasenia from "../pages/RecuperarContrasenia";
 
 export default function AppRoutes() {
   return (
@@ -18,6 +18,7 @@ export default function AppRoutes() {
           <Route path="/register" element={<Register />}/>
           <Route path="/panel-cliente" element={<PanelCliente />}/>
           <Route path="/panel-empresa" element={<PanelEmpresa />}/>
+          <Route path="/recuperar-password" element={<RecuperarContrasenia />}/>
         </Routes>
       </BrowserRouter>
     </>

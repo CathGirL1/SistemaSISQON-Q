@@ -1,0 +1,412 @@
+*{
+    box-sizing:border-box;
+}
+
+.seccion-recuperar{
+
+    min-height:100vh;
+
+    background:#f4f4f4;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:20px;
+
+}
+
+.contenedor-recuperar{
+
+    width:100%;
+    max-width:500px;
+
+    background:white;
+
+    padding:50px;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.10);
+
+}
+
+.contenedor-recuperar h2{
+
+    font-size:2.5rem;
+
+    color:#0a2255;
+
+    text-align:center;
+
+}
+
+.subtitulo-recuperar{
+
+    margin-top:15px;
+
+    margin-bottom:35px;
+
+    color:#666;
+
+    text-align:center;
+
+    line-height:1.7;
+
+}
+
+.formulario-recuperar{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.formulario-recuperar label{
+
+    margin-top:15px;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    color:#333;
+
+}
+
+.formulario-recuperar input{
+
+    width:100%;
+
+    padding:15px;
+
+    border:1px solid #d9d9d9;
+
+    border-radius:10px;
+
+    font-size:1rem;
+
+    outline:none;
+
+    transition:.25s;
+
+}
+
+.formulario-recuperar input:focus{
+
+    border-color:#11a66d;
+
+    box-shadow:0 0 0 3px rgba(17,166,109,.15);
+
+}
+
+.boton-recuperar{
+
+    margin-top:30px;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#11a66d;
+
+    color:white;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.boton-recuperar:hover{
+
+    background:#0e8d5c;
+
+}
+
+.mensaje-codigo{
+
+    margin-top:30px;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    background:#eaf8f1;
+
+    color:#0b8b59;
+
+    text-align:center;
+
+    line-height:1.6;
+
+    font-size:.95rem;
+
+}
+
+.logo-recuperar{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:1rem;
+
+    margin-bottom:40px;
+
+}
+
+.logo-recuperar img{
+
+    width:auto;
+
+    height:65px;
+
+}
+
+.texto-logo-recuperar{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.texto-logo-recuperar h1{
+
+    margin:0;
+
+    font-size:2.2rem;
+
+    color:#0a2255;
+
+}
+
+.texto-logo-recuperar p{
+
+    margin-top:5px;
+
+    color:#666;
+
+    font-size:.95rem;
+
+}
+
+/* ===========================
+        TABLETS
+=========================== */
+
+@media (max-width:1024px){
+
+    .contenedor-recuperar{
+
+        max-width:600px;
+
+        padding:45px;
+
+    }
+
+    .contenedor-recuperar h2{
+
+        font-size:2.2rem;
+
+    }
+
+}
+
+/* ===========================
+        CELULARES
+=========================== */
+
+@media (max-width:768px){
+
+    .seccion-recuperar{
+
+        padding:20px;
+
+    }
+
+    .contenedor-recuperar{
+
+        max-width:100%;
+
+        padding:35px 25px;
+
+        border-radius:15px;
+
+    }
+
+    .contenedor-recuperar h2{
+
+        font-size:2rem;
+
+    }
+
+    .subtitulo-recuperar{
+
+        font-size:.95rem;
+
+        margin-bottom:30px;
+
+        line-height:1.6;
+
+    }
+
+    .formulario-recuperar label{
+
+        font-size:.95rem;
+
+    }
+
+    .formulario-recuperar input{
+
+        padding:14px;
+
+        font-size:1rem;
+
+    }
+
+    .boton-recuperar{
+
+        padding:15px;
+
+        font-size:1rem;
+
+    }
+
+    .mensaje-codigo{
+
+        font-size:.95rem;
+
+    }
+
+     .logo-recuperar{
+
+        gap:.8rem;
+
+        margin-bottom:30px;
+
+    }
+
+    .logo-recuperar img{
+
+        height:55px;
+
+    }
+
+    .texto-logo-recuperar h1{
+
+        font-size:1.8rem;
+
+    }
+
+    .texto-logo-recuperar p{
+
+        font-size:.85rem;
+
+    }
+
+}
+
+/* ===========================
+      CELULARES PEQUEÑOS
+=========================== */
+
+@media (max-width:480px){
+
+    .seccion-recuperar{
+
+        padding:15px;
+
+    }
+
+    .contenedor-recuperar{
+
+        padding:25px 18px;
+
+        border-radius:12px;
+
+    }
+
+    .contenedor-recuperar h2{
+
+        font-size:1.7rem;
+
+    }
+
+    .subtitulo-recuperar{
+
+        font-size:.9rem;
+
+        line-height:1.5;
+
+        margin-bottom:25px;
+
+    }
+
+    .formulario-recuperar label{
+
+        font-size:.9rem;
+
+    }
+
+    .formulario-recuperar input{
+
+        padding:13px;
+
+        font-size:.95rem;
+
+    }
+
+    .boton-recuperar{
+
+        padding:14px;
+
+        font-size:.95rem;
+
+    }
+
+    .mensaje-codigo{
+
+        padding:13px;
+
+        font-size:.9rem;
+
+    }
+
+    .logo-recuperar{
+
+        gap:.6rem;
+
+    }
+
+    .logo-recuperar img{
+
+        height:48px;
+
+    }
+
+    .texto-logo-recuperar h1{
+
+        font-size:1.5rem;
+
+    }
+
+    .texto-logo-recuperar p{
+
+        font-size:.8rem;
+
+    }
+
+}
