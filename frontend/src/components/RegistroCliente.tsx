@@ -216,6 +216,14 @@ export default function RegistroCliente(){
 
             const datos = await respuesta.json();
 
+            if (!respuesta.ok) {
+
+                setMensaje(datos.mensaje);
+
+                return;
+
+            }
+
             console.log(datos);
 
             if (respuesta.ok) {
