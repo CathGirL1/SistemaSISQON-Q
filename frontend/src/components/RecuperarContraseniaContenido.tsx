@@ -3,13 +3,105 @@ import "../styles/RecuperarContraseniaContenido.css";
 import imagenLogo from "../assets/iconoHomeMenu.png";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 export default function RecuperarContraseniaContenido(){
 
 
     const [gmail, setGmail] = useState("");
     const [codigo, setCodigo] = useState("");
+    const [mensaje, setMensaje] = useState("");
 
     const [codigoEnviado, setCodigoEnviado] = useState(false);
+    const navigate = useNavigate();
+
+    const enviarCodigo = async () => {
+        try {
+
+            const respuesta = await fetch(
+                "http://localhost:3000/api/recuperacionAcceso/enviar-codigo",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        gmail
+                    })
+                }
+            );
+
+            const resultado = await respuesta.json();
+
+            if (!respuesta.ok) {
+
+                setMensaje(resultado.mensaje);
+
+                return;
+
+            }
+
+            setCodigoEnviado(true);
+
+            setMensaje(resultado.mensaje);
+
+        } catch (error) {
+
+            console.error(error);
+
+            setMensaje("Ocurrió un error al enviar el código.");
+
+        }
+
+    }
+
+    const verificarCodigo = async () => {
+        try {
+
+            const respuesta = await fetch(
+                "http://localhost:3000/api/recuperacionAcceso/verificar-codigo",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        gmail,
+                        codigoIngresado: codigo
+                    })
+                }
+            );
+
+            const resultado = await respuesta.json();
+
+            if (!respuesta.ok) {
+
+                setMensaje(resultado.mensaje);
+
+                return;
+
+            }
+
+            if (resultado.rol === "cliente") {
+
+                navigate("/panel-cliente");
+
+            }
+
+            if (resultado.rol === "empresa") {
+
+                navigate("/panel-empresa");
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            setMensaje("Ocurrió un error al verificar el código.");
+
+        }
+
+    }
 
     return(
 
@@ -58,10 +150,18 @@ export default function RecuperarContraseniaContenido(){
 
                             <button
                                 type="button"
-                                className="boton-recuperar"
+                                className="boton-recuperar" onClick={enviarCodigo}
                             >
                                 Enviar código
                             </button>
+
+                        )}
+
+                        {mensaje && (
+
+                            <p className="mensaje-codigo">
+                                {mensaje}
+                            </p>
 
                         )}
 
@@ -69,12 +169,6 @@ export default function RecuperarContraseniaContenido(){
 
                             <>
 
-                                <p className="mensaje-codigo">
-
-                                    ✔ Te enviamos un código de verificación
-                                    a tu correo electrónico.
-
-                                </p>
 
                                 <label>Código de verificación</label>
 
@@ -87,7 +181,7 @@ export default function RecuperarContraseniaContenido(){
 
                                 <button
                                     type="button"
-                                    className="boton-recuperar"
+                                    className="boton-recuperar" onClick={verificarCodigo}
                                 >
                                     Verificar código
                                 </button>
