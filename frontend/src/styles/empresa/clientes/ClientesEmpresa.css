@@ -1,0 +1,15 @@
+.clientes-page {
+  width: 100%;
+}
+
+.clientes-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .clientes-main-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -9,6 +9,8 @@ import PanelEmpresa from "../pages/PanelEmpresa";
 import DashboardEmpresa from "../pages/DashboardEmpresa";
 import MiPerfilEmpresa from "../pages/MiPerfilEmpresa";
 import CotizacionesEmpresa from "../pages/CotizacionesEmpresa";
+import ClientesEmpresa from "../pages/ClientesEmpresa";
+import MaterialesEmpresa from "../pages/MaterialesEmpresa";
 
 export default function AppRoutes() {
   return (
@@ -23,6 +25,8 @@ export default function AppRoutes() {
           <Route path="/empresa/dashboard" element={<DashboardEmpresa />} />
           <Route path="/empresa/perfil" element={<MiPerfilEmpresa />} />
           <Route path="/empresa/cotizaciones" element={<CotizacionesEmpresa />} />
+          <Route path="/empresa/clientes" element={<ClientesEmpresa />} />
+          <Route path="/empresa/materiales" element={<MaterialesEmpresa />} />
           
         </Routes>
       </BrowserRouter>

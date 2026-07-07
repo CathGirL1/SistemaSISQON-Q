@@ -1,0 +1,164 @@
+.material-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.material-menu-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #0f4fa8;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: 0.2s;
+}
+
+.material-menu-btn:hover {
+  background: #dbeafe;
+}
+
+.material-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 42px;
+
+  width: 210px;
+
+  background: white;
+
+  border-radius: 14px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 12px 30px rgba(15, 23, 42, .15);
+
+  padding: .5rem;
+
+  z-index: 9999;
+}
+
+.material-menu-dropdown button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+
+  border: none;
+  background: transparent;
+
+  padding: .8rem;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  color: #334155;
+
+  font-size: .9rem;
+
+  transition: .2s;
+
+  text-align: left;
+}
+
+.material-menu-dropdown button:hover {
+  background: #f8fafc;
+}
+
+.material-menu-dropdown button.danger {
+  color: #ef4444;
+}
+
+.material-menu-dropdown button.danger:hover {
+  background: rgba(239,68,68,.10);
+}
+
+/* ============================
+   MODALES
+============================ */
+
+.material-modal-form {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 1rem;
+}
+
+.form-group-material {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group-material label {
+  margin-bottom: .4rem;
+  font-weight: 600;
+  color: #08255b;
+}
+
+.form-group-material input,
+.form-group-material select {
+  height: 45px;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  padding: 0 .8rem;
+  font-size: .95rem;
+}
+
+.material-modal-actions {
+  grid-column: 1 / -1;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+
+  margin-top: 1rem;
+}
+
+.material-btn-cancelar,
+.material-btn-guardar,
+.material-btn-eliminar {
+  border: none;
+  border-radius: 10px;
+  padding: .8rem 1.3rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.material-btn-cancelar {
+  background: #e2e8f0;
+}
+
+.material-btn-guardar {
+  background: #10b981;
+  color: white;
+}
+
+.material-btn-eliminar {
+  background: #ef4444;
+  color: white;
+}
+
+.actualizar-precio-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.actualizar-precio-modal input {
+  height: 45px;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  padding: 0 .8rem;
+}
+
+.eliminar-material-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

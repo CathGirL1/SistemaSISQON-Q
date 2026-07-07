@@ -1,0 +1,139 @@
+.tabla-materiales-card {
+  background: white;
+  border-radius: 22px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.tabla-materiales-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.tabla-materiales {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+}
+
+.tabla-materiales th {
+  text-align: left;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabla-materiales td {
+  padding: 1rem 0.9rem;
+  border-bottom: 1px solid #eef2f7;
+  color: #334155;
+  font-size: 0.9rem;
+
+  position: relative;
+}
+.tabla-materiales tbody tr:hover {
+  background: #f8fafc;
+}
+
+.material-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.material-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #dbeafe, #dcfce7);
+  color: #08255b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.material-cell h4 {
+  margin: 0;
+  color: #08255b;
+}
+
+.material-cell p,
+.tabla-materiales td p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.material-disponibilidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.material-disponibilidad span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.material-disponibilidad.disponible span {
+  background: #42b48a;
+}
+
+.material-disponibilidad.stock-bajo span {
+  background: #f08a24;
+}
+
+.material-disponibilidad.sin-stock span {
+  background: #ef4444;
+}
+
+.material-estado {
+  width: fit-content;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.material-estado.activo {
+  background: rgba(66, 180, 138, 0.15);
+  color: #42b48a;
+}
+
+.material-estado.inactivo {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.material-acciones {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.material-acciones button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #0f4fa8;
+  cursor: pointer;
+}
+
+.material-acciones button:hover {
+  background: #dbeafe;
+}
+
+.materiales-table-footer {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
