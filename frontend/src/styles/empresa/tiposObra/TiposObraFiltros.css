@@ -1,0 +1,32 @@
+.tipos-obra-filtros {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tipos-obra-filtros select,
+.tipos-obra-filtros-btn {
+  height: 46px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 14px;
+  padding: 0 1rem;
+  color: #334155;
+  outline: none;
+}
+
+.tipos-obra-filtros-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-weight: 700;
+  color: #08255b;
+}
+
+@media (max-width: 768px) {
+  .tipos-obra-filtros {
+    grid-template-columns: 1fr;
+  }
+}

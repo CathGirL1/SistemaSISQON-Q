@@ -1,0 +1,170 @@
+.tipo-obra-modal-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+.tipo-obra-modal-form div,
+.observaciones-tipo-modal {
+  display: flex;
+  flex-direction: column;
+}
+
+.tipo-obra-modal-form .full {
+  grid-column: 1 / -1;
+}
+
+.tipo-obra-modal-form label,
+.observaciones-tipo-modal label {
+  margin-bottom: 0.45rem;
+  font-weight: 700;
+  color: #08255b;
+  font-size: 0.9rem;
+}
+
+.tipo-obra-modal-form input,
+.tipo-obra-modal-form select,
+.tipo-obra-modal-form textarea,
+.observaciones-tipo-modal textarea {
+  width: 100%;
+  border: 1px solid #dbe2ea;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  outline: none;
+  color: #334155;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.tipo-obra-modal-form textarea,
+.observaciones-tipo-modal textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.tipo-obra-modal-form input:focus,
+.tipo-obra-modal-form select:focus,
+.tipo-obra-modal-form textarea:focus,
+.observaciones-tipo-modal textarea:focus {
+  border-color: #42b48a;
+  background: white;
+}
+
+.tipo-obra-modal-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.btn-cancelar,
+.btn-guardar,
+.btn-eliminar {
+  border: none;
+  border-radius: 12px;
+  padding: 0.85rem 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-cancelar {
+  background: #e2e8f0;
+  color: #08255b;
+}
+
+.btn-guardar {
+  background: #42b48a;
+  color: white;
+}
+
+.btn-eliminar {
+  background: #ef4444;
+  color: white;
+}
+
+.eliminar-tipo-obra-modal p {
+  color: #475569;
+  line-height: 1.7;
+  margin-top: 0;
+}
+
+/* Menú acciones */
+.tipo-obra-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.tipo-obra-menu-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #0f4fa8;
+  cursor: pointer;
+}
+
+.tipo-obra-menu-btn:hover {
+  background: #dbeafe;
+}
+
+.tipo-obra-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  width: 210px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 0.5rem;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+  z-index: 9999;
+}
+
+.tipo-obra-menu-dropdown button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tipo-obra-menu-dropdown button:hover {
+  background: #f8fafc;
+  color: #0f4fa8;
+}
+
+.tipo-obra-menu-dropdown button.danger {
+  color: #ef4444;
+}
+
+.tipo-obra-menu-dropdown button.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 768px) {
+  .tipo-obra-modal-form {
+    grid-template-columns: 1fr;
+  }
+
+  .tipo-obra-modal-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancelar,
+  .btn-guardar,
+  .btn-eliminar {
+    width: 100%;
+  }
+}

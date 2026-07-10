@@ -1,0 +1,80 @@
+import { FaEye, FaEdit, FaRegCommentDots } from "react-icons/fa";
+
+import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
+import TipoObraEstadoBadge from "./TipoObraEstadoBadge";
+import MenuAccionesTipoObra from "./MenuAccionesTipoObra";
+
+type Props = {
+  tipoObra: TipoObraEmpresa;
+  activo: boolean;
+  onSeleccionar: () => void;
+  onEditar: (tipoObra: TipoObraEmpresa) => void;
+  onObservaciones: (tipoObra: TipoObraEmpresa) => void;
+  onDuplicar: (tipoObra: TipoObraEmpresa) => void;
+  onCambiarEstado: (tipoObra: TipoObraEmpresa) => void;
+  onEliminar: (tipoObra: TipoObraEmpresa) => void;
+};
+
+export default function FilaTipoObra({
+  tipoObra,
+  activo,
+  onSeleccionar,
+  onEditar,
+  onObservaciones,
+  onDuplicar,
+  onCambiarEstado,
+  onEliminar,
+}: Props) {
+  return (
+    <tr className={activo ? "tipo-obra-fila-activa" : ""} onClick={onSeleccionar}>
+      <td>
+        <div className="tipo-obra-cell">
+          <div className={`tipo-obra-icon tipo-${tipoObra.id}`}>
+            {tipoObra.nombre.charAt(0)}
+          </div>
+
+          <div>
+            <h4>{tipoObra.nombre}</h4>
+            <p>{tipoObra.codigo}</p>
+          </div>
+        </div>
+      </td>
+
+      <td>{tipoObra.descripcion}</td>
+
+      <td>
+        <span className="materiales-asociados">
+          {tipoObra.materialesAsociados} materiales
+        </span>
+      </td>
+
+      <td>{tipoObra.tiempoAproximado}</td>
+
+      <td>
+        <TipoObraEstadoBadge estado={tipoObra.estado} />
+      </td>
+
+      <td onClick={(e) => e.stopPropagation()}>
+        <div className="tipo-obra-acciones">
+          <button title="Ver" onClick={onSeleccionar}>
+            <FaEye />
+          </button>
+
+          <button title="Editar" onClick={() => onEditar(tipoObra)}>
+            <FaEdit />
+          </button>
+
+          <button title="Observaciones" onClick={() => onObservaciones(tipoObra)}>
+            <FaRegCommentDots />
+          </button>
+
+          <MenuAccionesTipoObra
+            onDuplicar={() => onDuplicar(tipoObra)}
+            onCambiarEstado={() => onCambiarEstado(tipoObra)}
+            onEliminar={() => onEliminar(tipoObra)}
+          />
+        </div>
+      </td>
+    </tr>
+  );
+}
