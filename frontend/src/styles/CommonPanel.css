@@ -381,3 +381,65 @@
 .modal-content {
   padding: 1.5rem;
 }
+
+.panel-toast {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+
+  width: min(390px, calc(100vw - 2rem));
+
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-left: 5px solid #42b48a;
+  border-radius: 16px;
+
+  padding: 1rem 1.1rem;
+
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+
+  z-index: 5000;
+}
+
+.panel-toast.error {
+  border-left-color: #ef4444;
+}
+
+.panel-toast-icon {
+  color: #42b48a;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.panel-toast.error .panel-toast-icon {
+  color: #ef4444;
+}
+
+.panel-toast p {
+  flex: 1;
+  margin: 0;
+  color: #334155;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.panel-toast button {
+  width: 32px;
+  height: 32px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #f1f5f9;
+  color: #64748b;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

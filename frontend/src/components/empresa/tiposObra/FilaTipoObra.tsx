@@ -1,8 +1,9 @@
-import { FaEye, FaEdit, FaRegCommentDots } from "react-icons/fa";
+import { FaEye, FaEdit, FaRegCommentDots, FaClock } from "react-icons/fa";
 
 import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
 import TipoObraEstadoBadge from "./TipoObraEstadoBadge";
 import MenuAccionesTipoObra from "./MenuAccionesTipoObra";
+import IconoTipoObra from "./IconoTipoObra";
 
 type Props = {
   tipoObra: TipoObraEmpresa;
@@ -26,11 +27,14 @@ export default function FilaTipoObra({
   onEliminar,
 }: Props) {
   return (
-    <tr className={activo ? "tipo-obra-fila-activa" : ""} onClick={onSeleccionar}>
+    <tr
+      className={activo ? "tipo-obra-fila-activa" : ""}
+      onClick={onSeleccionar}
+    >
       <td>
         <div className="tipo-obra-cell">
           <div className={`tipo-obra-icon tipo-${tipoObra.id}`}>
-            {tipoObra.nombre.charAt(0)}
+            <IconoTipoObra nombre={tipoObra.nombre} />
           </div>
 
           <div>
@@ -48,13 +52,18 @@ export default function FilaTipoObra({
         </span>
       </td>
 
-      <td>{tipoObra.tiempoAproximado}</td>
+      <td>
+        <span className="tipo-obra-tiempo">
+          <FaClock />
+          {tipoObra.tiempoAproximado}
+        </span>
+      </td>
 
       <td>
         <TipoObraEstadoBadge estado={tipoObra.estado} />
       </td>
 
-      <td onClick={(e) => e.stopPropagation()}>
+      <td onClick={(evento) => evento.stopPropagation()}>
         <div className="tipo-obra-acciones">
           <button title="Ver" onClick={onSeleccionar}>
             <FaEye />
@@ -64,7 +73,10 @@ export default function FilaTipoObra({
             <FaEdit />
           </button>
 
-          <button title="Observaciones" onClick={() => onObservaciones(tipoObra)}>
+          <button
+            title="Observaciones"
+            onClick={() => onObservaciones(tipoObra)}
+          >
             <FaRegCommentDots />
           </button>
 

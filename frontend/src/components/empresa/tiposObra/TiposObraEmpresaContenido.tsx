@@ -1,8 +1,8 @@
 import "../../../styles/empresa/tiposObra/TiposObraEmpresa.css";
 
-import { useState } from "react";
 import PageHeader from "../../common/PageHeader";
 import PanelBottomCard from "../../common/PanelBottomCard";
+import Toast from "../../common/Toast";
 
 import TiposObraKPIs from "./TiposObraKPIs";
 import TiposObraFiltros from "./TiposObraFiltros";
@@ -13,104 +13,39 @@ import TipoObraModal from "./TipoObraModal";
 import ObservacionesTipoObraModal from "./ObservacionesTipoObraModal";
 import ConfirmEliminarTipoObraModal from "./ConfirmEliminarTipoObraModal";
 
-import { tiposObraData } from "../../../data/tiposObraData";
-import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
+import useTiposObra from "../../../hooks/useTiposObra";
 
 export default function TiposObraEmpresaContenido() {
-  const [tiposObra, setTiposObra] = useState<TipoObraEmpresa[]>(tiposObraData);
-  const [tipoSeleccionado, setTipoSeleccionado] = useState<TipoObraEmpresa>(tiposObraData[0]);
-  const [tipoAccion, setTipoAccion] = useState<TipoObraEmpresa | null>(null);
+  const {
+    tiposObra,
+    tipoSeleccionado,
+    tipoAccion,
 
-  const [modoModal, setModoModal] = useState<"crear" | "editar">("crear");
-  const [modalTipoObra, setModalTipoObra] = useState(false);
-  const [modalObservaciones, setModalObservaciones] = useState(false);
-  const [modalEliminar, setModalEliminar] = useState(false);
+    modoModal,
 
-  const abrirCrear = () => {
-    setTipoAccion(null);
-    setModoModal("crear");
-    setModalTipoObra(true);
-  };
+    modalTipoObra,
+    modalObservaciones,
+    modalEliminar,
 
-  const abrirEditar = (tipoObra: TipoObraEmpresa) => {
-    setTipoAccion(tipoObra);
-    setModoModal("editar");
-    setModalTipoObra(true);
-  };
+    toastVisible,
+    toastMensaje,
+    toastTipo,
 
-  const abrirObservaciones = (tipoObra: TipoObraEmpresa) => {
-    setTipoAccion(tipoObra);
-    setModalObservaciones(true);
-  };
+    seleccionarTipoObra,
 
-  const abrirEliminar = (tipoObra: TipoObraEmpresa) => {
-    setTipoAccion(tipoObra);
-    setModalEliminar(true);
-  };
+    abrirCrear,
+    abrirEditar,
+    abrirObservaciones,
+    abrirEliminar,
 
-  const cerrarModales = () => {
-    setModalTipoObra(false);
-    setModalObservaciones(false);
-    setModalEliminar(false);
-    setTipoAccion(null);
-  };
+    cerrarModales,
+    cerrarToast,
 
-  const guardarTipoObra = (tipoObraGuardado: TipoObraEmpresa) => {
-    if (modoModal === "crear") {
-      setTiposObra([...tiposObra, tipoObraGuardado]);
-      setTipoSeleccionado(tipoObraGuardado);
-    } else {
-      const listaActualizada = tiposObra.map((item) =>
-        item.id === tipoObraGuardado.id ? tipoObraGuardado : item
-      );
-
-      setTiposObra(listaActualizada);
-
-      if (tipoSeleccionado.id === tipoObraGuardado.id) {
-        setTipoSeleccionado(tipoObraGuardado);
-      }
-    }
-
-    cerrarModales();
-  };
-
-  const duplicarTipoObra = (tipoObra: TipoObraEmpresa) => {
-    const copia: TipoObraEmpresa = {
-      ...tipoObra,
-      id: Date.now(),
-      codigo: `${tipoObra.codigo}-COPIA`,
-      nombre: `${tipoObra.nombre} copia`,
-    };
-
-    setTiposObra([...tiposObra, copia]);
-  };
-
-  const cambiarEstado = (tipoObra: TipoObraEmpresa) => {
-    const nuevoEstado = tipoObra.estado === "Activo" ? "Inactivo" : "Activo";
-
-    const listaActualizada = tiposObra.map((item) =>
-      item.id === tipoObra.id ? { ...item, estado: nuevoEstado } : item
-    );
-
-    setTiposObra(listaActualizada);
-
-    if (tipoSeleccionado.id === tipoObra.id) {
-      setTipoSeleccionado({ ...tipoObra, estado: nuevoEstado });
-    }
-  };
-
-  const eliminarTipoObra = () => {
-    if (!tipoAccion) return;
-
-    const nuevaLista = tiposObra.filter((item) => item.id !== tipoAccion.id);
-    setTiposObra(nuevaLista);
-
-    if (tipoSeleccionado.id === tipoAccion.id && nuevaLista.length > 0) {
-      setTipoSeleccionado(nuevaLista[0]);
-    }
-
-    cerrarModales();
-  };
+    guardarTipoObra,
+    duplicarTipoObra,
+    cambiarEstado,
+    eliminarTipoObra,
+  } = useTiposObra();
 
   return (
     <section className="tipos-obra-page">
@@ -129,7 +64,7 @@ export default function TiposObraEmpresaContenido() {
         <TablaTiposObra
           tiposObra={tiposObra}
           tipoSeleccionado={tipoSeleccionado}
-          onSeleccionarTipo={setTipoSeleccionado}
+          onSeleccionarTipo={seleccionarTipoObra}
           onEditar={abrirEditar}
           onObservaciones={abrirObservaciones}
           onDuplicar={duplicarTipoObra}
@@ -137,7 +72,9 @@ export default function TiposObraEmpresaContenido() {
           onEliminar={abrirEliminar}
         />
 
-        <TipoObraDetallePanel tipoObra={tipoSeleccionado} />
+        <TipoObraDetallePanel
+          tipoObra={tipoSeleccionado}
+        />
       </div>
 
       <PanelBottomCard
@@ -165,6 +102,13 @@ export default function TiposObraEmpresaContenido() {
         tipoObra={tipoAccion}
         onCerrar={cerrarModales}
         onConfirmar={eliminarTipoObra}
+      />
+
+      <Toast
+        visible={toastVisible}
+        mensaje={toastMensaje}
+        tipo={toastTipo}
+        onCerrar={cerrarToast}
       />
     </section>
   );

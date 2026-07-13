@@ -12,6 +12,7 @@ import CotizacionesEmpresa from "../pages/CotizacionesEmpresa";
 import ClientesEmpresa from "../pages/ClientesEmpresa";
 import MaterialesEmpresa from "../pages/MaterialesEmpresa";
 import TiposObraEmpresa from "../pages/TiposObraEmpresa";
+import ManoObraEmpresa from "../pages/ManoObraEmpresa";
 
 export default function AppRoutes() {
   return (
@@ -29,7 +30,8 @@ export default function AppRoutes() {
           <Route path="/empresa/clientes" element={<ClientesEmpresa />} />
           <Route path="/empresa/materiales" element={<MaterialesEmpresa />} />
           <Route path="/empresa/tipos-obra" element={<TiposObraEmpresa />} />
-          
+          <Route path="/empresa/mano-obra"  element={<ManoObraEmpresa />}
+/>
         </Routes>
       </BrowserRouter>
     </>

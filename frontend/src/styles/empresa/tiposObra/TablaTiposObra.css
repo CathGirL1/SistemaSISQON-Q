@@ -132,3 +132,20 @@
   color: #64748b;
   font-size: 0.9rem;
 }
+
+.tipo-obra-icon svg {
+  font-size: 1.2rem;
+}
+
+.tipo-obra-tiempo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #475569;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tipo-obra-tiempo svg {
+  color: #64748b;
+}

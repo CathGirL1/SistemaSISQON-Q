@@ -1,10 +1,11 @@
 import "../../../styles/empresa/tiposObra/TipoObraDetallePanel.css";
 
-import { FaTimes, FaEdit, FaHardHat } from "react-icons/fa";
+import { FaTimes, FaEdit} from "react-icons/fa";
 
 import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
 import TipoObraEstadoBadge from "./TipoObraEstadoBadge";
 import TipoObraTabs from "./TipoObraTabs";
+import IconoTipoObra from "./IconoTipoObra";
 
 type Props = {
   tipoObra: TipoObraEmpresa;
@@ -19,7 +20,7 @@ export default function TipoObraDetallePanel({ tipoObra }: Props) {
 
       <div className="tipo-obra-panel-hero">
         <div className="tipo-obra-panel-icon">
-          <FaHardHat />
+        <IconoTipoObra nombre={tipoObra.nombre} />
         </div>
 
         <div>
