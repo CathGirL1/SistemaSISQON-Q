@@ -6,6 +6,7 @@ import Login from "../pages/Login"
 import Register from "../pages/Register";
 import PanelCliente from "../pages/PanelCliente";
 import PanelEmpresa from "../pages/PanelEmpresa";
+<<<<<<< HEAD
 import RecuperarContrasenia from "../pages/RecuperarContrasenia";
 import DashboardEmpresa from "../pages/DashboardEmpresa";
 import MiPerfilEmpresa from "../pages/MiPerfilEmpresa";
@@ -14,6 +15,15 @@ import ClientesEmpresa from "../pages/ClientesEmpresa";
 import MaterialesEmpresa from "../pages/MaterialesEmpresa";
 import TiposObraEmpresa from "../pages/TiposObraEmpresa";
 import ManoObraEmpresa from "../pages/ManoObraEmpresa";
+=======
+import MisProyectos from "../pages/cliente/MisProyectos";
+import MisCotizaciones from "../pages/cliente/MisCotizaciones";
+import CatalogoMateriales from "../pages/cliente/CatalogoMateriales";
+import Comparador from "../pages/cliente/Comparador";
+import Empresas from "../pages/cliente/Empresas";
+import EmpresasFavoritas from "../pages/cliente/EmpresasFavoritas";
+import AsistenteIA from "../pages/cliente/AsistenteIA";
+>>>>>>> a2d7008 (Frontend de Panel Cliente (Estático) -navegación del panel cliente)
 
 export default function AppRoutes() {
   return (
@@ -24,6 +34,7 @@ export default function AppRoutes() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />}/>
           <Route path="/panel-cliente" element={<PanelCliente />}/>
+<<<<<<< HEAD
           <Route path="/panel-empresa" element={<PanelEmpresa />}/>
           <Route path="/recuperar-password" element={<RecuperarContrasenia />}/>
           <Route path="/informacion" element={<Informacion />} />
@@ -35,6 +46,17 @@ export default function AppRoutes() {
           <Route path="/empresa/tipos-obra" element={<TiposObraEmpresa />} />
           <Route path="/empresa/mano-obra"  element={<ManoObraEmpresa />}
 />
+=======
+          <Route path="/panel-cliente/proyectos" element={<MisProyectos />} />
+          <Route path="/panel-cliente/cotizaciones" element={<MisCotizaciones />} />
+          <Route path="/panel-cliente/proyectos" element={<MisProyectos />} />
+          <Route path="/panel-cliente/materiales" element={<CatalogoMateriales />} />
+          <Route path="/panel-cliente/comparador" element={<Comparador />} />
+          <Route path="/panel-cliente/empresas" element={<Empresas />} />
+          <Route path="/panel-cliente/favoritas" element={<EmpresasFavoritas />} />
+          <Route path="/panel-cliente/asistente" element={<AsistenteIA />} />
+          <Route path="/panel-empresa" element={<PanelEmpresa />} />
+>>>>>>> a2d7008 (Frontend de Panel Cliente (Estático) -navegación del panel cliente)
         </Routes>
       </BrowserRouter>
     </>
