@@ -1,15 +1,15 @@
-import PanelClienteContenedor from "../layouts/PanelEmpresaContenedor";
-import PanelClienteContenido from "../components/PanelEmpresaContenido"
+import PanelEmpresaContenedor from "../layouts/PanelEmpresaContenedor";
+import PanelEmpresaContenido from "../components/PanelEmpresaContenido"
 
 import "../styles/PanelEmpresaContenido.css";
 export default function PanelEmpresa() {
   return (
     <>
-      <PanelClienteContenedor>
+      <PanelEmpresaContenedor>
 
-        <PanelClienteContenido/>
+        <PanelEmpresaContenido/>
         
-      </PanelClienteContenedor>
+      </PanelEmpresaContenedor>
 
     </>
    
