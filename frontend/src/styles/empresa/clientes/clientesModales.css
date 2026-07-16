@@ -130,3 +130,58 @@
     width: 100%;
   }
 }
+
+.cliente-modal-form textarea {
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+
+  border: 1px solid #dbe2ea;
+  border-radius: 12px;
+
+  padding: 0.85rem;
+  background: #f8fafc;
+
+  font: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.cliente-modal-form textarea:focus {
+  border-color: #42b48a;
+  background: white;
+}
+
+.cliente-form-error {
+  grid-column: 1 / -1;
+
+  margin: 0;
+
+  padding: 0.75rem 0.9rem;
+  border-radius: 11px;
+
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.btn-cancelar:disabled,
+.btn-guardar:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.cliente-eliminar-aviso {
+  margin-top: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.84rem;
+}
+
+.btn-eliminar:disabled,
+.btn-cancelar:disabled,
+.btn-guardar:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}

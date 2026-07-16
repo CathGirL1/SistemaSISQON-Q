@@ -1,12 +1,20 @@
 import "../../../styles/empresa/clientes/TablaClientes.css";
 
 import FilaCliente from "./FilaCliente";
+
 import type { ClienteEmpresa } from "../../../interfaces/ClienteEmpresa";
 
 type Props = {
   clientes: ClienteEmpresa[];
-  clienteSeleccionado: ClienteEmpresa;
-  onSeleccionarCliente: (cliente: ClienteEmpresa) => void;
+  clienteSeleccionado: ClienteEmpresa | null;
+
+  cargando: boolean;
+  error: string;
+
+  onSeleccionarCliente: (
+    cliente: ClienteEmpresa
+  ) => void;
+
   onWhatsapp: (cliente: ClienteEmpresa) => void;
   onEditar: (cliente: ClienteEmpresa) => void;
   onAgregarNota: (cliente: ClienteEmpresa) => void;
@@ -18,6 +26,8 @@ type Props = {
 export default function TablaClientes({
   clientes,
   clienteSeleccionado,
+  cargando,
+  error,
   onSeleccionarCliente,
   onWhatsapp,
   onEditar,
@@ -26,6 +36,31 @@ export default function TablaClientes({
   onVerHistorial,
   onEliminar,
 }: Props) {
+  if (cargando) {
+    return (
+      <div className="tabla-clientes-card">
+        <div className="clientes-estado-tabla">
+          <span className="clientes-spinner" />
+
+          <p>
+            Cargando clientes desde la base de datos...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="tabla-clientes-card">
+        <div className="clientes-estado-tabla clientes-error">
+          <h3>No se pudieron cargar los clientes</h3>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="tabla-clientes-card">
       <div className="tabla-clientes-wrapper">
@@ -43,26 +78,44 @@ export default function TablaClientes({
           </thead>
 
           <tbody>
-            {clientes.map((cliente) => (
-              <FilaCliente
-                key={cliente.id}
-                cliente={cliente}
-                activo={clienteSeleccionado.id === cliente.id}
-                onSeleccionar={() => onSeleccionarCliente(cliente)}
-                onWhatsapp={onWhatsapp}
-                onEditar={onEditar}
-                onAgregarNota={onAgregarNota}
-                onLlamar={onLlamar}
-                onVerHistorial={onVerHistorial}
-                onEliminar={onEliminar}
-              />
-            ))}
+            {clientes.length > 0 ? (
+              clientes.map((cliente) => (
+                <FilaCliente
+                  key={cliente.id}
+                  cliente={cliente}
+                  activo={
+                    clienteSeleccionado?.id === cliente.id
+                  }
+                  onSeleccionar={() =>
+                    onSeleccionarCliente(cliente)
+                  }
+                  onWhatsapp={onWhatsapp}
+                  onEditar={onEditar}
+                  onAgregarNota={onAgregarNota}
+                  onLlamar={onLlamar}
+                  onVerHistorial={onVerHistorial}
+                  onEliminar={onEliminar}
+                />
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={7}
+                  className="clientes-tabla-vacia"
+                >
+                  No hay clientes registrados en la base
+                  de datos.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="clientes-table-footer">
-        Mostrando 1 a {clientes.length} de 156 clientes
+        {clientes.length === 0
+          ? "No hay clientes para mostrar"
+          : `Mostrando 1 a ${clientes.length} de ${clientes.length} clientes`}
       </div>
     </div>
   );
