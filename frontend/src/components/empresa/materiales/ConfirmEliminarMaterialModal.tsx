@@ -1,13 +1,16 @@
 import "../../../styles/empresa/materiales/MaterialesModales.css";
 
+import { useEffect, useState } from "react";
+
 import ModalBase from "../../common/ModalBase";
+
 import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
 
 type Props = {
   abierto: boolean;
   material: MaterialEmpresa | null;
   onCerrar: () => void;
-  onConfirmar: () => void;
+  onConfirmar: () => Promise<void> | void;
 };
 
 export default function ConfirmEliminarMaterialModal({
@@ -16,7 +19,36 @@ export default function ConfirmEliminarMaterialModal({
   onCerrar,
   onConfirmar,
 }: Props) {
-  if (!material) return null;
+  const [eliminando, setEliminando] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (abierto) {
+      setEliminando(false);
+      setError("");
+    }
+  }, [abierto]);
+
+  if (!material) {
+    return null;
+  }
+
+  const confirmar = async () => {
+    try {
+      setEliminando(true);
+      setError("");
+
+      await onConfirmar();
+    } catch (errorDesconocido) {
+      setError(
+        errorDesconocido instanceof Error
+          ? errorDesconocido.message
+          : "No se pudo eliminar el material."
+      );
+    } finally {
+      setEliminando(false);
+    }
+  };
 
   return (
     <ModalBase
@@ -30,13 +62,32 @@ export default function ConfirmEliminarMaterialModal({
           <strong>{material.nombre}</strong>?
         </p>
 
+        <p className="material-eliminar-aviso">
+          Esta acción eliminará el registro de la base de
+          datos.
+        </p>
+
+        {error && (
+          <p className="material-form-error">{error}</p>
+        )}
+
         <div className="material-modal-actions">
-          <button className="material-btn-cancelar" onClick={onCerrar}>
+          <button
+            type="button"
+            className="material-btn-cancelar"
+            onClick={onCerrar}
+            disabled={eliminando}
+          >
             Cancelar
           </button>
 
-          <button className="material-btn-eliminar" onClick={onConfirmar}>
-            Eliminar
+          <button
+            type="button"
+            className="material-btn-eliminar"
+            onClick={confirmar}
+            disabled={eliminando}
+          >
+            {eliminando ? "Eliminando..." : "Eliminar"}
           </button>
         </div>
       </div>

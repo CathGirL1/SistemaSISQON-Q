@@ -1,6 +1,6 @@
 import "../../../styles/empresa/materiales/MaterialesEmpresa.css";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import PageHeader from "../../common/PageHeader";
 import MaterialesKPIs from "./MaterialesKPIs";
@@ -9,8 +9,68 @@ import TablaMateriales from "./TablaMateriales";
 import PanelBottomCard from "../../common/PanelBottomCard";
 import MaterialModal from "./MaterialModal";
 
+
+import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
+
+import {
+  crearMaterial,
+  obtenerMateriales,
+} from "../../../services/materialService";
+
+import type { CrearMaterialRequest } from "../../../services/materialService";
+
 export default function MaterialesEmpresaContenido() {
-  const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
+  const [materiales, setMateriales] = useState<
+    MaterialEmpresa[]
+  >([]);
+
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
+
+  const [modalCrearAbierto, setModalCrearAbierto] =
+    useState(false);
+
+  const cargarMateriales = useCallback(async () => {
+    try {
+      setCargando(true);
+      setError("");
+
+      const materialesObtenidos =
+        await obtenerMateriales();
+
+      setMateriales(materialesObtenidos);
+    } catch (errorDesconocido) {
+      console.error(
+        "Error al cargar materiales:",
+        errorDesconocido
+      );
+
+      setError(
+        errorDesconocido instanceof Error
+          ? errorDesconocido.message
+          : "Ocurrió un error al cargar los materiales."
+      );
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    cargarMateriales();
+  }, [cargarMateriales]);
+
+  const guardarNuevoMaterial = async (
+    datos: CrearMaterialRequest
+  ) => {
+    const materialCreado = await crearMaterial(datos);
+
+    setMateriales((listaActual) => [
+      materialCreado,
+      ...listaActual,
+    ]);
+
+    setModalCrearAbierto(false);
+  };
 
   return (
     <section className="materiales-page">
@@ -25,12 +85,15 @@ export default function MaterialesEmpresaContenido() {
 
       <MaterialesFiltros />
 
-      <TablaMateriales />
+      <TablaMateriales
+        materialesIniciales={materiales}
+        cargando={cargando}
+        error={error}
+      />
 
       <PanelBottomCard
         title="Importante"
         description="Mantené los precios y stocks actualizados para asegurar cotizaciones precisas y competitivas."
-        secondaryText="Ver guía de actualización"
       />
 
       <MaterialModal
@@ -38,6 +101,7 @@ export default function MaterialesEmpresaContenido() {
         modo="crear"
         material={null}
         onCerrar={() => setModalCrearAbierto(false)}
+        onGuardar={guardarNuevoMaterial}
       />
     </section>
   );

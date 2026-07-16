@@ -1,23 +1,44 @@
 import "../../../styles/empresa/materiales/TablaMateriales.css";
 
-import { useState } from "react";
-import { materialesData } from "../../../data/materialesData";
+import { useEffect, useState } from "react";
+
 import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
+
+import type { GuardarMaterialRequest } from "../../../services/materialService";
+import { actualizarMaterial, eliminarMaterial } from "../../../services/materialService";
 
 import FilaMaterial from "./FilaMaterial";
 import MaterialModal from "./MaterialModal";
 import ActualizarPrecioMaterialModal from "./ActualizarPrecioMaterialModal";
 import ConfirmEliminarMaterialModal from "./ConfirmEliminarMaterialModal";
 
-export default function TablaMateriales() {
-  const [materiales, setMateriales] = useState<MaterialEmpresa[]>(materialesData);
+type Props = {
+  materialesIniciales: MaterialEmpresa[];
+  cargando: boolean;
+  error: string;
+};
+
+export default function TablaMateriales({
+  materialesIniciales,
+  cargando,
+  error,
+}: Props) {
+  const [materiales, setMateriales] =
+    useState<MaterialEmpresa[]>(
+      materialesIniciales
+    );
 
   const [materialSeleccionado, setMaterialSeleccionado] =
     useState<MaterialEmpresa | null>(null);
 
   const [modalEditar, setModalEditar] = useState(false);
   const [modalPrecio, setModalPrecio] = useState(false);
-  const [modalEliminar, setModalEliminar] = useState(false);
+  const [modalEliminar, setModalEliminar] =
+    useState(false);
+
+  useEffect(() => {
+    setMateriales(materialesIniciales);
+  }, [materialesIniciales]);
 
   const abrirEditar = (material: MaterialEmpresa) => {
     setMaterialSeleccionado(material);
@@ -41,15 +62,114 @@ export default function TablaMateriales() {
     setMaterialSeleccionado(null);
   };
 
-  const eliminarMaterial = () => {
-    if (!materialSeleccionado) return;
+  const guardarEdicion = async (
+    datos: GuardarMaterialRequest
+  ) => {
+    if (!materialSeleccionado) {
+      throw new Error(
+        "No se pudo identificar el material."
+      );
+    }
 
-    setMateriales(
-      materiales.filter((material) => material.id !== materialSeleccionado.id)
+  
+
+    const materialActualizado =
+      await actualizarMaterial(
+        materialSeleccionado.id,
+        datos
+      );
+
+    setMateriales((listaActual) =>
+      listaActual.map((material) =>
+        material.id === materialActualizado.id
+          ? materialActualizado
+          : material
+      )
     );
 
     cerrarModales();
   };
+
+  const guardarNuevoPrecio = async (
+  nuevoPrecio: number
+  ) => {
+    if (!materialSeleccionado) {
+      throw new Error(
+        "No se pudo identificar el material."
+      );
+    }
+
+  const materialActualizado =
+    await actualizarMaterial(
+      materialSeleccionado.id,
+      {
+        nombre: materialSeleccionado.nombre,
+        descripcion:
+          materialSeleccionado.descripcion || null,
+        categoria:
+          materialSeleccionado.categoria,
+        unidad: materialSeleccionado.unidad,
+        costoUnitario: nuevoPrecio,
+        stock: materialSeleccionado.stockCantidad,
+        estado: materialSeleccionado.estado,
+      }
+    );
+
+  setMateriales((listaActual) =>
+    listaActual.map((material) =>
+      material.id === materialActualizado.id
+        ? materialActualizado
+        : material
+    )
+  );
+
+  cerrarModales();
+};
+
+  const confirmarEliminarMaterial = async () => {
+    if (!materialSeleccionado) {
+      throw new Error(
+        "No se pudo identificar el material."
+      );
+    }
+
+    await eliminarMaterial(materialSeleccionado.id);
+
+    setMateriales((listaActual) =>
+      listaActual.filter(
+        (material) =>
+          material.id !== materialSeleccionado.id
+      )
+    );
+
+    cerrarModales();
+  };
+
+  if (cargando) {
+    return (
+      <div className="tabla-materiales-card">
+        <div className="materiales-estado-tabla">
+          <span className="materiales-spinner" />
+          <p>
+            Cargando materiales desde la base de datos...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="tabla-materiales-card">
+        <div className="materiales-estado-tabla materiales-error">
+          <h3>
+            No se pudieron cargar los materiales
+          </h3>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="tabla-materiales-card">
@@ -70,21 +190,34 @@ export default function TablaMateriales() {
           </thead>
 
           <tbody>
-            {materiales.map((material) => (
-              <FilaMaterial
-                key={material.id}
-                material={material}
-                onEditar={abrirEditar}
-                onActualizarPrecio={abrirPrecio}
-                onEliminar={abrirEliminar}
-              />
-            ))}
+            {materiales.length > 0 ? (
+              materiales.map((material) => (
+                <FilaMaterial
+                  key={material.id}
+                  material={material}
+                  onEditar={abrirEditar}
+                  onActualizarPrecio={abrirPrecio}
+                  onEliminar={abrirEliminar}
+                />
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={9}
+                  className="materiales-tabla-vacia"
+                >
+                  No hay materiales registrados.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="materiales-table-footer">
-        Mostrando 1 a {materiales.length} de 87 materiales
+        {materiales.length === 0
+          ? "No hay materiales para mostrar"
+          : `Mostrando 1 a ${materiales.length} de ${materiales.length} materiales`}
       </div>
 
       <MaterialModal
@@ -92,19 +225,21 @@ export default function TablaMateriales() {
         modo="editar"
         material={materialSeleccionado}
         onCerrar={cerrarModales}
+        onGuardar={guardarEdicion}
       />
 
       <ActualizarPrecioMaterialModal
         abierto={modalPrecio}
         material={materialSeleccionado}
         onCerrar={cerrarModales}
+        onGuardar={guardarNuevoPrecio}
       />
 
       <ConfirmEliminarMaterialModal
         abierto={modalEliminar}
         material={materialSeleccionado}
         onCerrar={cerrarModales}
-        onConfirmar={eliminarMaterial}
+        onConfirmar={confirmarEliminarMaterial}
       />
     </div>
   );
