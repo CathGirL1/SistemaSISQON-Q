@@ -1,7 +1,6 @@
 import "../../../styles/empresa/tiposObra/TiposObraEmpresa.css";
 
 import PageHeader from "../../common/PageHeader";
-import PanelBottomCard from "../../common/PanelBottomCard";
 import Toast from "../../common/Toast";
 
 import TiposObraKPIs from "./TiposObraKPIs";
@@ -26,6 +25,10 @@ export default function TiposObraEmpresaContenido() {
     modalTipoObra,
     modalObservaciones,
     modalEliminar,
+
+    cargando,
+    guardando,
+    error,
 
     toastVisible,
     toastMensaje,
@@ -60,28 +63,42 @@ export default function TiposObraEmpresaContenido() {
 
       <TiposObraFiltros />
 
-      <div className="tipos-obra-main-grid">
-        <TablaTiposObra
-          tiposObra={tiposObra}
-          tipoSeleccionado={tipoSeleccionado}
-          onSeleccionarTipo={seleccionarTipoObra}
-          onEditar={abrirEditar}
-          onObservaciones={abrirObservaciones}
-          onDuplicar={duplicarTipoObra}
-          onCambiarEstado={cambiarEstado}
-          onEliminar={abrirEliminar}
-        />
+      {cargando && (
+        <div className="tipos-obra-vacio">
+          Cargando tipos de obra...
+        </div>
+      )}
 
-        <TipoObraDetallePanel
-          tipoObra={tipoSeleccionado}
-        />
-      </div>
+      {error && !cargando && (
+        <div className="tipos-obra-vacio">
+          {error}
+        </div>
+      )}
 
-      <PanelBottomCard
-        title="Importante"
-        description="La configuración correcta de los tipos de obra es fundamental para generar cotizaciones precisas."
-        secondaryText="Ver guía de configuración"
-      />
+      {!cargando && !error && (
+        <div className="tipos-obra-main-grid">
+          <TablaTiposObra
+            tiposObra={tiposObra}
+            tipoSeleccionado={tipoSeleccionado}
+            onSeleccionarTipo={seleccionarTipoObra}
+            onEditar={abrirEditar}
+            onObservaciones={abrirObservaciones}
+            onDuplicar={duplicarTipoObra}
+            onCambiarEstado={cambiarEstado}
+            onEliminar={abrirEliminar}
+          />
+
+          {tipoSeleccionado ? (
+            <TipoObraDetallePanel
+              tipoObra={tipoSeleccionado}
+            />
+          ) : (
+            <div className="tipos-obra-vacio">
+              No hay tipos de obra registrados.
+            </div>
+          )}
+        </div>
+      )}
 
       <TipoObraModal
         abierto={modalTipoObra}
@@ -89,6 +106,7 @@ export default function TiposObraEmpresaContenido() {
         tipoObra={tipoAccion}
         onCerrar={cerrarModales}
         onGuardar={guardarTipoObra}
+        guardando={guardando}
       />
 
       <ObservacionesTipoObraModal

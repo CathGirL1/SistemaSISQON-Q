@@ -1,4 +1,11 @@
-export type EstadoTipoObra = "Activo" | "Inactivo";
+export type DificultadTipoObra =
+  | "Baja"
+  | "Media"
+  | "Alta";
+
+export type EstadoTipoObra =
+  | "Activo"
+  | "Inactivo";
 
 export interface TipoObraEmpresa {
   id: number;
@@ -7,7 +14,7 @@ export interface TipoObraEmpresa {
   descripcion: string;
   materialesAsociados: number;
   tiempoAproximado: string;
-  dificultad: string;
+  dificultad: DificultadTipoObra;
   estado: EstadoTipoObra;
   formulaCalculo: string;
   manoObra: string;

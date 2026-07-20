@@ -5,15 +5,32 @@ import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
 
 type Props = {
   tiposObra: TipoObraEmpresa[];
-  tipoSeleccionado: TipoObraEmpresa;
-  onSeleccionarTipo: (tipoObra: TipoObraEmpresa) => void;
-  onEditar: (tipoObra: TipoObraEmpresa) => void;
-  onObservaciones: (tipoObra: TipoObraEmpresa) => void;
-  onDuplicar: (tipoObra: TipoObraEmpresa) => void;
-  onCambiarEstado: (tipoObra: TipoObraEmpresa) => void;
-  onEliminar: (tipoObra: TipoObraEmpresa) => void;
-};
+  tipoSeleccionado: TipoObraEmpresa | null;
 
+  onSeleccionarTipo: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
+
+  onEditar: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
+
+  onObservaciones: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
+
+  onDuplicar: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
+
+  onCambiarEstado: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
+
+  onEliminar: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
+};
 export default function TablaTiposObra({
   tiposObra,
   tipoSeleccionado,
@@ -44,7 +61,7 @@ export default function TablaTiposObra({
               <FilaTipoObra
                 key={tipoObra.id}
                 tipoObra={tipoObra}
-                activo={tipoSeleccionado.id === tipoObra.id}
+                activo={tipoSeleccionado?.id === tipoObra.id}
                 onSeleccionar={() => onSeleccionarTipo(tipoObra)}
                 onEditar={onEditar}
                 onObservaciones={onObservaciones}

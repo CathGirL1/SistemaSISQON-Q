@@ -7,6 +7,7 @@ import registroRoutes from "../routes/RegistroUsuario";
 import loginRoutes from "../routes/loginUsuario";
 import materialRoutes from "../routes/materialRoutes";
 import clienteRoutes from "../routes/clienteRoutes";
+import tipoObraRoutes from "../routes/tipoObraRoutes";
 
 import { connectDB } from "./database";
 
@@ -29,6 +30,7 @@ servidor.use("/api/registro", registroRoutes);
 servidor.use("/api/login", loginRoutes);
 servidor.use("/api/materiales", materialRoutes);
 servidor.use("/api/clientes", clienteRoutes);
+servidor.use("/api/tipos-obra",tipoObraRoutes);
 
 const puerto = Number(process.env.PORT) || 3000;
 
