@@ -1,182 +1,514 @@
-import { useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import { manoObraData } from "../data/manoObraData";
 import type {
   EstadoManoObra,
   ManoObraEmpresa,
-  UnidadManoObra,
 } from "../interfaces/ManoObraEmpresa";
 
-type ModoModal = "crear" | "editar";
+import {
+  actualizarManoObra,
+  crearManoObra,
+  eliminarManoObra as eliminarManoObraApi,
+  obtenerManoObra,
+} from "../services/manoObraService";
+
+type ModoModalManoObra =
+  | "crear"
+  | "editar";
+
+type FiltroEstadoManoObra =
+  | "Todos"
+  | EstadoManoObra;
+
+const obtenerMensajeError = (
+  error: unknown
+): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Ocurrió un error inesperado.";
+};
+
+const normalizarTexto = (
+  texto: string
+): string => {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+};
 
 export default function useManoObra() {
   const [trabajos, setTrabajos] =
-    useState<ManoObraEmpresa[]>(manoObraData);
+    useState<ManoObraEmpresa[]>([]);
 
-  const [trabajoAccion, setTrabajoAccion] =
-    useState<ManoObraEmpresa | null>(null);
+  const [
+    trabajoAccion,
+    setTrabajoAccion,
+  ] = useState<ManoObraEmpresa | null>(
+    null
+  );
 
-  const [modoModal, setModoModal] = useState<ModoModal>("crear");
-  const [modalTrabajo, setModalTrabajo] = useState(false);
-  const [modalEliminar, setModalEliminar] = useState(false);
+  const [modoModal, setModoModal] =
+    useState<ModoModalManoObra>("crear");
 
-  const [busqueda, setBusqueda] = useState("");
-  const [zonaFiltro, setZonaFiltro] = useState("Todas");
-  const [unidadFiltro, setUnidadFiltro] = useState("Todas");
-  const [estadoFiltro, setEstadoFiltro] = useState("Todos");
+  const [
+    modalManoObra,
+    setModalManoObra,
+  ] = useState(false);
 
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastMensaje, setToastMensaje] = useState("");
+  const [
+    modalEliminar,
+    setModalEliminar,
+  ] = useState(false);
+
+  const [busqueda, setBusqueda] =
+    useState("");
+
+  const [
+    categoriaFiltro,
+    setCategoriaFiltro,
+  ] = useState("Todas");
+
+  const [
+    unidadFiltro,
+    setUnidadFiltro,
+  ] = useState("Todas");
+
+  const [
+    estadoFiltro,
+    setEstadoFiltro,
+  ] = useState<FiltroEstadoManoObra>(
+    "Todos"
+  );
+
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [guardando, setGuardando] =
+    useState(false);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const [toastVisible, setToastVisible] =
+    useState(false);
+
+  const [toastMensaje, setToastMensaje] =
+    useState("");
+
   const [toastTipo, setToastTipo] =
-    useState<"success" | "error">("success");
+    useState<"success" | "error">(
+      "success"
+    );
 
-  const timeoutToast = useRef<number | null>(null);
+  const timeoutToast =
+    useRef<number | null>(null);
+
+  useEffect(() => {
+    void cargarManoObra();
+
+    return () => {
+      if (timeoutToast.current !== null) {
+        window.clearTimeout(
+          timeoutToast.current
+        );
+      }
+    };
+  }, []);
 
   const mostrarToast = (
     mensaje: string,
-    tipo: "success" | "error" = "success"
+    tipo: "success" | "error" =
+      "success"
   ) => {
     setToastMensaje(mensaje);
     setToastTipo(tipo);
     setToastVisible(true);
 
     if (timeoutToast.current !== null) {
-      window.clearTimeout(timeoutToast.current);
+      window.clearTimeout(
+        timeoutToast.current
+      );
     }
 
-    timeoutToast.current = window.setTimeout(() => {
-      setToastVisible(false);
-    }, 3000);
+    timeoutToast.current =
+      window.setTimeout(() => {
+        setToastVisible(false);
+        timeoutToast.current = null;
+      }, 3000);
   };
 
   const cerrarToast = () => {
     setToastVisible(false);
 
     if (timeoutToast.current !== null) {
-      window.clearTimeout(timeoutToast.current);
+      window.clearTimeout(
+        timeoutToast.current
+      );
+
+      timeoutToast.current = null;
     }
   };
+
+  const cargarManoObra =
+    async (): Promise<void> => {
+      try {
+        setCargando(true);
+        setError(null);
+
+        const datos =
+          await obtenerManoObra();
+
+        const datosOrdenados = [
+          ...datos,
+        ].sort((trabajoA, trabajoB) =>
+          trabajoA.nombre.localeCompare(
+            trabajoB.nombre
+          )
+        );
+
+        setTrabajos(datosOrdenados);
+      } catch (errorCapturado) {
+        const mensaje =
+          obtenerMensajeError(
+            errorCapturado
+          );
+
+        setError(mensaje);
+        mostrarToast(mensaje, "error");
+      } finally {
+        setCargando(false);
+      }
+    };
 
   const abrirCrear = () => {
     setTrabajoAccion(null);
     setModoModal("crear");
-    setModalTrabajo(true);
+    setModalManoObra(true);
   };
 
-  const abrirEditar = (trabajo: ManoObraEmpresa) => {
+  const abrirEditar = (
+    trabajo: ManoObraEmpresa
+  ) => {
     setTrabajoAccion(trabajo);
     setModoModal("editar");
-    setModalTrabajo(true);
+    setModalManoObra(true);
   };
 
-  const abrirEliminar = (trabajo: ManoObraEmpresa) => {
+  const abrirEliminar = (
+    trabajo: ManoObraEmpresa
+  ) => {
     setTrabajoAccion(trabajo);
     setModalEliminar(true);
   };
 
   const cerrarModales = () => {
-    setModalTrabajo(false);
+    setModalManoObra(false);
     setModalEliminar(false);
     setTrabajoAccion(null);
   };
 
-  const guardarTrabajo = (trabajoGuardado: ManoObraEmpresa) => {
-    if (modoModal === "crear") {
-      setTrabajos((listaActual) => [
-        ...listaActual,
-        trabajoGuardado,
-      ]);
+  const guardarManoObra = async (
+    trabajoFormulario: ManoObraEmpresa
+  ): Promise<void> => {
+    try {
+      setGuardando(true);
 
-      mostrarToast("Trabajo agregado correctamente.");
-    } else {
-      setTrabajos((listaActual) =>
-        listaActual.map((trabajo) =>
-          trabajo.id === trabajoGuardado.id
-            ? trabajoGuardado
-            : trabajo
-        )
-      );
+      if (modoModal === "crear") {
+        const trabajoParaCrear: ManoObraEmpresa =
+          {
+            ...trabajoFormulario,
 
-      mostrarToast("Trabajo actualizado correctamente.");
-    }
+            // El backend genera estos valores.
+            id: "",
+            codigo: "",
+          };
 
-    cerrarModales();
-  };
+        const trabajoCreado =
+          await crearManoObra(
+            trabajoParaCrear
+          );
 
-  const cambiarEstado = (trabajo: ManoObraEmpresa) => {
-    const nuevoEstado: EstadoManoObra =
-      trabajo.estado === "Activo" ? "Inactivo" : "Activo";
+        setTrabajos(
+          (listaActual) =>
+            [
+              ...listaActual,
+              trabajoCreado,
+            ].sort(
+              (trabajoA, trabajoB) =>
+                trabajoA.nombre.localeCompare(
+                  trabajoB.nombre
+                )
+            )
+        );
 
-    setTrabajos((listaActual) =>
-      listaActual.map((item) =>
-        item.id === trabajo.id
-          ? { ...item, estado: nuevoEstado }
-          : item
-      )
-    );
+        mostrarToast(
+          "Trabajo de mano de obra agregado correctamente."
+        );
+      } else {
+        if (!trabajoAccion) {
+          throw new Error(
+            "No se pudo identificar el trabajo que se desea editar."
+          );
+        }
 
-    mostrarToast(
-      nuevoEstado === "Activo"
-        ? "Trabajo activado correctamente."
-        : "Trabajo desactivado correctamente."
-    );
-  };
+        const trabajoActualizado =
+          await actualizarManoObra(
+            trabajoAccion.id,
+            trabajoFormulario
+          );
 
-  const eliminarTrabajo = () => {
-    if (!trabajoAccion) {
+        setTrabajos(
+          (listaActual) =>
+            listaActual
+              .map((trabajo) =>
+                trabajo.id ===
+                trabajoActualizado.id
+                  ? trabajoActualizado
+                  : trabajo
+              )
+              .sort(
+                (
+                  trabajoA,
+                  trabajoB
+                ) =>
+                  trabajoA.nombre.localeCompare(
+                    trabajoB.nombre
+                  )
+              )
+        );
+
+        mostrarToast(
+          "Trabajo de mano de obra actualizado correctamente."
+        );
+      }
+
+      cerrarModales();
+    } catch (errorCapturado) {
       mostrarToast(
-        "No se pudo identificar el trabajo.",
+        obtenerMensajeError(
+          errorCapturado
+        ),
         "error"
       );
-      return;
+    } finally {
+      setGuardando(false);
     }
-
-    setTrabajos((listaActual) =>
-      listaActual.filter(
-        (trabajo) => trabajo.id !== trabajoAccion.id
-      )
-    );
-
-    mostrarToast("Trabajo eliminado correctamente.");
-    cerrarModales();
   };
 
-  const trabajosFiltrados = useMemo(() => {
-    const termino = busqueda.trim().toLowerCase();
+  const cambiarEstado = async (
+    trabajo: ManoObraEmpresa
+  ): Promise<void> => {
+    try {
+      const nuevoEstado: EstadoManoObra =
+        trabajo.estado === "Activo"
+          ? "Inactivo"
+          : "Activo";
 
-    return trabajos.filter((trabajo) => {
-      const coincideBusqueda =
-        termino === "" ||
-        trabajo.trabajo.toLowerCase().includes(termino) ||
-        trabajo.descripcion.toLowerCase().includes(termino) ||
-        trabajo.codigo.toLowerCase().includes(termino);
+      const trabajoParaActualizar: ManoObraEmpresa =
+        {
+          ...trabajo,
+          estado: nuevoEstado,
+        };
 
-      const coincideZona =
-        zonaFiltro === "Todas" ||
-        trabajo.zona === zonaFiltro;
+      const trabajoActualizado =
+        await actualizarManoObra(
+          trabajo.id,
+          trabajoParaActualizar
+        );
 
-      const coincideUnidad =
-        unidadFiltro === "Todas" ||
-        trabajo.unidad === (unidadFiltro as UnidadManoObra);
-
-      const coincideEstado =
-        estadoFiltro === "Todos" ||
-        trabajo.estado === estadoFiltro;
-
-      return (
-        coincideBusqueda &&
-        coincideZona &&
-        coincideUnidad &&
-        coincideEstado
+      setTrabajos(
+        (listaActual) =>
+          listaActual.map((item) =>
+            item.id ===
+            trabajoActualizado.id
+              ? trabajoActualizado
+              : item
+          )
       );
-    });
-  }, [
-    trabajos,
-    busqueda,
-    zonaFiltro,
-    unidadFiltro,
-    estadoFiltro,
-  ]);
+
+      mostrarToast(
+        nuevoEstado === "Activo"
+          ? "Trabajo activado correctamente."
+          : "Trabajo desactivado correctamente."
+      );
+    } catch (errorCapturado) {
+      mostrarToast(
+        obtenerMensajeError(
+          errorCapturado
+        ),
+        "error"
+      );
+    }
+  };
+
+  const eliminarManoObra =
+    async (): Promise<void> => {
+      if (!trabajoAccion) {
+        mostrarToast(
+          "No se pudo identificar el trabajo de mano de obra.",
+          "error"
+        );
+
+        return;
+      }
+
+      try {
+        setGuardando(true);
+
+        await eliminarManoObraApi(
+          trabajoAccion.id
+        );
+
+        const idEliminado =
+          trabajoAccion.id;
+
+        setTrabajos(
+          (listaActual) =>
+            listaActual.filter(
+              (trabajo) =>
+                trabajo.id !==
+                idEliminado
+            )
+        );
+
+        mostrarToast(
+          "Trabajo de mano de obra eliminado correctamente."
+        );
+
+        cerrarModales();
+      } catch (errorCapturado) {
+        mostrarToast(
+          obtenerMensajeError(
+            errorCapturado
+          ),
+          "error"
+        );
+      } finally {
+        setGuardando(false);
+      }
+    };
+
+  const limpiarFiltros = () => {
+    setBusqueda("");
+    setCategoriaFiltro("Todas");
+    setUnidadFiltro("Todas");
+    setEstadoFiltro("Todos");
+  };
+
+  const categoriasDisponibles =
+    useMemo(() => {
+      return Array.from(
+        new Set(
+          trabajos
+            .map(
+              (trabajo) =>
+                trabajo.categoria
+            )
+            .filter(
+              (categoria) =>
+                categoria.trim() !== ""
+            )
+        )
+      ).sort((categoriaA, categoriaB) =>
+        categoriaA.localeCompare(
+          categoriaB
+        )
+      );
+    }, [trabajos]);
+
+  const unidadesDisponibles =
+    useMemo(() => {
+      return Array.from(
+        new Set(
+          trabajos
+            .map(
+              (trabajo) =>
+                trabajo.unidad
+            )
+            .filter(
+              (unidad) =>
+                unidad.trim() !== ""
+            )
+        )
+      ).sort((unidadA, unidadB) =>
+        unidadA.localeCompare(unidadB)
+      );
+    }, [trabajos]);
+
+  const trabajosFiltrados =
+    useMemo(() => {
+      const busquedaNormalizada =
+        normalizarTexto(busqueda);
+
+      return trabajos.filter(
+        (trabajo) => {
+          const coincideBusqueda =
+            busquedaNormalizada === "" ||
+            normalizarTexto(
+              trabajo.codigo
+            ).includes(
+              busquedaNormalizada
+            ) ||
+            normalizarTexto(
+              trabajo.nombre
+            ).includes(
+              busquedaNormalizada
+            ) ||
+            normalizarTexto(
+              trabajo.descripcion
+            ).includes(
+              busquedaNormalizada
+            ) ||
+            normalizarTexto(
+              trabajo.categoria
+            ).includes(
+              busquedaNormalizada
+            ) ||
+            normalizarTexto(
+              trabajo.unidad
+            ).includes(
+              busquedaNormalizada
+            );
+
+          const coincideCategoria =
+            categoriaFiltro === "Todas" ||
+            trabajo.categoria ===
+              categoriaFiltro;
+
+          const coincideUnidad =
+            unidadFiltro === "Todas" ||
+            trabajo.unidad ===
+              unidadFiltro;
+
+          const coincideEstado =
+            estadoFiltro === "Todos" ||
+            trabajo.estado ===
+              estadoFiltro;
+
+          return (
+            coincideBusqueda &&
+            coincideCategoria &&
+            coincideUnidad &&
+            coincideEstado
+          );
+        }
+      );
+    }, [
+      trabajos,
+      busqueda,
+      categoriaFiltro,
+      unidadFiltro,
+      estadoFiltro,
+    ]);
 
   return {
     trabajos,
@@ -184,32 +516,43 @@ export default function useManoObra() {
     trabajoAccion,
 
     modoModal,
-    modalTrabajo,
+
+    modalManoObra,
     modalEliminar,
 
     busqueda,
-    zonaFiltro,
+    categoriaFiltro,
     unidadFiltro,
     estadoFiltro,
+
+    categoriasDisponibles,
+    unidadesDisponibles,
+
+    cargando,
+    guardando,
+    error,
 
     toastVisible,
     toastMensaje,
     toastTipo,
 
     setBusqueda,
-    setZonaFiltro,
+    setCategoriaFiltro,
     setUnidadFiltro,
     setEstadoFiltro,
 
     abrirCrear,
     abrirEditar,
     abrirEliminar,
+
     cerrarModales,
-
-    guardarTrabajo,
-    cambiarEstado,
-    eliminarTrabajo,
-
     cerrarToast,
+
+    limpiarFiltros,
+
+    cargarManoObra,
+    guardarManoObra,
+    cambiarEstado,
+    eliminarManoObra,
   };
 }

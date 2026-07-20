@@ -7,7 +7,6 @@ import ModalBase from "../../common/ModalBase";
 import type {
   EstadoManoObra,
   ManoObraEmpresa,
-  UnidadManoObra,
 } from "../../../interfaces/ManoObraEmpresa";
 
 type Props = {
@@ -20,25 +19,23 @@ type Props = {
 
 type FormularioTrabajo = {
   codigo: string;
-  trabajo: string;
+  nombre: string;
   descripcion: string;
-  unidad: UnidadManoObra;
-  costoBaja: string;
-  costoMedia: string;
-  costoAlta: string;
-  zona: string;
+  categoria: string;
+  unidad: string;
+  costoUnitario: string;
+  observaciones: string;
   estado: EstadoManoObra;
 };
 
 const formularioInicial: FormularioTrabajo = {
   codigo: "",
-  trabajo: "",
+  nombre: "",
   descripcion: "",
+  categoria: "",
   unidad: "m²",
-  costoBaja: "",
-  costoMedia: "",
-  costoAlta: "",
-  zona: "Montevideo",
+  costoUnitario: "",
+  observaciones: "",
   estado: "Activo",
 };
 
@@ -60,13 +57,12 @@ export default function ManoObraModal({
     if (modo === "editar" && trabajo) {
       setFormulario({
         codigo: trabajo.codigo,
-        trabajo: trabajo.trabajo,
+        nombre: trabajo.nombre,
         descripcion: trabajo.descripcion,
+        categoria: trabajo.categoria,
         unidad: trabajo.unidad,
-        costoBaja: String(trabajo.costoBaja),
-        costoMedia: String(trabajo.costoMedia),
-        costoAlta: String(trabajo.costoAlta),
-        zona: trabajo.zona,
+        costoUnitario: String(trabajo.costoUnitario),
+        observaciones: trabajo.observaciones,
         estado: trabajo.estado,
       });
     } else {
@@ -89,48 +85,31 @@ export default function ManoObraModal({
   const guardar = () => {
     if (
       !formulario.codigo.trim() ||
-      !formulario.trabajo.trim() ||
-      !formulario.descripcion.trim()
+      !formulario.nombre.trim() ||
+      !formulario.descripcion.trim() ||
+      !formulario.categoria.trim()
     ) {
-      setError("Completá los campos obligatorios.");
+      setError("Completá todos los campos obligatorios.");
       return;
     }
 
-    const costos = [
-      Number(formulario.costoBaja),
-      Number(formulario.costoMedia),
-      Number(formulario.costoAlta),
-    ];
+    const costo = Number(formulario.costoUnitario);
 
-    if (costos.some((costo) => Number.isNaN(costo) || costo < 0)) {
-      setError("Los costos deben ser números válidos.");
+    if (Number.isNaN(costo) || costo < 0) {
+      setError("El costo unitario debe ser un número válido.");
       return;
     }
-
-    if (!(costos[0] <= costos[1] && costos[1] <= costos[2])) {
-      setError(
-        "El costo bajo debe ser menor o igual al medio, y el medio menor o igual al alto."
-      );
-      return;
-    }
-
-    const fechaActual = new Date();
 
     const trabajoGuardado: ManoObraEmpresa = {
-      id: trabajo?.id ?? Date.now(),
+      id: trabajo?.id ?? String(Date.now()),
       codigo: formulario.codigo.trim(),
-      trabajo: formulario.trabajo.trim(),
+      nombre: formulario.nombre.trim(),
       descripcion: formulario.descripcion.trim(),
+      categoria: formulario.categoria.trim(),
       unidad: formulario.unidad,
-      costoBaja: costos[0],
-      costoMedia: costos[1],
-      costoAlta: costos[2],
-      zona: formulario.zona,
-      ultimaActualizacion: fechaActual.toLocaleDateString("es-UY"),
-      horaActualizacion: fechaActual.toLocaleTimeString("es-UY", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      costoUnitario: costo,
+      observaciones: formulario.observaciones.trim(),
+      ultimaActualizacion: new Date().toLocaleDateString("es-UY"),
       estado: formulario.estado,
     };
 
@@ -143,139 +122,107 @@ export default function ManoObraModal({
       titulo={
         modo === "crear"
           ? "Agregar trabajo"
-          : `Editar trabajo - ${trabajo?.trabajo ?? ""}`
+          : `Editar trabajo - ${trabajo?.nombre ?? ""}`
       }
       onCerrar={onCerrar}
     >
       <form
         className="mano-obra-modal-form"
-        onSubmit={(evento) => {
-          evento.preventDefault();
+        onSubmit={(e) => {
+          e.preventDefault();
           guardar();
         }}
       >
         <div className="campo-mano-obra">
-          <label htmlFor="codigo-trabajo">Código *</label>
+          <label>Código *</label>
           <input
-            id="codigo-trabajo"
             type="text"
             value={formulario.codigo}
-            placeholder="Ej: MO-009"
-            onChange={(evento) =>
-              actualizarCampo("codigo", evento.target.value)
+            onChange={(e) =>
+              actualizarCampo("codigo", e.target.value)
             }
           />
         </div>
 
         <div className="campo-mano-obra">
-          <label htmlFor="nombre-trabajo">Nombre del trabajo *</label>
+          <label>Nombre *</label>
           <input
-            id="nombre-trabajo"
             type="text"
-            value={formulario.trabajo}
-            placeholder="Ej: Colocación de revestimiento"
-            onChange={(evento) =>
-              actualizarCampo("trabajo", evento.target.value)
+            value={formulario.nombre}
+            onChange={(e) =>
+              actualizarCampo("nombre", e.target.value)
             }
           />
         </div>
 
         <div className="campo-mano-obra campo-completo">
-          <label htmlFor="descripcion-trabajo">Descripción *</label>
+          <label>Descripción *</label>
           <textarea
-            id="descripcion-trabajo"
             value={formulario.descripcion}
-            placeholder="Describí brevemente el trabajo..."
-            onChange={(evento) =>
-              actualizarCampo("descripcion", evento.target.value)
+            onChange={(e) =>
+              actualizarCampo("descripcion", e.target.value)
             }
           />
         </div>
 
         <div className="campo-mano-obra">
-          <label htmlFor="unidad-trabajo">Unidad de medida</label>
-          <select
-            id="unidad-trabajo"
+          <label>Categoría *</label>
+          <input
+            type="text"
+            value={formulario.categoria}
+            onChange={(e) =>
+              actualizarCampo("categoria", e.target.value)
+            }
+          />
+        </div>
+
+        <div className="campo-mano-obra">
+          <label>Unidad</label>
+          <input
+            type="text"
             value={formulario.unidad}
-            onChange={(evento) =>
+            onChange={(e) =>
+              actualizarCampo("unidad", e.target.value)
+            }
+          />
+        </div>
+
+        <div className="campo-mano-obra">
+          <label>Costo unitario *</label>
+          <input
+            type="number"
+            min="0"
+            value={formulario.costoUnitario}
+            onChange={(e) =>
               actualizarCampo(
-                "unidad",
-                evento.target.value as UnidadManoObra
+                "costoUnitario",
+                e.target.value
               )
             }
-          >
-            <option value="m²">m²</option>
-            <option value="día">Día</option>
-            <option value="punto">Punto</option>
-            <option value="unidad">Unidad</option>
-            <option value="metro">Metro</option>
-            <option value="hora">Hora</option>
-          </select>
+          />
+        </div>
+
+        <div className="campo-mano-obra campo-completo">
+          <label>Observaciones</label>
+          <textarea
+            value={formulario.observaciones}
+            onChange={(e) =>
+              actualizarCampo(
+                "observaciones",
+                e.target.value
+              )
+            }
+          />
         </div>
 
         <div className="campo-mano-obra">
-          <label htmlFor="zona-trabajo">Zona</label>
+          <label>Estado</label>
           <select
-            id="zona-trabajo"
-            value={formulario.zona}
-            onChange={(evento) =>
-              actualizarCampo("zona", evento.target.value)
-            }
-          >
-            <option value="Montevideo">Montevideo</option>
-            <option value="Canelones">Canelones</option>
-            <option value="Maldonado">Maldonado</option>
-          </select>
-        </div>
-
-        <div className="campo-mano-obra">
-          <label htmlFor="costo-bajo">Costo bajo</label>
-          <input
-            id="costo-bajo"
-            type="number"
-            min="0"
-            value={formulario.costoBaja}
-            onChange={(evento) =>
-              actualizarCampo("costoBaja", evento.target.value)
-            }
-          />
-        </div>
-
-        <div className="campo-mano-obra">
-          <label htmlFor="costo-medio">Costo medio</label>
-          <input
-            id="costo-medio"
-            type="number"
-            min="0"
-            value={formulario.costoMedia}
-            onChange={(evento) =>
-              actualizarCampo("costoMedia", evento.target.value)
-            }
-          />
-        </div>
-
-        <div className="campo-mano-obra">
-          <label htmlFor="costo-alto">Costo alto</label>
-          <input
-            id="costo-alto"
-            type="number"
-            min="0"
-            value={formulario.costoAlta}
-            onChange={(evento) =>
-              actualizarCampo("costoAlta", evento.target.value)
-            }
-          />
-        </div>
-
-        <div className="campo-mano-obra">
-          <label htmlFor="estado-trabajo">Estado</label>
-          <select
-            id="estado-trabajo"
             value={formulario.estado}
-            onChange={(evento) =>
+            onChange={(e) =>
               actualizarCampo(
                 "estado",
-                evento.target.value as EstadoManoObra
+                e.target.value as EstadoManoObra
               )
             }
           >
@@ -285,7 +232,9 @@ export default function ManoObraModal({
         </div>
 
         {error && (
-          <p className="mano-obra-form-error">{error}</p>
+          <p className="mano-obra-form-error">
+            {error}
+          </p>
         )}
 
         <div className="mano-obra-modal-actions">

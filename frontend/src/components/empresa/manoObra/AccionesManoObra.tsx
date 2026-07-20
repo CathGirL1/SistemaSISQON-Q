@@ -57,7 +57,7 @@ export default function AccionesManoObra({
         <button
           type="button"
           title="Más opciones"
-          onClick={() => setMenuAbierto((valor) => !valor)}
+          onClick={() => setMenuAbierto((abierto) => !abierto)}
         >
           <FaEllipsisV />
         </button>
@@ -87,7 +87,9 @@ export default function AccionesManoObra({
             <button
               type="button"
               className="danger"
-              onClick={() => ejecutar(() => onEliminar(trabajo))}
+              onClick={() =>
+                ejecutar(() => onEliminar(trabajo))
+              }
             >
               <FaTrashAlt />
               Eliminar

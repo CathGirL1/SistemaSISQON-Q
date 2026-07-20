@@ -3,7 +3,7 @@ import "../../../styles/empresa/manoObra/ManoObraKPIs.css";
 import {
   FaUsers,
   FaDollarSign,
-  FaMapMarkerAlt,
+  FaTags,
   FaChartLine,
 } from "react-icons/fa";
 
@@ -24,14 +24,24 @@ export default function ManoObraKPIs({ trabajos }: Props) {
       ? 0
       : Math.round(
           trabajos.reduce(
-            (total, trabajo) => total + trabajo.costoMedia,
+            (total, trabajo) => total + trabajo.costoUnitario,
             0
           ) / trabajos.length
         );
 
-  const zonas = new Set(
-    trabajos.map((trabajo) => trabajo.zona)
+  const categorias = new Set(
+    trabajos.map((trabajo) => trabajo.categoria)
   ).size;
+
+  const ultimaActualizacion =
+    trabajos.length === 0
+      ? "-"
+      : trabajos.reduce((ultima, actual) =>
+          new Date(actual.ultimaActualizacion) >
+          new Date(ultima.ultimaActualizacion)
+            ? actual
+            : ultima
+        ).ultimaActualizacion;
 
   const formatoMoneda = new Intl.NumberFormat("es-UY", {
     style: "currency",
@@ -42,7 +52,7 @@ export default function ManoObraKPIs({ trabajos }: Props) {
   return (
     <div className="mano-obra-kpis">
       <KpiCard
-        title="Tipos de trabajo"
+        title="Trabajos activos"
         value={trabajosActivos.length}
         icon={<FaUsers />}
         variant="blue"
@@ -56,15 +66,15 @@ export default function ManoObraKPIs({ trabajos }: Props) {
       />
 
       <KpiCard
-        title="Zonas configuradas"
-        value={zonas}
-        icon={<FaMapMarkerAlt />}
+        title="Categorías"
+        value={categorias}
+        icon={<FaTags />}
         variant="yellow"
       />
 
       <KpiCard
         title="Última actualización"
-        value="28/05/2024"
+        value={ultimaActualizacion}
         icon={<FaChartLine />}
         variant="purple"
       />

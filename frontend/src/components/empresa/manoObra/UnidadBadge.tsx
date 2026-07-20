@@ -1,7 +1,5 @@
-import type { UnidadManoObra } from "../../../interfaces/ManoObraEmpresa";
-
 type Props = {
-  unidad: UnidadManoObra;
+  unidad: string;
 };
 
 export default function UnidadBadge({ unidad }: Props) {
@@ -9,6 +7,7 @@ export default function UnidadBadge({ unidad }: Props) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace("²", "2")
+    .replace(/\s+/g, "-")
     .toLowerCase();
 
   return (

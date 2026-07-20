@@ -1,27 +1,20 @@
 export type EstadoManoObra = "Activo" | "Inactivo";
 
-export type UnidadManoObra =
-  | "m²"
-  | "día"
-  | "punto"
-  | "unidad"
-  | "metro"
-  | "hora";
-
 export interface ManoObraEmpresa {
-  id: number;
+  id: string;
   codigo: string;
-  trabajo: string;
+
+  nombre: string;
   descripcion: string;
-  unidad: UnidadManoObra;
 
-  costoBaja: number;
-  costoMedia: number;
-  costoAlta: number;
+  categoria: string;
+  unidad: string;
 
-  zona: string;
+  costoUnitario: number;
+
+  observaciones: string;
+
   ultimaActualizacion: string;
-  horaActualizacion: string;
 
   estado: EstadoManoObra;
 }

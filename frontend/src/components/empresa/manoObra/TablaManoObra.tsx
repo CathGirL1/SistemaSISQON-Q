@@ -22,42 +22,45 @@ export default function TablaManoObra({
         <table className="tabla-mano-obra">
           <thead>
             <tr>
-              <th rowSpan={2}>Trabajo</th>
-              <th rowSpan={2}>Descripción</th>
-              <th rowSpan={2}>Unidad de medida</th>
-              <th colSpan={3} className="costo-grupo">
-                Costo de mano de obra
-              </th>
-              <th rowSpan={2}>Zona</th>
-              <th rowSpan={2}>Última actualización</th>
-              <th rowSpan={2}>Estado</th>
-              <th rowSpan={2}>Acciones</th>
-            </tr>
-
-            <tr>
-              <th>Baja</th>
-              <th>Media</th>
-              <th>Alta</th>
+              <th>Trabajo</th>
+              <th>Descripción</th>
+              <th>Categoría</th>
+              <th>Unidad</th>
+              <th>Costo unitario</th>
+              <th>Última actualización</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
 
           <tbody>
-            {trabajos.map((trabajo) => (
-              <FilaManoObra
-                key={trabajo.id}
-                trabajo={trabajo}
-                onEditar={onEditar}
-                onCambiarEstado={onCambiarEstado}
-                onEliminar={onEliminar}
-              />
-            ))}
+            {trabajos.length > 0 ? (
+              trabajos.map((trabajo) => (
+                <FilaManoObra
+                  key={trabajo.id}
+                  trabajo={trabajo}
+                  onEditar={onEditar}
+                  onCambiarEstado={onCambiarEstado}
+                  onEliminar={onEliminar}
+                />
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={8}
+                  className="materiales-tabla-vacia"
+                >
+                  No hay trabajos registrados.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="mano-obra-table-footer">
         {trabajos.length === 0 ? (
-          <span>No se encontraron trabajos.</span>
+          <span>No hay trabajos para mostrar.</span>
         ) : (
           <span>
             Mostrando 1 a {trabajos.length} de {trabajos.length} trabajos
@@ -66,7 +69,9 @@ export default function TablaManoObra({
 
         <div className="mano-obra-paginacion">
           <button type="button">‹</button>
-          <button type="button" className="active">1</button>
+          <button type="button" className="active">
+            1
+          </button>
           <button type="button">2</button>
           <button type="button">3</button>
           <button type="button">›</button>

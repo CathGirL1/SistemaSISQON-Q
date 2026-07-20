@@ -4,23 +4,23 @@ import { FaFilter, FaSearch } from "react-icons/fa";
 
 type Props = {
   busqueda: string;
-  zona: string;
+  categoria: string;
   unidad: string;
   estado: string;
 
   onBusquedaChange: (valor: string) => void;
-  onZonaChange: (valor: string) => void;
+  onCategoriaChange: (valor: string) => void;
   onUnidadChange: (valor: string) => void;
   onEstadoChange: (valor: string) => void;
 };
 
 export default function ManoObraFiltros({
   busqueda,
-  zona,
+  categoria,
   unidad,
   estado,
   onBusquedaChange,
-  onZonaChange,
+  onCategoriaChange,
   onUnidadChange,
   onEstadoChange,
 }: Props) {
@@ -40,15 +40,19 @@ export default function ManoObraFiltros({
       </div>
 
       <select
-        value={zona}
+        value={categoria}
         onChange={(evento) =>
-          onZonaChange(evento.target.value)
+          onCategoriaChange(evento.target.value)
         }
       >
-        <option value="Todas">Todas las zonas</option>
-        <option value="Montevideo">Montevideo</option>
-        <option value="Canelones">Canelones</option>
-        <option value="Maldonado">Maldonado</option>
+        <option value="Todas">Todas las categorías</option>
+        <option value="Albañilería">Albañilería</option>
+        <option value="Pintura">Pintura</option>
+        <option value="Electricidad">Electricidad</option>
+        <option value="Sanitaria">Sanitaria</option>
+        <option value="Carpintería">Carpintería</option>
+        <option value="Herrería">Herrería</option>
+        <option value="Otros">Otros</option>
       </select>
 
       <select
@@ -60,10 +64,10 @@ export default function ManoObraFiltros({
         <option value="Todas">Todas las unidades</option>
         <option value="m²">m²</option>
         <option value="día">Día</option>
-        <option value="punto">Punto</option>
-        <option value="unidad">Unidad</option>
-        <option value="metro">Metro</option>
         <option value="hora">Hora</option>
+        <option value="metro">Metro</option>
+        <option value="unidad">Unidad</option>
+        <option value="punto">Punto</option>
       </select>
 
       <select
@@ -77,7 +81,10 @@ export default function ManoObraFiltros({
         <option value="Inactivo">Inactivo</option>
       </select>
 
-      <button type="button" className="mano-obra-filtros-btn">
+      <button
+        type="button"
+        className="mano-obra-filtros-btn"
+      >
         <FaFilter />
         Filtros
       </button>

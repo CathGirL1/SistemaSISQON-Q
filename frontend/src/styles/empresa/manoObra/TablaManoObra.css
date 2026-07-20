@@ -352,3 +352,10 @@
     align-items: flex-start;
   }
 }
+
+.mano-obra-tabla-vacia {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-style: italic;
+}

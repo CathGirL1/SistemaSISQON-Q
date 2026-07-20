@@ -10,9 +10,9 @@ import {
 
 import type { ManoObraEmpresa } from "../../../interfaces/ManoObraEmpresa";
 
+import AccionesManoObra from "./AccionesManoObra";
 import EstadoManoObraBadge from "./EstadoManoObraBadge";
 import UnidadBadge from "./UnidadBadge";
-import AccionesManoObra from "./AccionesManoObra";
 
 type Props = {
   trabajo: ManoObraEmpresa;
@@ -25,13 +25,15 @@ function obtenerIconoTrabajo(nombre: string) {
   const normalizado = nombre.toLowerCase();
 
   if (normalizado.includes("quincho")) return <FaHome />;
-  if (normalizado.includes("albañilería")) return <FaToolbox />;
+  if (normalizado.includes("albañiler")) return <FaToolbox />;
   if (normalizado.includes("techo")) return <FaThLarge />;
   if (normalizado.includes("pintura")) return <FaPaintRoller />;
-  if (normalizado.includes("eléctrica")) return <FaBolt />;
+  if (normalizado.includes("eléctr")) return <FaBolt />;
+  if (normalizado.includes("electr")) return <FaBolt />;
   if (normalizado.includes("sanitaria")) return <FaWater />;
+  if (normalizado.includes("sanitar")) return <FaWater />;
   if (normalizado.includes("piso")) return <FaThLarge />;
-  if (normalizado.includes("aberturas")) return <FaWindowMaximize />;
+  if (normalizado.includes("abertura")) return <FaWindowMaximize />;
 
   return <FaToolbox />;
 }
@@ -53,11 +55,11 @@ export default function FilaManoObra({
       <td>
         <div className="trabajo-cell">
           <div className={`trabajo-icon trabajo-icon-${trabajo.id}`}>
-            {obtenerIconoTrabajo(trabajo.trabajo)}
+            {obtenerIconoTrabajo(trabajo.nombre)}
           </div>
 
           <div>
-            <h4>{trabajo.trabajo}</h4>
+            <h4>{trabajo.nombre}</h4>
             <p>{trabajo.codigo}</p>
           </div>
         </div>
@@ -67,30 +69,17 @@ export default function FilaManoObra({
         <p className="trabajo-descripcion">{trabajo.descripcion}</p>
       </td>
 
+      <td>{trabajo.categoria}</td>
+
       <td>
         <UnidadBadge unidad={trabajo.unidad} />
       </td>
 
       <td className="costo-cell">
-        {formatoMoneda.format(trabajo.costoBaja)}
+        {formatoMoneda.format(trabajo.costoUnitario)}
       </td>
 
-      <td className="costo-cell">
-        {formatoMoneda.format(trabajo.costoMedia)}
-      </td>
-
-      <td className="costo-cell">
-        {formatoMoneda.format(trabajo.costoAlta)}
-      </td>
-
-      <td>{trabajo.zona}</td>
-
-      <td>
-        <div className="actualizacion-cell">
-          <strong>{trabajo.ultimaActualizacion}</strong>
-          <span>{trabajo.horaActualizacion}</span>
-        </div>
-      </td>
+      <td>{trabajo.ultimaActualizacion}</td>
 
       <td>
         <EstadoManoObraBadge estado={trabajo.estado} />

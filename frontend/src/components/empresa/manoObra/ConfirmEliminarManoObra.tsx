@@ -28,12 +28,11 @@ export default function ConfirmEliminarManoObra({
       <div className="eliminar-mano-obra-modal">
         <p>
           ¿Seguro que querés eliminar el trabajo{" "}
-          <strong>{trabajo.trabajo}</strong>?
+          <strong>{trabajo.nombre}</strong>?
         </p>
 
         <span>
-          Esta acción solo modifica los datos visuales por ahora. Cuando
-          conectemos el backend, se aplicará en la base de datos.
+          Esta acción eliminará el registro de la base de datos y no podrá deshacerse.
         </span>
 
         <div className="mano-obra-modal-actions">
