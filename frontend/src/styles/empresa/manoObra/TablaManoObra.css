@@ -1,0 +1,361 @@
+.tabla-mano-obra-card {
+  background: white;
+  border-radius: 22px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.tabla-mano-obra-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.tabla-mano-obra {
+  width: 100%;
+  min-width: 1250px;
+  border-collapse: collapse;
+}
+
+.tabla-mano-obra th {
+  padding: 0.85rem 0.9rem;
+  text-align: left;
+
+  color: #64748b;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+
+  background: #fafcfe;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabla-mano-obra th.costo-grupo {
+  text-align: center;
+  color: #08255b;
+}
+
+.tabla-mano-obra td {
+  padding: 1rem 0.9rem;
+
+  color: #334155;
+  font-size: 0.88rem;
+
+  border-bottom: 1px solid #eef2f7;
+  position: relative;
+}
+
+.tabla-mano-obra tbody tr {
+  transition: background 0.2s ease;
+}
+
+.tabla-mano-obra tbody tr:hover {
+  background: #f8fafc;
+}
+
+.trabajo-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 210px;
+}
+
+.trabajo-icon {
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: #dbeafe;
+  color: #0f4fa8;
+
+  font-size: 1.1rem;
+}
+
+.trabajo-icon-1,
+.trabajo-icon-4,
+.trabajo-icon-7 {
+  background: rgba(240, 138, 36, 0.14);
+  color: #f08a24;
+}
+
+.trabajo-icon-2,
+.trabajo-icon-5,
+.trabajo-icon-8 {
+  background: #dbeafe;
+  color: #0f4fa8;
+}
+
+.trabajo-icon-3,
+.trabajo-icon-6 {
+  background: rgba(66, 180, 138, 0.15);
+  color: #2a9d74;
+}
+
+.trabajo-cell h4 {
+  margin: 0;
+  color: #08255b;
+  font-size: 0.91rem;
+}
+
+.trabajo-cell p {
+  margin: 0.25rem 0 0;
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.trabajo-descripcion {
+  max-width: 240px;
+  margin: 0;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.costo-cell {
+  color: #08255b !important;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.actualizacion-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.actualizacion-cell strong {
+  color: #334155;
+  font-size: 0.84rem;
+}
+
+.actualizacion-cell span {
+  color: #64748b;
+  font-size: 0.76rem;
+}
+
+.unidad-mano-obra,
+.estado-mano-obra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+  padding: 0.42rem 0.76rem;
+
+  border-radius: 999px;
+
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.unidad-m2 {
+  background: #dbeafe;
+  color: #0f4fa8;
+}
+
+.unidad-dia {
+  background: rgba(66, 180, 138, 0.15);
+  color: #2a9d74;
+}
+
+.unidad-punto {
+  background: rgba(155, 93, 229, 0.15);
+  color: #8b4bd6;
+}
+
+.unidad-unidad,
+.unidad-metro,
+.unidad-hora {
+  background: rgba(240, 138, 36, 0.15);
+  color: #d97706;
+}
+
+.estado-mano-obra.activo {
+  background: rgba(66, 180, 138, 0.15);
+  color: #2a9d74;
+}
+
+.estado-mano-obra.inactivo {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.acciones-mano-obra {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.acciones-mano-obra > button,
+.menu-mano-obra > button {
+  width: 34px;
+  height: 34px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #f1f5f9;
+  color: #0f4fa8;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.acciones-mano-obra > button:hover,
+.menu-mano-obra > button:hover {
+  background: #dbeafe;
+}
+
+.estado-switch {
+  width: 42px !important;
+  height: 24px !important;
+
+  padding: 3px;
+  justify-content: flex-start !important;
+
+  border-radius: 999px !important;
+
+  background: #cbd5e1 !important;
+}
+
+.estado-switch span {
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+  background: white;
+
+  transition: transform 0.2s ease;
+}
+
+.estado-switch.activo {
+  background: #42b48a !important;
+}
+
+.estado-switch.activo span {
+  transform: translateX(18px);
+}
+
+.menu-mano-obra {
+  position: relative;
+}
+
+.menu-mano-obra-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+
+  width: 190px;
+
+  padding: 0.45rem;
+
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+
+  z-index: 200;
+}
+
+.menu-mano-obra-dropdown button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  padding: 0.75rem 0.8rem;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+  color: #334155;
+
+  font-size: 0.85rem;
+  font-weight: 650;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.menu-mano-obra-dropdown button:hover {
+  background: #f8fafc;
+  color: #0f4fa8;
+}
+
+.menu-mano-obra-dropdown button.danger {
+  color: #ef4444;
+}
+
+.menu-mano-obra-dropdown button.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.mano-obra-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  margin-top: 1rem;
+
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.mano-obra-paginacion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mano-obra-paginacion button {
+  width: 34px;
+  height: 34px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  background: white;
+  color: #334155;
+
+  cursor: pointer;
+}
+
+.mano-obra-paginacion button.active {
+  border-color: #42b48a;
+  background: #42b48a;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .tabla-mano-obra-card {
+    padding: 1rem;
+  }
+
+  .mano-obra-table-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.mano-obra-tabla-vacia {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-style: italic;
+}

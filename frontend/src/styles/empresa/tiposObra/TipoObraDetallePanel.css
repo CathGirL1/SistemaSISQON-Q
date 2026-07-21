@@ -1,0 +1,288 @@
+.tipo-obra-detalle-panel {
+  background: white;
+  border-radius: 22px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+  position: relative;
+}
+
+.tipo-obra-panel-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  background: #f1f5f9;
+  color: #08255b;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.tipo-obra-panel-hero {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-right: 2rem;
+  margin-bottom: 1rem;
+}
+
+.tipo-obra-panel-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: rgba(66, 180, 138, 0.15);
+  color: #42b48a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+}
+
+.tipo-obra-panel-hero h3 {
+  margin: 0;
+  color: #08255b;
+  font-size: 1.35rem;
+}
+
+.tipo-obra-panel-hero p {
+  margin: 0.3rem 0 0;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.tipo-obra-panel-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.tipo-obra-panel-status > span {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.tipo-obra-tabs {
+  display: flex;
+  gap: 0.8rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+
+.tipo-obra-tabs button {
+  border: none;
+  background: transparent;
+  padding: 0.9rem 0.2rem;
+  color: #64748b;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tipo-obra-tabs button.active {
+  color: #42b48a;
+  border-bottom: 2px solid #42b48a;
+}
+
+.tipo-obra-tab-content {
+  color: #475569;
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+
+.detalle-box {
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  padding: 0.9rem;
+  background: #f8fafc;
+}
+
+.detalle-box span {
+  display: block;
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.detalle-box strong {
+  color: #08255b;
+  font-size: 1rem;
+}
+
+.detalle-section {
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  padding: 0.9rem;
+  margin-top: 0.8rem;
+}
+
+.detalle-section h4 {
+  margin: 0 0 0.45rem;
+  color: #08255b;
+  font-size: 0.9rem;
+}
+
+.detalle-section p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+  font-size: 0.88rem;
+}
+
+.mini-table {
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.mini-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 0.8fr;
+  padding: 0.8rem;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 0.85rem;
+}
+
+.mini-row:last-child {
+  border-bottom: none;
+}
+
+.mini-row.head {
+  background: #f8fafc;
+  font-weight: 800;
+  color: #08255b;
+}
+
+.formula-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.formula-box div {
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  color: #08255b;
+  font-weight: 800;
+}
+
+.formula-box span {
+  color: #42b48a;
+  font-weight: 900;
+}
+
+.formula-box .total {
+  background: rgba(66, 180, 138, 0.15);
+  color: #087f5b;
+}
+
+.formula-box p {
+  width: 100%;
+  margin: 0.8rem 0 0;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.mano-obra-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+
+.mano-obra-grid div {
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  padding: 0.9rem;
+}
+
+.mano-obra-grid span {
+  display: block;
+  color: #64748b;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.mano-obra-grid strong {
+  color: #08255b;
+}
+
+.extras-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.extras-list div {
+  border: 1px solid #eef2f7;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 0.8rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.extras-list span {
+  color: #42b48a;
+  margin-right: 0.5rem;
+  font-weight: 900;
+}
+
+.tipo-obra-panel-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.3rem;
+}
+
+.desactivar-btn,
+.editar-config-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.desactivar-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.editar-config-btn {
+  flex: 1;
+  background: #42b48a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .detalle-grid,
+  .mano-obra-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipo-obra-panel-actions {
+    flex-direction: column;
+  }
+
+  .tipo-obra-panel-status {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,141 @@
+.mano-obra-modal-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+.campo-mano-obra {
+  display: flex;
+  flex-direction: column;
+}
+
+.campo-mano-obra.campo-completo {
+  grid-column: 1 / -1;
+}
+
+.campo-mano-obra label {
+  margin-bottom: 0.42rem;
+
+  color: #08255b;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.campo-mano-obra input,
+.campo-mano-obra select,
+.campo-mano-obra textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  border: 1px solid #dbe2ea;
+  border-radius: 12px;
+
+  background: #f8fafc;
+
+  padding: 0.82rem 0.95rem;
+
+  color: #334155;
+  font: inherit;
+
+  outline: none;
+}
+
+.campo-mano-obra textarea {
+  min-height: 105px;
+  resize: vertical;
+}
+
+.campo-mano-obra input:focus,
+.campo-mano-obra select:focus,
+.campo-mano-obra textarea:focus {
+  border-color: #42b48a;
+  background: white;
+}
+
+.mano-obra-form-error {
+  grid-column: 1 / -1;
+
+  margin: 0;
+
+  padding: 0.75rem 0.9rem;
+
+  border-radius: 11px;
+
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.mano-obra-modal-actions {
+  grid-column: 1 / -1;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+
+  margin-top: 0.5rem;
+}
+
+.mano-obra-btn-cancelar,
+.mano-obra-btn-guardar,
+.mano-obra-btn-eliminar {
+  border: none;
+  border-radius: 12px;
+
+  padding: 0.82rem 1.25rem;
+
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.mano-obra-btn-cancelar {
+  background: #e2e8f0;
+  color: #08255b;
+}
+
+.mano-obra-btn-guardar {
+  background: #42b48a;
+  color: white;
+}
+
+.mano-obra-btn-eliminar {
+  background: #ef4444;
+  color: white;
+}
+
+.eliminar-mano-obra-modal p {
+  margin: 0 0 0.7rem;
+
+  color: #475569;
+  line-height: 1.65;
+}
+
+.eliminar-mano-obra-modal > span {
+  display: block;
+
+  color: #94a3b8;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .mano-obra-modal-form {
+    grid-template-columns: 1fr;
+  }
+
+  .campo-mano-obra.campo-completo {
+    grid-column: auto;
+  }
+
+  .mano-obra-modal-actions {
+    flex-direction: column;
+  }
+
+  .mano-obra-btn-cancelar,
+  .mano-obra-btn-guardar,
+  .mano-obra-btn-eliminar {
+    width: 100%;
+  }
+}

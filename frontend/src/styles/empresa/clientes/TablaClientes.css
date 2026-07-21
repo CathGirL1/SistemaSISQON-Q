@@ -1,0 +1,165 @@
+.tabla-clientes-card {
+  background: white;
+  border-radius: 22px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.tabla-clientes-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla-clientes {
+  width: 100%;
+  min-width: 950px;
+  border-collapse: collapse;
+}
+
+.tabla-clientes th {
+  text-align: left;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabla-clientes td {
+  padding: 1rem 0.9rem;
+  border-bottom: 1px solid #eef2f7;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.tabla-clientes tbody tr:hover {
+  background: #f8fafc;
+}
+
+.cliente-info-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.cliente-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  color: #0f4fa8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.cliente-info-cell h4 {
+  margin: 0;
+  color: #08255b;
+}
+
+.cliente-info-cell p,
+.tabla-clientes td p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.cliente-estado {
+  width: fit-content;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.cliente-estado.nuevo {
+  background: #dbeafe;
+  color: #0f4fa8;
+}
+
+.cliente-estado.interesado {
+  background: rgba(240, 138, 36, 0.15);
+  color: #f08a24;
+}
+
+.cliente-estado.contactado {
+  background: rgba(155, 93, 229, 0.15);
+  color: #9b5de5;
+}
+
+.cliente-estado.cliente-confirmado {
+  background: rgba(66, 180, 138, 0.15);
+  color: #42b48a;
+}
+
+.clientes-table-footer {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.tabla-clientes tbody tr {
+  cursor: pointer;
+}
+
+.cliente-fila-activa {
+  background: rgba(66, 180, 138, 0.08) !important;
+}
+
+.clientes-estado-tabla {
+  min-height: 260px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 2rem;
+
+  text-align: center;
+  color: #64748b;
+}
+
+.clientes-spinner {
+  width: 42px;
+  height: 42px;
+
+  border: 4px solid #e2e8f0;
+  border-top-color: #42b48a;
+  border-radius: 50%;
+
+  animation: clientes-girar 0.8s linear infinite;
+}
+
+@keyframes clientes-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.clientes-estado-tabla p {
+  margin: 0.8rem 0 0;
+}
+
+.clientes-estado-tabla.clientes-error {
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 16px;
+
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.clientes-estado-tabla.clientes-error h3 {
+  margin: 0;
+  color: #dc2626;
+}
+
+.clientes-tabla-vacia {
+  height: 180px;
+
+  text-align: center !important;
+  color: #64748b !important;
+}

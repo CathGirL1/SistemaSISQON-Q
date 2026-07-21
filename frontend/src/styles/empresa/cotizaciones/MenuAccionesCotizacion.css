@@ -1,0 +1,83 @@
+.menu-acciones-cotizacion {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.menu-acciones-btn {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #f1f5f9;
+  color: #0f4fa8;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.menu-acciones-btn:hover {
+  background: #dbeafe;
+}
+
+.menu-acciones-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+
+  width: 170px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  padding: 0.4rem;
+
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.14);
+
+  z-index: 50;
+}
+
+.menu-acciones-dropdown button {
+  width: 100%;
+
+  border: none;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+
+  padding: 0.75rem 0.8rem;
+
+  border-radius: 10px;
+
+  color: #334155;
+  font-weight: 600;
+  font-size: 0.85rem;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.menu-acciones-dropdown button:hover {
+  background: #f8fafc;
+  color: #0f4fa8;
+}
+
+.menu-acciones-dropdown button.danger {
+  color: #ef4444;
+}
+
+.menu-acciones-dropdown button.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}

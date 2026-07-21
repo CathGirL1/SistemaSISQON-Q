@@ -1,12 +1,5 @@
-export default function PanelEmpresaContenido(){
+import DashboardEmpresaContenido from "./DashboardEmpresaContenido";
 
-
-    return(
-
-        <>
-            <div>panel empresa</div>
-        
-        </>
-
-    ) 
+export default function PanelEmpresaContenido() {
+  return <DashboardEmpresaContenido />;
 }

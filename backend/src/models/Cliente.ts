@@ -1,25 +1,54 @@
-import { Usuario } from "./Usuario";
+export type EstadoCliente =
+  | "Nuevo"
+  | "Interesado"
+  | "Contactado"
+  | "Cliente confirmado";
 
+export interface Cliente {
+  id_Cliente: number;
+  id_Usuario: number;
 
-export class Cliente extends Usuario{
+  cedula: string;
+  nombre: string;
+  apellido: string;
 
-    constructor(
+  nombreUsuario: string;
+  gmail: string;
+  telefono: string | null;
+  direccion: string | null;
 
-        private cedula : number, 
-        private nombre : string, 
-        private apellido : string, 
-        private usuarioID : number,
-        id : number, 
-        nombreUsuario : string, 
-        rol : string,
-        gmail : string, 
-        telefono : number, 
-        contrasenia : string,
-        direccion : string
+  ciudad: string | null;
+  estado: EstadoCliente;
+  notas: string | null;
+}
 
-    ){
-        super(id, nombreUsuario, rol, gmail, telefono, contrasenia, direccion);
-    }
+export interface CrearClienteDTO {
+  nombreUsuario: string;
+  gmail: string;
+  telefono?: string | null;
+  password: string;
+  direccion?: string | null;
 
+  cedula: string;
+  nombre: string;
+  apellido: string;
 
+  ciudad?: string | null;
+  estado?: EstadoCliente;
+  notas?: string | null;
+}
+
+export interface ActualizarClienteDTO {
+  nombreUsuario: string;
+  gmail: string;
+  telefono?: string | null;
+  direccion?: string | null;
+
+  cedula: string;
+  nombre: string;
+  apellido: string;
+
+  ciudad?: string | null;
+  estado: EstadoCliente;
+  notas?: string | null;
 }

@@ -1,0 +1,64 @@
+import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
+import MaterialEstadoBadge from "./MaterialEstadoBadge";
+import MaterialDisponibilidad from "./MaterialDisponibilidad";
+import MaterialAcciones from "./MaterialAcciones";
+
+type Props = {
+  material: MaterialEmpresa;
+  onEditar: (material: MaterialEmpresa) => void;
+  onActualizarPrecio: (material: MaterialEmpresa) => void;
+  onEliminar: (material: MaterialEmpresa) => void;
+};
+
+export default function FilaMaterial({
+  material,
+  onEditar,
+  onActualizarPrecio,
+  onEliminar,
+}: Props) {
+  return (
+    <tr>
+      <td>
+        <div className="material-cell">
+          <div className="material-img">{material.nombre.charAt(0)}</div>
+
+          <div>
+            <h4>{material.nombre}</h4>
+            <p>{material.id}</p>
+          </div>
+        </div>
+      </td>
+
+      <td>{material.categoria}</td>
+      <td>{material.unidad}</td>
+
+      <td>
+        <strong>{material.precioActual}</strong>
+        <p>{material.precioDetalle}</p>
+      </td>
+
+      <td>{material.ultimaActualizacion}</td>
+
+      <td>
+        <MaterialDisponibilidad disponibilidad={material.disponibilidad} />
+      </td>
+
+      <td>
+        <strong>{material.stock.split(" ")[0]}</strong>
+        <p>{material.stock.split(" ").slice(1).join(" ")}</p>
+      </td>
+
+      <td>
+        <MaterialEstadoBadge estado={material.estado} />
+      </td>
+
+      <td>
+        <MaterialAcciones
+          onEditar={() => onEditar(material)}
+          onActualizarPrecio={() => onActualizarPrecio(material)}
+          onEliminar={() => onEliminar(material)}
+        />
+      </td>
+    </tr>
+  );
+}

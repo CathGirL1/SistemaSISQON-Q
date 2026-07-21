@@ -1,0 +1,151 @@
+.tabla-tipos-obra-card {
+  background: white;
+  border-radius: 22px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.tabla-tipos-obra-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla-tipos-obra {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+
+.tabla-tipos-obra th {
+  text-align: left;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabla-tipos-obra td {
+  padding: 1rem 0.9rem;
+  border-bottom: 1px solid #eef2f7;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.tabla-tipos-obra tbody tr {
+  cursor: pointer;
+}
+
+.tabla-tipos-obra tbody tr:hover {
+  background: #f8fafc;
+}
+
+.tipo-obra-fila-activa {
+  background: rgba(66, 180, 138, 0.08) !important;
+}
+
+.tipo-obra-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.tipo-obra-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(66, 180, 138, 0.15);
+  color: #42b48a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.tipo-obra-icon.tipo-1 { background: rgba(240, 138, 36, 0.15); color: #f08a24; }
+.tipo-obra-icon.tipo-2 { background: #dbeafe; color: #0f4fa8; }
+.tipo-obra-icon.tipo-3 { background: rgba(66, 180, 138, 0.15); color: #42b48a; }
+.tipo-obra-icon.tipo-4 { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+.tipo-obra-icon.tipo-5 { background: rgba(155, 93, 229, 0.15); color: #9b5de5; }
+.tipo-obra-icon.tipo-6 { background: rgba(20, 184, 166, 0.15); color: #0f766e; }
+
+.tipo-obra-cell h4 {
+  margin: 0;
+  color: #08255b;
+}
+
+.tipo-obra-cell p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.materiales-asociados {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.tipo-obra-estado {
+  width: fit-content;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.tipo-obra-estado.activo {
+  background: rgba(66, 180, 138, 0.15);
+  color: #42b48a;
+}
+
+.tipo-obra-estado.inactivo {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.tipo-obra-acciones {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.tipo-obra-acciones button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #0f4fa8;
+  cursor: pointer;
+}
+
+.tipo-obra-acciones button:hover {
+  background: #dbeafe;
+}
+
+.tipos-obra-table-footer {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.tipo-obra-icon svg {
+  font-size: 1.2rem;
+}
+
+.tipo-obra-tiempo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #475569;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tipo-obra-tiempo svg {
+  color: #64748b;
+}

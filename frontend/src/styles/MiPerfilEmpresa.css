@@ -1,0 +1,63 @@
+.perfil-empresa-page {
+  width: 100%;
+}
+
+.perfil-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.perfil-header h1 {
+  margin: 0;
+  color: #08255b;
+  font-size: 2rem;
+}
+
+.perfil-header p {
+  margin: 0.4rem 0 0;
+  color: #64748b;
+}
+
+.perfil-header-btn {
+  border: none;
+  background: #42b48a;
+  color: white;
+  padding: 0.9rem 1.4rem;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(66, 180, 138, 0.25);
+}
+
+.perfil-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+}
+
+.perfil-left,
+.perfil-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .perfil-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .perfil-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .perfil-header h1 {
+    font-size: 1.6rem;
+  }
+}
