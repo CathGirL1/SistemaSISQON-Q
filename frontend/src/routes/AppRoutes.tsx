@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-
+import Informacion from "../pages/Informacion";
 import Home from "../pages/Home";
 import Login from "../pages/Login"
 import Register from "../pages/Register";
@@ -19,6 +19,8 @@ export default function AppRoutes() {
           <Route path="/panel-cliente" element={<PanelCliente />}/>
           <Route path="/panel-empresa" element={<PanelEmpresa />}/>
           <Route path="/recuperar-password" element={<RecuperarContrasenia />}/>
+          <Route path="/" element={<Home />} />
+          <Route path="/informacion" element={<Informacion />} />
         </Routes>
       </BrowserRouter>
     </>

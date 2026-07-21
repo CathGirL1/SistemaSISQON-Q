@@ -33,10 +33,10 @@ export default function NavbarDeHome(){
                 </button>
 
                 <ul className={`navbar-links ${menuAbierto ? "active" : ""}`}>
-                    <li><a href="#">¿Cómo funciona?</a></li>
-                    <li><a href="#">Beneficios</a></li>
-                    <li><a href="#">Para empresas</a></li>
-                    <li><a href="#">Ayuda</a></li>
+                    <li><a href="/informacion#como-funciona">¿Cómo funciona?</a></li>
+                    <li><a href="/informacion#beneficios">Beneficios</a></li>
+                    <li><a href="/informacion#empresas">Para empresas</a></li>
+                    <li><a href="/informacion#ayuda">Ayuda</a></li>
 
                     <li>
                         <button className="login-btn" onClick={() => navegar("/login")}>

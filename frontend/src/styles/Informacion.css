@@ -1,0 +1,254 @@
+html {
+    scroll-behavior: smooth;
+}
+
+/* ========================= */
+/* SECCIONES */
+/* ========================= */
+
+.info-section {
+    min-height: 100vh;
+
+    padding: 7rem 3rem;
+
+    background: white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    scroll-margin-top: 100px;
+}
+
+.info-section:nth-child(even) {
+    background: #f8fafc;
+}
+
+.info-section h2 {
+    text-align: center;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #08255b;
+
+    margin-bottom: 1rem;
+}
+
+.info-section h2 span {
+    color: #42b48a;
+}
+
+.info-subtitle {
+    text-align: center;
+
+    font-size: 1.1rem;
+    color: #6b7280;
+
+    margin-bottom: 4rem;
+}
+
+/* ========================= */
+/* CARDS */
+/* ========================= */
+
+.info-grid {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+
+    gap: 2rem;
+
+    max-width: 1400px;
+    width: 100%;
+
+    margin: 0 auto;
+}
+
+.info-card {
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 2rem;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+    text-align: center;
+
+    transition: all 0.25s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-6px);
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.info-card svg {
+    font-size: 2.5rem;
+
+    color: #42b48a;
+
+    margin-bottom: 1rem;
+}
+
+.info-card h3 {
+    color: #08255b;
+
+    margin-bottom: 1rem;
+}
+
+.info-card p {
+    color: #4b5563;
+
+    line-height: 1.7;
+}
+
+/* ========================= */
+/* TEXTO */
+/* ========================= */
+
+.texto-info {
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    text-align: center;
+}
+
+.texto-info p {
+    font-size: 1.05rem;
+
+    line-height: 2;
+
+    color: #4b5563;
+
+    margin-bottom: 1.5rem;
+}
+
+/* ========================= */
+/* FAQ */
+/* ========================= */
+
+.faq-container {
+    max-width: 900px;
+
+    width: 100%;
+
+    margin: 0 auto;
+}
+
+.faq-item {
+    background: white;
+
+    padding: 1.5rem;
+
+    border-radius: 12px;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+
+    margin-bottom: 1.5rem;
+
+    transition: all 0.2s ease;
+}
+
+.faq-item:hover {
+    transform: translateY(-3px);
+}
+
+.faq-item h3 {
+    color: #08255b;
+
+    margin-bottom: .8rem;
+}
+
+.faq-item p {
+    color: #4b5563;
+
+    line-height: 1.7;
+}
+
+/* ========================= */
+/* TABLET */
+/* ========================= */
+
+@media (max-width: 1024px) {
+
+    .info-section {
+        padding: 6rem 2rem;
+    }
+
+    .info-section h2 {
+        font-size: 2.3rem;
+    }
+
+    .texto-info {
+        max-width: 700px;
+    }
+
+}
+
+/* ========================= */
+/* CELULAR */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+    .info-section {
+        min-height: auto;
+
+        padding: 5rem 1.5rem;
+    }
+
+    .info-section h2 {
+        font-size: 2rem;
+    }
+
+    .info-subtitle {
+        font-size: .95rem;
+    }
+
+    .texto-info {
+        text-align: left;
+    }
+
+    .texto-info p {
+        font-size: .95rem;
+    }
+
+    .info-card {
+        padding: 1.5rem;
+    }
+
+    .faq-item {
+        padding: 1rem;
+    }
+
+}
+
+/* ========================= */
+/* CELULARES PEQUEÑOS */
+/* ========================= */
+
+@media (max-width: 480px) {
+
+    .info-section {
+        padding: 4rem 1rem;
+    }
+
+    .info-section h2 {
+        font-size: 1.7rem;
+    }
+
+    .info-card svg {
+        font-size: 2rem;
+    }
+
+    .info-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .texto-info p {
+        font-size: .9rem;
+    }
+
+}
