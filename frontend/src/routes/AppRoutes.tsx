@@ -26,7 +26,6 @@ export default function AppRoutes() {
           <Route path="/panel-cliente" element={<PanelCliente />}/>
           <Route path="/panel-empresa" element={<PanelEmpresa />}/>
           <Route path="/recuperar-password" element={<RecuperarContrasenia />}/>
-          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/informacion" element={<Informacion />} />
           <Route path="/empresa/dashboard" element={<DashboardEmpresa />} />
           <Route path="/empresa/perfil" element={<MiPerfilEmpresa />} />
