@@ -5,7 +5,6 @@ import FlowCliente from "./cliente/FlowCliente";
 import DashboardCard from "./cliente/DashboardCard";
 import ProjectItem from "./cliente/ProjectItem";
 import QuoteItem from "./cliente/QuoteItem";
-import CompanyItem from "./cliente/CompanyItem";
 import ResponseItem from "./cliente/ResponseItem";
 import { useState } from "react";
 
@@ -101,38 +100,6 @@ export default function PanelClienteContenido(){
                     />
                 </DashboardCard>
 
-                <DashboardCard
-                    title="Empresas favoritas"
-                    linkText="Ver todas mis favoritas"
-                >
-                    <CompanyItem
-                        logo="ABC"
-                        name="Constructora ABC"
-                        category="Quinchos y Terrazas"
-                        rating="4.8"
-                    />
-
-                    <CompanyItem
-                        logo="NORTE"
-                        name="Construcciones del Norte"
-                        category="Ampliaciones y Obras"
-                        rating="4.6"
-                    />
-
-                    <CompanyItem
-                        logo="HC"
-                        name="Hogar Construcciones"
-                        category="Remodelaciones"
-                        rating="4.5"
-                    />
-
-                    <CompanyItem
-                        logo="OS"
-                        name="Obras y Servicios SRL"
-                        category="Construcción en general"
-                        rating="4.3"
-                    />
-                    </DashboardCard>
 
                     <DashboardCard
                         title="Últimas respuestas recibidas"
