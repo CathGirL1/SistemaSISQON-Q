@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-import HeaderCliente from "../../components/cliente/HeaderCliente";
+
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/Comparador.css";
@@ -90,18 +90,13 @@ export default function Comparador() {
       />
 
       <main className="cliente-main">
-        <HeaderCliente
-          title="Comparador inteligente"
-          subtitle="Compará costos, materiales y características para elegir la mejor opción."
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((prev) => !prev)}
-        />
+       
 
         <section className="comparador-heading">
           <div>
             <h2>Comparación del proyecto</h2>
             <p>
-              Quincho familiar · 30 m² · La Serena, IV Región
+              Compará costos, materiales y características para elegir la mejor opción.
             </p>
           </div>
 

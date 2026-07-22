@@ -78,14 +78,6 @@ export default function SidebarCliente({
   </NavLink>
 
   <NavLink
-    to="/panel-cliente/favoritas"
-    className={({ isActive }) => (isActive ? "active" : "")}
-    onClick={onClose}
-  >
-    ♡ Empresas Favoritas
-  </NavLink>
-
-  <NavLink
     to="/panel-cliente/asistente"
     className={({ isActive }) => (isActive ? "active" : "")}
     onClick={onClose}

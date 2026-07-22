@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-import HeaderCliente from "../../components/cliente/HeaderCliente";
+
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/MisProyectos.css";
@@ -125,18 +125,12 @@ export default function MisProyectos() {
       />
 
       <main className="cliente-main">
-        <HeaderCliente
-          title="Mis proyectos"
-          subtitle="Gestioná, editá y revisá todos tus proyectos."
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((prev) => !prev)}
-        />
 
         <section className="proyectos-heading">
           <div>
             <h2>Mis proyectos</h2>
             <p>
-              Organizá tus proyectos y generá cotizaciones a partir de cada uno.
+              Gestioná, editá y revisá todos tus proyectos.
             </p>
           </div>
 

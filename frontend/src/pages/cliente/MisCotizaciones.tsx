@@ -13,12 +13,9 @@ import {
   Eye,
   Download,
   Pencil,
-  Lightbulb,
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-import HeaderCliente from "../../components/cliente/HeaderCliente";
-
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/MisCotizaciones.css";
 
@@ -140,12 +137,7 @@ export default function MisCotizaciones() {
       />
 
       <main className="cliente-main">
-        <HeaderCliente
-          title="Mis cotizaciones"
-          subtitle="Aquí podés ver y gestionar todas las cotizaciones que has creado."
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((prev) => !prev)}
-        />
+       
 
         <section className="cotizaciones-heading">
           <div>
@@ -335,23 +327,7 @@ export default function MisCotizaciones() {
           </footer>
         </section>
 
-        <aside className="cotizaciones-tip">
-          <div className="tip-content">
-            <div className="tip-icon">
-              <Lightbulb size={25} />
-            </div>
-
-            <div>
-              <strong>Consejo:</strong>
-              <p>
-                Podés duplicar una cotización existente para crear una nueva
-                con ajustes.
-              </p>
-            </div>
-          </div>
-
-          <button type="button">Ver guía rápida</button>
-        </aside>
+        
       </main>
     </div>
   );

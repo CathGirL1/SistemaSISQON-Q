@@ -29,30 +29,6 @@ export default function HeaderCliente({
         <h1>{title}</h1>
         {subtitle && <p>{subtitle}</p>}
       </div>
-
-      <div className="header-actions">
-        <button type="button" className="btn-create">
-          <span className="btn-plus">+</span>
-          Crear nuevo proyecto
-        </button>
-
-        <button
-          type="button"
-          className="icon-button notification-button"
-          aria-label="Notificaciones"
-        >
-          🔔
-          <span className="notification-badge">3</span>
-        </button>
-
-        <button
-          type="button"
-          className="icon-button"
-          aria-label="Ayuda"
-        >
-          ?
-        </button>
-      </div>
     </header>
   );
 }

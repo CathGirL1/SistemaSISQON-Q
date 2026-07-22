@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-import HeaderCliente from "../../components/cliente/HeaderCliente";
+
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/EmpresasCliente.css";
@@ -176,13 +176,6 @@ export default function Empresas() {
       />
 
       <main className="cliente-main">
-        <HeaderCliente
-          title="Empresas"
-          subtitle="Explorá empresas verificadas y encontrá la más adecuada para tu proyecto."
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((prev) => !prev)}
-        />
-
         <section className="empresas-heading">
           <div>
             <h2>Empresas disponibles</h2>

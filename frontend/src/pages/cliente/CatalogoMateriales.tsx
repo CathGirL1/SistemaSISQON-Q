@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-import HeaderCliente from "../../components/cliente/HeaderCliente";
+
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/CatalogoMateriales.css";
@@ -145,18 +145,12 @@ export default function CatalogoMateriales() {
       />
 
       <main className="cliente-main">
-        <HeaderCliente
-          title="Catálogo de materiales"
-          subtitle="Explorá materiales, compará características y agregalos a tus proyectos."
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((prev) => !prev)}
-        />
 
         <section className="catalogo-heading">
           <div>
             <h2>Materiales disponibles</h2>
             <p>
-              Conocé sus precios aproximados, durabilidad y mantenimiento.
+              Explorá materiales, compará características y agregalos a tus proyectos.
             </p>
           </div>
 

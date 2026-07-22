@@ -2,7 +2,6 @@ import "../styles/PanelClienteContenido.css";
 import SidebarCliente from "./cliente/SidebarCliente";
 import HeaderCliente from "./cliente/HeaderCliente";
 import FlowCliente from "./cliente/FlowCliente";
-import AsistenteCliente from "./cliente/AssistantCard";
 import DashboardCard from "./cliente/DashboardCard";
 import ProjectItem from "./cliente/ProjectItem";
 import QuoteItem from "./cliente/QuoteItem";
@@ -175,7 +174,7 @@ export default function PanelClienteContenido(){
 
     
 
-                <AsistenteCliente />
+              
             </main>
         </div>
     ); 
