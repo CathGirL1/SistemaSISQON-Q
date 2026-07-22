@@ -4,7 +4,7 @@ interface PanelEmpresaContenedorProps {
   children: React.ReactNode;
 }
 
-export default function PanelClienteContenedor({
+export default function PanelEmpresaContenedor({
   children,
 }: PanelEmpresaContenedorProps) {
   return (

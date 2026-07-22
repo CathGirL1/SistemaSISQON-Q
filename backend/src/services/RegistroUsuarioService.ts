@@ -36,4 +36,38 @@ export class AuthService {
             rut
         );
     }
+
+    
+    public async existeGmail(
+        gmail: string
+    ) {
+
+        return await this.repository.existeGmail(gmail);
+
+    }
+
+    public async existeNombreUsuario(
+        nombreUsuario: string
+    ) {
+
+        return await this.repository.existeNombreUsuario(nombreUsuario);
+
+    }
+
+    public async existeCedula(
+        cedula: string
+    ) {
+
+        return await this.repository.existeCedula(cedula);
+
+    }
+
+    public async existeRut(
+        rut: string
+    ) {
+
+        return await this.repository.existeRut(rut);
+
+    }
+
 }
