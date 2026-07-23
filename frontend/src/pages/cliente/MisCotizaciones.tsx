@@ -1,4 +1,10 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+
 import {
   Search,
   ChevronDown,
@@ -9,12 +15,13 @@ import {
   ClipboardCheck,
   CircleCheck,
   CircleX,
-  Plus,
   Eye,
   Download,
   Pencil,
   Lightbulb,
 } from "lucide-react";
+
+import { useNavigate } from "react-router-dom";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
@@ -23,114 +30,130 @@ import "../../styles/PanelClienteContenido.css";
 import "../../styles/MisCotizaciones.css";
 
 type EstadoCotizacion =
+  | "Borrador"
   | "Pendiente"
   | "Enviada"
   | "Revisada"
+  | "Aceptada"
   | "Aprobada"
   | "Rechazada";
 
-interface Cotizacion {
-  id: number;
+interface CotizacionAPI {
+  idCotizacion: number;
+  idProyecto: number;
   codigo: string;
-  nombre: string;
-  imagen: string;
-  fecha: string;
-  hora: string;
-  tipo: string;
-  superficie: string;
+  fechaCreacion: string;
+  fechaActualizacion: string | null;
   estado: EstadoCotizacion;
-  precio: string;
+  precioEstimado: number | null;
+  observaciones: string | null;
+  idCliente: number;
+  idTipoObra: number;
+  nombreProyecto: string;
+  descripcionProyecto: string | null;
+  ubicacion: string | null;
+  alto: number;
+  ancho: number;
+  largo: number;
+  superficie: number;
 }
 
-const cotizaciones: Cotizacion[] = [
-  {
-    id: 1,
-    codigo: "COT-2024-0012",
-    nombre: "Quincho en patio trasero",
-    imagen:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200",
-    fecha: "28 May 2024",
-    hora: "10:30",
-    tipo: "Quincho",
-    superficie: "30,00 m²",
-    estado: "Pendiente",
-    precio: "$ 6.890.000",
-  },
-  {
-    id: 2,
-    codigo: "COT-2024-0011",
-    nombre: "Reforma cocina",
-    imagen:
-      "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=200",
-    fecha: "26 May 2024",
-    hora: "16:45",
-    tipo: "Reforma",
-    superficie: "18,00 m²",
-    estado: "Enviada",
-    precio: "$ 3.450.000",
-  },
-  {
-    id: 3,
-    codigo: "COT-2024-0010",
-    nombre: "Construcción casa",
-    imagen:
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200",
-    fecha: "24 May 2024",
-    hora: "09:15",
-    tipo: "Construcción general",
-    superficie: "120,00 m²",
-    estado: "Revisada",
-    precio: "$ 24.750.000",
-  },
-  {
-    id: 4,
-    codigo: "COT-2024-0009",
-    nombre: "Quincho rústico",
-    imagen:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200",
-    fecha: "20 May 2024",
-    hora: "11:20",
-    tipo: "Quincho",
-    superficie: "25,00 m²",
-    estado: "Aprobada",
-    precio: "$ 5.980.000",
-  },
-  {
-    id: 5,
-    codigo: "COT-2024-0008",
-    nombre: "Ampliación y reforma",
-    imagen:
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=200",
-    fecha: "18 May 2024",
-    hora: "14:10",
-    tipo: "Reforma",
-    superficie: "35,00 m²",
-    estado: "Rechazada",
-    precio: "$ 8.200.000",
-  },
-  {
-    id: 6,
-    codigo: "COT-2024-0007",
-    nombre: "Quincho con parrilla",
-    imagen:
-      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=200",
-    fecha: "15 May 2024",
-    hora: "08:30",
-    tipo: "Quincho",
-    superficie: "22,00 m²",
-    estado: "Enviada",
-    precio: "$ 4.950.000",
-  },
-];
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+const ID_CLIENTE_TEMPORAL = 1;
+
+const IMAGEN_COTIZACION =
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200";
 
 export default function MisCotizaciones() {
+  const navigate = useNavigate();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
 
-  const cotizacionesFiltradas = cotizaciones.filter((cotizacion) => {
-    const texto = `${cotizacion.codigo} ${cotizacion.nombre} ${cotizacion.tipo}`;
-    return texto.toLowerCase().includes(busqueda.toLowerCase());
-  });
+  const [cotizaciones, setCotizaciones] = useState<CotizacionAPI[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    obtenerCotizaciones();
+  }, []);
+
+  const obtenerCotizaciones = async () => {
+    try {
+      setCargando(true);
+      setError("");
+
+      const response = await fetch(
+        `${API_URL}/api/cotizaciones/cliente/${ID_CLIENTE_TEMPORAL}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.mensaje ||
+            "No se pudieron obtener las cotizaciones"
+        );
+      }
+
+      setCotizaciones(data);
+    } catch (error) {
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al cargar las cotizaciones";
+
+      setError(mensaje);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const cotizacionesFiltradas = useMemo(() => {
+    const textoBusqueda = busqueda.trim().toLowerCase();
+
+    if (!textoBusqueda) {
+      return cotizaciones;
+    }
+
+    return cotizaciones.filter((cotizacion) => {
+      const texto = `
+        ${cotizacion.codigo}
+        ${cotizacion.nombreProyecto}
+        ${cotizacion.estado}
+        ${cotizacion.ubicacion ?? ""}
+        ${cotizacion.idTipoObra}
+      `;
+
+      return texto.toLowerCase().includes(textoBusqueda);
+    });
+  }, [busqueda, cotizaciones]);
+
+  const totalPendientes = cotizaciones.filter(
+    (cotizacion) =>
+      cotizacion.estado === "Pendiente" ||
+      cotizacion.estado === "Borrador"
+  ).length;
+
+  const totalEnviadas = cotizaciones.filter(
+    (cotizacion) => cotizacion.estado === "Enviada"
+  ).length;
+
+  const totalRevisadas = cotizaciones.filter(
+    (cotizacion) => cotizacion.estado === "Revisada"
+  ).length;
+
+  const totalAprobadas = cotizaciones.filter(
+    (cotizacion) =>
+      cotizacion.estado === "Aprobada" ||
+      cotizacion.estado === "Aceptada"
+  ).length;
+
+  const totalRechazadas = cotizaciones.filter(
+    (cotizacion) => cotizacion.estado === "Rechazada"
+  ).length;
 
   return (
     <div className="cliente-panel">
@@ -141,66 +164,62 @@ export default function MisCotizaciones() {
 
       <main className="cliente-main">
         <HeaderCliente
-          title="Mis cotizaciones"
-          subtitle="Aquí podés ver y gestionar todas las cotizaciones que has creado."
           menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((prev) => !prev)}
+          onToggleMenu={() =>
+            setMenuOpen((prev) => !prev)
+          }
         />
 
         <section className="cotizaciones-heading">
           <div>
             <h2>Mis cotizaciones</h2>
+
             <p>
-              Consultá, filtrá y gestioná todas tus cotizaciones desde un solo
-              lugar.
+              Consultá, filtrá y gestioná todas tus
+              cotizaciones desde un solo lugar.
             </p>
           </div>
-
-          <button type="button" className="nueva-cotizacion-button">
-            <Plus size={20} />
-            Nueva cotización
-          </button>
         </section>
 
         <section className="cotizaciones-stats">
           <StatCard
             icon={<FileText size={24} />}
-            value="12"
+            value={cotizaciones.length.toString()}
             label="Total cotizaciones"
             variant="blue"
           />
 
           <StatCard
             icon={<Clock3 size={24} />}
-            value="3"
+            value={totalPendientes.toString()}
             label="Pendientes"
             variant="orange"
           />
 
           <StatCard
             icon={<Send size={24} />}
-            value="4"
+            value={totalEnviadas.toString()}
             label="Enviadas"
             variant="blue"
           />
 
           <StatCard
             icon={<ClipboardCheck size={24} />}
-            value="3"
+            value={totalRevisadas.toString()}
             label="Revisadas"
             variant="purple"
           />
 
           <StatCard
             icon={<CircleCheck size={24} />}
-            value="1"
+            value={totalAprobadas.toString()}
             label="Aprobadas"
             variant="green"
           />
 
           <StatCard
             icon={<CircleX size={24} />}
-            value="1"
+            value={totalRechazadas.toString()}
             label="Rechazadas"
             variant="red"
           />
@@ -214,7 +233,9 @@ export default function MisCotizaciones() {
               type="search"
               placeholder="Buscar cotización..."
               value={busqueda}
-              onChange={(event) => setBusqueda(event.target.value)}
+              onChange={(event) =>
+                setBusqueda(event.target.value)
+              }
             />
           </label>
 
@@ -228,112 +249,200 @@ export default function MisCotizaciones() {
             <ChevronDown size={17} />
           </button>
 
-          <button type="button" className="filter-button date-filter">
+          <button
+            type="button"
+            className="filter-button date-filter"
+          >
             <CalendarDays size={18} />
             Fecha: más reciente
           </button>
         </section>
 
-        <section className="cotizaciones-table-card">
-          <div className="cotizaciones-table-wrapper">
-            <table className="cotizaciones-table">
-              <thead>
-                <tr>
-                  <th>Cotización</th>
-                  <th>Fecha</th>
-                  <th>Tipo de obra</th>
-                  <th>Superficie</th>
-                  <th>Estado</th>
-                  <th>Precio estimado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
+        {cargando && (
+          <section className="cotizaciones-feedback">
+            <p>Cargando cotizaciones...</p>
+          </section>
+        )}
 
-              <tbody>
-                {cotizacionesFiltradas.map((cotizacion) => (
-                  <tr key={cotizacion.id}>
-                    <td>
-                      <div className="cotizacion-info">
-                        <img
-                          src={cotizacion.imagen}
-                          alt={cotizacion.nombre}
-                        />
+        {!cargando && error && (
+          <section className="cotizaciones-feedback">
+            <p>{error}</p>
 
-                        <div>
-                          <strong>{cotizacion.codigo}</strong>
-                          <span>{cotizacion.nombre}</span>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td>
-                      <div className="table-double-line">
-                        <strong>{cotizacion.fecha}</strong>
-                        <span>{cotizacion.hora}</span>
-                      </div>
-                    </td>
-
-                    <td>{cotizacion.tipo}</td>
-
-                    <td>{cotizacion.superficie}</td>
-
-                    <td>
-                      <EstadoBadge estado={cotizacion.estado} />
-                    </td>
-
-                    <td className="cotizacion-precio">
-                      {cotizacion.precio}
-                    </td>
-
-                    <td>
-                      <div className="cotizacion-actions">
-                        <button type="button">
-                          <Eye size={16} />
-                          Ver detalle
-                        </button>
-
-                        <button type="button">
-                          <Download size={16} />
-                          PDF
-                        </button>
-
-                        <button type="button">
-                          <Send size={16} />
-                          Enviar
-                        </button>
-
-                        <button type="button">
-                          <Pencil size={16} />
-                          Modificar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <footer className="cotizaciones-pagination">
-            <span>
-              Mostrando 1 a {cotizacionesFiltradas.length} de 12 cotizaciones
-            </span>
-
-            <div className="pagination-buttons">
-              <button type="button">‹</button>
-              <button type="button" className="active">
-                1
-              </button>
-              <button type="button">2</button>
-              <button type="button">›</button>
-            </div>
-
-            <button type="button" className="rows-button">
-              10 por página
-              <ChevronDown size={16} />
+            <button
+              type="button"
+              onClick={obtenerCotizaciones}
+            >
+              Volver a intentar
             </button>
-          </footer>
-        </section>
+          </section>
+        )}
+
+        {!cargando &&
+          !error &&
+          cotizacionesFiltradas.length === 0 && (
+            <section className="cotizaciones-feedback">
+              <FileText size={42} />
+
+              <h3>No hay cotizaciones</h3>
+
+              <p>
+                Generá una cotización desde el detalle de un
+                proyecto.
+              </p>
+
+              <button
+                type="button"
+                onClick={() =>
+                  navigate("/panel-cliente/proyectos")
+                }
+              >
+                Ir a Mis proyectos
+              </button>
+            </section>
+          )}
+
+        {!cargando &&
+          !error &&
+          cotizacionesFiltradas.length > 0 && (
+            <section className="cotizaciones-table-card">
+              <div className="cotizaciones-table-wrapper">
+                <table className="cotizaciones-table">
+                  <thead>
+                    <tr>
+                      <th>Cotización</th>
+                      <th>Fecha</th>
+                      <th>Tipo de obra</th>
+                      <th>Superficie</th>
+                      <th>Estado</th>
+                      <th>Precio estimado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {cotizacionesFiltradas.map(
+                      (cotizacion) => (
+                        <tr key={cotizacion.idCotizacion}>
+                          <td>
+                            <div className="cotizacion-info">
+                              <img
+                                src={IMAGEN_COTIZACION}
+                                alt={
+                                  cotizacion.nombreProyecto
+                                }
+                              />
+
+                              <div>
+                                <strong>
+                                  {cotizacion.codigo}
+                                </strong>
+
+                                <span>
+                                  {
+                                    cotizacion.nombreProyecto
+                                  }
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td>
+                            <div className="table-double-line">
+                              <strong>
+                                {formatearFecha(
+                                  cotizacion.fechaCreacion
+                                )}
+                              </strong>
+
+                              <span>
+                                {formatearHora(
+                                  cotizacion.fechaCreacion
+                                )}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td>
+                            Tipo #{cotizacion.idTipoObra}
+                          </td>
+
+                          <td>
+                            {formatearSuperficie(
+                              cotizacion.superficie
+                            )}
+                          </td>
+
+                          <td>
+                            <EstadoBadge
+                              estado={cotizacion.estado}
+                            />
+                          </td>
+
+                          <td className="cotizacion-precio">
+                            {formatearPrecio(
+                              cotizacion.precioEstimado
+                            )}
+                          </td>
+
+                          <td>
+                            <div className="cotizacion-actions">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  navigate(
+                                    `/panel-cliente/cotizaciones/${cotizacion.idCotizacion}`
+                                  )
+                                }
+                              >
+                                <Eye size={16} />
+                                Ver detalle
+                              </button>
+
+                              <button
+                                type="button"
+                                disabled
+                              >
+                                <Download size={16} />
+                                PDF
+                              </button>
+
+                              <button
+                                type="button"
+                                disabled
+                              >
+                                <Send size={16} />
+                                Enviar
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  navigate(
+                                    `/panel-cliente/cotizaciones/${cotizacion.idCotizacion}`
+                                  )
+                                }
+                              >
+                                <Pencil size={16} />
+                                Modificar
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <footer className="cotizaciones-pagination">
+                <span>
+                  Mostrando 1 a{" "}
+                  {cotizacionesFiltradas.length} de{" "}
+                  {cotizaciones.length} cotizaciones
+                </span>
+              </footer>
+            </section>
+          )}
 
         <aside className="cotizaciones-tip">
           <div className="tip-content">
@@ -343,14 +452,13 @@ export default function MisCotizaciones() {
 
             <div>
               <strong>Consejo:</strong>
+
               <p>
-                Podés duplicar una cotización existente para crear una nueva
-                con ajustes.
+                Las cotizaciones se generan desde el detalle de
+                cada proyecto.
               </p>
             </div>
           </div>
-
-          <button type="button">Ver guía rápida</button>
         </aside>
       </main>
     </div>
@@ -358,10 +466,15 @@ export default function MisCotizaciones() {
 }
 
 interface StatCardProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   value: string;
   label: string;
-  variant: "blue" | "orange" | "purple" | "green" | "red";
+  variant:
+    | "blue"
+    | "orange"
+    | "purple"
+    | "green"
+    | "red";
 }
 
 function StatCard({
@@ -372,7 +485,9 @@ function StatCard({
 }: StatCardProps) {
   return (
     <article className="cotizacion-stat-card">
-      <div className={`stat-icon stat-${variant}`}>{icon}</div>
+      <div className={`stat-icon stat-${variant}`}>
+        {icon}
+      </div>
 
       <div>
         <strong>{value}</strong>
@@ -382,10 +497,62 @@ function StatCard({
   );
 }
 
-function EstadoBadge({ estado }: { estado: EstadoCotizacion }) {
+function EstadoBadge({
+  estado,
+}: {
+  estado: EstadoCotizacion;
+}) {
   const className = `estado-badge estado-${estado
     .toLowerCase()
-    .replace("ó", "o")}`;
+    .replace("ó", "o")
+    .replace(/\s+/g, "-")}`;
 
   return <span className={className}>{estado}</span>;
+}
+
+function formatearFecha(fecha: string): string {
+  const fechaCotizacion = new Date(fecha);
+
+  if (Number.isNaN(fechaCotizacion.getTime())) {
+    return "Fecha no disponible";
+  }
+
+  return new Intl.DateTimeFormat("es-UY", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(fechaCotizacion);
+}
+
+function formatearHora(fecha: string): string {
+  const fechaCotizacion = new Date(fecha);
+
+  if (Number.isNaN(fechaCotizacion.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("es-UY", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(fechaCotizacion);
+}
+
+function formatearSuperficie(
+  superficie: number
+): string {
+  return `${Number(superficie).toFixed(2)} m²`;
+}
+
+function formatearPrecio(
+  precio: number | null
+): string {
+  if (precio === null) {
+    return "Sin calcular";
+  }
+
+  return new Intl.NumberFormat("es-UY", {
+    style: "currency",
+    currency: "UYU",
+    maximumFractionDigits: 0,
+  }).format(precio);
 }

@@ -114,8 +114,6 @@ export default function EmpresasFavoritas() {
 
       <main className="cliente-main">
         <HeaderCliente
-          title="Empresas favoritas"
-          subtitle="Accedé rápidamente a las empresas que guardaste como favoritas."
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((prev) => !prev)}
         />

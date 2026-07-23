@@ -1,10 +1,12 @@
 import { Menu, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderClienteProps {
-  title: string;
+  title?: string;
   subtitle?: string;
   menuOpen: boolean;
   onToggleMenu: () => void;
+  showCreateButton?: boolean;
 }
 
 export default function HeaderCliente({
@@ -12,9 +14,22 @@ export default function HeaderCliente({
   subtitle,
   menuOpen,
   onToggleMenu,
+  showCreateButton = false,
 }: HeaderClienteProps) {
+  const navigate = useNavigate();
+
+  const irACrearProyecto = () => {
+    navigate("/panel-cliente/proyectos/crear");
+  };
+
+  const mostrarTitulo = Boolean(title || subtitle);
+
   return (
-    <header className="cliente-header">
+    <header
+      className={`cliente-header ${
+        !mostrarTitulo ? "cliente-header-minimal" : ""
+      }`}
+    >
       <button
         type="button"
         className="menu-toggle"
@@ -25,16 +40,24 @@ export default function HeaderCliente({
         {menuOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      <div className="header-title">
-        <h1>{title}</h1>
-        {subtitle && <p>{subtitle}</p>}
-      </div>
+      {mostrarTitulo && (
+        <div className="header-title">
+          {title && <h1>{title}</h1>}
+          {subtitle && <p>{subtitle}</p>}
+        </div>
+      )}
 
       <div className="header-actions">
-        <button type="button" className="btn-create">
-          <span className="btn-plus">+</span>
-          Crear nuevo proyecto
-        </button>
+        {showCreateButton && (
+          <button
+            type="button"
+            className="btn-create"
+            onClick={irACrearProyecto}
+          >
+            <span className="btn-plus">+</span>
+            Crear nuevo proyecto
+          </button>
+        )}
 
         <button
           type="button"

@@ -177,8 +177,6 @@ export default function Empresas() {
 
       <main className="cliente-main">
         <HeaderCliente
-          title="Empresas"
-          subtitle="Explorá empresas verificadas y encontrá la más adecuada para tu proyecto."
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((prev) => !prev)}
         />

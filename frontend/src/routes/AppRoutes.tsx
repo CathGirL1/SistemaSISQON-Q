@@ -13,6 +13,10 @@ import Comparador from "../pages/cliente/Comparador";
 import Empresas from "../pages/cliente/Empresas";
 import EmpresasFavoritas from "../pages/cliente/EmpresasFavoritas";
 import AsistenteIA from "../pages/cliente/AsistenteIA";
+import CrearProyecto from "../pages/cliente/CrearProyecto";
+import DetalleProyecto from "../pages/cliente/DetalleProyecto"
+import DetalleCotizacion from "../pages/cliente/DetalleCotizacion";
+import { Import } from "lucide-react";
 
 export default function AppRoutes() {
   return (
@@ -24,8 +28,10 @@ export default function AppRoutes() {
           <Route path="/register" element={<Register />}/>
           <Route path="/panel-cliente" element={<PanelCliente />}/>
           <Route path="/panel-cliente/proyectos" element={<MisProyectos />} />
+          <Route path="/panel-cliente/proyectos/crear" element={<CrearProyecto />} />
+          <Route path="/panel-cliente/proyectos/:idProyecto" element={<DetalleProyecto />}/>
           <Route path="/panel-cliente/cotizaciones" element={<MisCotizaciones />} />
-          <Route path="/panel-cliente/proyectos" element={<MisProyectos />} />
+          <Route path="/panel-cliente/cotizaciones/:idCotizacion" element={<DetalleCotizacion />} />
           <Route path="/panel-cliente/materiales" element={<CatalogoMateriales />} />
           <Route path="/panel-cliente/comparador" element={<Comparador />} />
           <Route path="/panel-cliente/empresas" element={<Empresas />} />
