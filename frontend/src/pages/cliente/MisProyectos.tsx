@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   ChevronDown,
@@ -14,263 +14,302 @@ import {
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-
+import { useNavigate } from "react-router-dom";
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/MisProyectos.css";
 
-type EstadoProyecto = "Activo" | "Borrador" | "Finalizado" | "Pendiente";
+type EstadoProyecto =
+  | "Activo"
+  | "Borrador"
+  | "Finalizado"
+  | "Pendiente";
 
 interface Proyecto {
-  id: number;
+  id_Proyecto: number;
   nombre: string;
-  ubicacion: string;
-  imagen: string;
-  tipo: string;
-  superficie: string;
-  fecha: string;
   estado: EstadoProyecto;
-  cotizaciones: number;
+  alto: number;
+  ancho: number;
+  largo: number;
+  fechaCreacion: string;
+  tipoObra: string;
 }
-
-const proyectos: Proyecto[] = [
-  {
-    id: 1,
-    nombre: "Quincho familiar",
-    ubicacion: "La Serena, IV Región",
-    imagen:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500",
-    tipo: "Quincho",
-    superficie: "30 m²",
-    fecha: "28 May 2024",
-    estado: "Activo",
-    cotizaciones: 3,
-  },
-  {
-    id: 2,
-    nombre: "Ampliación cocina",
-    ubicacion: "Coquimbo, IV Región",
-    imagen:
-      "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=500",
-    tipo: "Ampliación",
-    superficie: "18 m²",
-    fecha: "26 May 2024",
-    estado: "Activo",
-    cotizaciones: 2,
-  },
-  {
-    id: 3,
-    nombre: "Remodelación baño",
-    ubicacion: "La Serena, IV Región",
-    imagen:
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=500",
-    tipo: "Remodelación",
-    superficie: "12 m²",
-    fecha: "24 May 2024",
-    estado: "Borrador",
-    cotizaciones: 0,
-  },
-  {
-    id: 4,
-    nombre: "Terraza y pérgola",
-    ubicacion: "Coquimbo, IV Región",
-    imagen:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=500",
-    tipo: "Terraza",
-    superficie: "22 m²",
-    fecha: "20 May 2024",
-    estado: "Pendiente",
-    cotizaciones: 1,
-  },
-  {
-    id: 5,
-    nombre: "Casa Punta del Este",
-    ubicacion: "Maldonado, Uruguay",
-    imagen:
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=500",
-    tipo: "Construcción general",
-    superficie: "120 m²",
-    fecha: "18 May 2024",
-    estado: "Finalizado",
-    cotizaciones: 4,
-  },
-  {
-    id: 6,
-    nombre: "Barbacoa moderna",
-    ubicacion: "Punta del Este, Uruguay",
-    imagen:
-      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=500",
-    tipo: "Quincho",
-    superficie: "28 m²",
-    fecha: "15 May 2024",
-    estado: "Activo",
-    cotizaciones: 2,
-  },
-];
 
 export default function MisProyectos() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [busqueda, setBusqueda] = useState("");
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [busqueda, setBusqueda] = useState("");
+    const [proyectos, setProyectos] = useState<Proyecto[]>([]);
 
-  const proyectosFiltrados = proyectos.filter((proyecto) => {
-    const texto = `${proyecto.nombre} ${proyecto.ubicacion} ${proyecto.tipo}`;
-    return texto.toLowerCase().includes(busqueda.toLowerCase());
-  });
+    const navigate = useNavigate();
 
-  return (
-    <div className="cliente-panel">
-      <SidebarCliente
-        menuOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
-      />
+    useEffect(() => {
+      const cargarProyectos = async () => {
+        try {
+          const usuario = JSON.parse(
+            localStorage.getItem("usuario") || "{}"
+          );
 
-      <main className="cliente-main">
+          const respuesta = await fetch(
+            `http://localhost:3000/api/crearProyecto/obtenerProyectos/${usuario.id_Cliente}`
+          );
 
-        <section className="proyectos-heading">
-          <div>
-            <h2>Mis proyectos</h2>
-            <p>
-              Gestioná, editá y revisá todos tus proyectos.
-            </p>
-          </div>
+          const datos = await respuesta.json();
 
-          <button type="button" className="nuevo-proyecto-button">
-            <Plus size={20} />
-            Crear nuevo proyecto
-          </button>
-        </section>
+          setProyectos(datos);
+        } catch (error) {
+          console.error("Error al cargar proyectos:", error);
+        }
+      };
 
-        <section className="proyectos-stats">
-          <StatCard
-            icon={<FolderOpen size={23} />}
-            value="6"
-            label="Total proyectos"
-            variant="blue"
+      cargarProyectos();
+    }, []);
+
+    const proyectosFiltrados = proyectos.filter((proyecto) => {
+      const texto = `${proyecto.nombre} ${proyecto.tipoObra} ${proyecto.estado}`;
+      return texto.toLowerCase().includes(busqueda.toLowerCase());
+    });
+
+    const proyectosActivos = proyectos.filter(
+      (p) => p.estado === "Activo"
+    ).length;
+
+    const proyectosPendientes = proyectos.filter(
+      (p) => p.estado === "Pendiente"
+    ).length;
+
+    const proyectosFinalizados = proyectos.filter(
+      (p) => p.estado === "Finalizado"
+    ).length;
+
+    return (
+      <>
+        <div className="cliente-panel">
+          <SidebarCliente
+            menuOpen={menuOpen}
+            onClose={() => setMenuOpen(false)}
           />
 
-          <StatCard
-            icon={<CircleDashed size={23} />}
-            value="3"
-            label="Activos"
-            variant="green"
-          />
+        <main className="cliente-main">
 
-          <StatCard
-            icon={<Clock3 size={23} />}
-            value="1"
-            label="Pendiente"
-            variant="orange"
-          />
+          <section className="proyectos-heading">
+            <div>
+              <h2>Mis proyectos</h2>
+              <p>
+                Gestioná, editá y revisá todos tus proyectos.
+              </p>
+            </div>
 
-          <StatCard
-            icon={<CircleCheck size={23} />}
-            value="1"
-            label="Finalizado"
-            variant="purple"
-          />
-        </section>
+            <button
+              type="button"
+              className="nuevo-proyecto-button"
+              onClick={() => navigate("/registro-proyecto")}
+            >
+              <Plus size={20} />
+              Crear nuevo proyecto
+            </button>
+          </section>
 
-        <section className="proyectos-filters">
-          <label className="proyectos-search">
-            <Search size={19} />
+          <section className="proyectos-stats">
 
-            <input
-              type="search"
-              placeholder="Buscar proyecto..."
-              value={busqueda}
-              onChange={(event) => setBusqueda(event.target.value)}
+            <StatCard
+              icon={<FolderOpen size={23} />}
+              value={proyectos.length.toString()}
+              label="Total proyectos"
+              variant="blue"
             />
-          </label>
 
-          <button type="button" className="proyecto-filter-button">
-            Todos los tipos
-            <ChevronDown size={17} />
-          </button>
+            <StatCard
+              icon={<CircleDashed size={23} />}
+              value={proyectosActivos.toString()}
+              label="Activos"
+              variant="green"
+            />
 
-          <button type="button" className="proyecto-filter-button">
-            Todos los estados
-            <ChevronDown size={17} />
-          </button>
+            <StatCard
+              icon={<Clock3 size={23} />}
+              value={proyectosPendientes.toString()}
+              label="Pendientes"
+              variant="orange"
+            />
 
-          <button type="button" className="proyecto-filter-button">
-            Más recientes
-            <ChevronDown size={17} />
-          </button>
-        </section>
+            <StatCard
+              icon={<CircleCheck size={23} />}
+              value={proyectosFinalizados.toString()}
+              label="Finalizados"
+              variant="purple"
+            />
 
-        <section className="proyectos-grid">
-          {proyectosFiltrados.map((proyecto) => (
-            <article className="proyecto-card" key={proyecto.id}>
-              <div className="proyecto-card-image">
-                <img src={proyecto.imagen} alt={proyecto.nombre} />
+          </section>
 
-                <EstadoProyectoBadge estado={proyecto.estado} />
+          <section className="proyectos-filters">
 
-                <button
-                  type="button"
-                  className="proyecto-options"
-                  aria-label={`Opciones de ${proyecto.nombre}`}
-                >
-                  <MoreVertical size={19} />
-                </button>
-              </div>
+            <label className="proyectos-search">
 
-              <div className="proyecto-card-content">
-                <div className="proyecto-card-title">
-                  <div>
-                    <h3>{proyecto.nombre}</h3>
-                    <p>{proyecto.ubicacion}</p>
-                  </div>
-                </div>
+              <Search size={19} />
 
-                <div className="proyecto-details">
-                  <div>
-                    <span>Tipo de obra</span>
-                    <strong>{proyecto.tipo}</strong>
-                  </div>
+              <input
+                type="search"
+                placeholder="Buscar proyecto..."
+                value={busqueda}
+                onChange={(event) =>
+                  setBusqueda(event.target.value)
+                }
+              />
 
-                  <div>
-                    <span>Superficie</span>
-                    <strong>{proyecto.superficie}</strong>
-                  </div>
+            </label>
 
-                  <div>
-                    <span>Actualizado</span>
-                    <strong>{proyecto.fecha}</strong>
-                  </div>
+            <button
+              type="button"
+              className="proyecto-filter-button"
+            >
+              Todos los tipos
+              <ChevronDown size={17} />
+            </button>
 
-                  <div>
-                    <span>Cotizaciones</span>
-                    <strong>{proyecto.cotizaciones}</strong>
-                  </div>
-                </div>
+            <button
+              type="button"
+              className="proyecto-filter-button"
+            >
+              Todos los estados
+              <ChevronDown size={17} />
+            </button>
 
-                <div className="proyecto-card-actions">
-                  <button type="button" className="primary-action">
-                    <Eye size={16} />
-                    Ver detalle
+            <button
+              type="button"
+              className="proyecto-filter-button"
+            >
+              Más recientes
+              <ChevronDown size={17} />
+            </button>
+
+          </section>
+
+          <section className="proyectos-grid">
+
+            {proyectosFiltrados.map((proyecto) => (
+
+              <article
+                className="proyecto-card"
+                key={proyecto.id_Proyecto}
+              >
+
+                <div className="proyecto-card-image">
+
+                  <img
+                    src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=700"
+                    alt={proyecto.nombre}
+                  />
+
+                  <EstadoProyectoBadge
+                    estado={proyecto.estado}
+                  />
+
+                  <button
+                    type="button"
+                    className="proyecto-options"
+                  >
+                    <MoreVertical size={19} />
                   </button>
 
-                  <button type="button">
-                    <Pencil size={16} />
-                    Editar
-                  </button>
-
-                  <button type="button">
-                    <FileText size={16} />
-                    Cotizar
-                  </button>
                 </div>
-              </div>
-            </article>
-          ))}
-        </section>
-      </main>
-    </div>
-  );
-}
 
-interface StatCardProps {
+                <div className="proyecto-card-content">
+
+                  <div className="proyecto-card-title">
+
+                    <div>
+
+                      <h3>{proyecto.nombre}</h3>
+
+                      <p>
+                        Proyecto N° {proyecto.id_Proyecto}
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                  <div className="proyecto-details">
+
+                    <div>
+
+                      <span>Tipo de obra</span>
+
+                      <strong>{proyecto.tipoObra}</strong>
+
+                    </div>
+
+                    <div>
+
+                      <span>Superficie</span>
+
+                      <strong>
+                        {proyecto.ancho * proyecto.largo} m²
+                      </strong>
+
+                    </div>
+
+                    <div>
+
+                      <span>Actualizado</span>
+
+                      <strong>
+                        {new Date(
+                          proyecto.fechaCreacion
+                        ).toLocaleDateString()}
+                      </strong>
+
+                    </div>
+
+                    <div>
+
+                      <span>Cotizaciones</span>
+
+                      <strong>0</strong>
+
+                    </div>
+
+                  </div>
+
+                  <div className="proyecto-card-actions">
+
+                    <button
+                      type="button"
+                      className="primary-action"
+                    >
+                      <Eye size={16} />
+                      Ver detalle
+                    </button>
+
+                    <button type="button">
+                      <Pencil size={16} />
+                      Editar
+                    </button>
+
+                    <button type="button">
+                      <FileText size={16} />
+                      Cotizar
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </article>
+
+            ))}
+
+          </section>
+
+        </main>
+
+      </div>
+      </>
+    
+    );
+  }
+  interface StatCardProps {
   icon: React.ReactNode;
   value: string;
   label: string;
@@ -297,12 +336,18 @@ function StatCard({
   );
 }
 
+interface EstadoProyectoBadgeProps {
+  estado: EstadoProyecto;
+}
+
 function EstadoProyectoBadge({
   estado,
-}: {
-  estado: EstadoProyecto;
-}) {
+}: EstadoProyectoBadgeProps) {
   const clase = `proyecto-status proyecto-status-${estado.toLowerCase()}`;
 
-  return <span className={clase}>{estado}</span>;
+  return (
+    <span className={clase}>
+      {estado}
+    </span>
+  );
 }

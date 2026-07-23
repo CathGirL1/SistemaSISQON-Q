@@ -40,7 +40,14 @@ export default function LoginContenido() {
          const usuarioAutenticado =
           await respuesta.json();
 
-          console.log(usuarioAutenticado);
+          /* console.log(usuarioAutenticado); */
+          console.log(JSON.stringify(usuarioAutenticado, null, 2));
+
+          // Guardar la sesión
+          localStorage.setItem(
+              "usuario",
+              JSON.stringify(usuarioAutenticado)
+          );
 
           if (usuarioAutenticado.rol === "cliente") {
 
