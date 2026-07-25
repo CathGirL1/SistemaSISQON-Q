@@ -4,13 +4,14 @@ import { connectDB } from "../server/database";
 export interface Material {
   idMaterial: number;
   nombre: string;
-  categoria: string;
   descripcion: string | null;
-  unidadMedida: string;
-  precioReferencia: number | null;
-  marca: string | null;
-  imagen: string | null;
-  activo: boolean;
+  stock: number;
+  costoUnitario: number;
+  categoria: string;
+  unidad: string;
+  ultimaActualizacion: Date;
+  disponibilidad: string;
+  estado: string;
 }
 
 export async function obtenerMateriales(): Promise<Material[]> {
@@ -20,15 +21,16 @@ export async function obtenerMateriales(): Promise<Material[]> {
     SELECT
       id_Material AS idMaterial,
       nombre,
-      categoria,
       descripcion,
-      unidadMedida,
-      precioReferencia,
-      marca,
-      imagen,
-      activo
+      stock,
+      costoUnitario,
+      categoria,
+      unidad,
+      ultimaActualizacion,
+      disponibilidad,
+      estado
     FROM Material
-    WHERE activo = 1
+    WHERE estado = 'Activo'
     ORDER BY categoria, nombre;
   `);
 
@@ -47,13 +49,14 @@ export async function obtenerMaterialPorId(
       SELECT
         id_Material AS idMaterial,
         nombre,
-        categoria,
         descripcion,
-        unidadMedida,
-        precioReferencia,
-        marca,
-        imagen,
-        activo
+        stock,
+        costoUnitario,
+        categoria,
+        unidad,
+        ultimaActualizacion,
+        disponibilidad,
+        estado
       FROM Material
       WHERE id_Material = @idMaterial;
     `);

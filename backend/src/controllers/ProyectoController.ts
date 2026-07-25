@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-
-import { Proyecto } from "../models/Proyecto";
 import { ProyectoService } from "../services/ProyectoService";
 
 export class ProyectoController {
@@ -11,34 +9,7 @@ export class ProyectoController {
     res: Response
   ): Promise<void> => {
     try {
-      const {
-        idCliente,
-        idEmpresa,
-        idTipoObra,
-        nombre,
-        descripcion,
-        ubicacion,
-        estado,
-        alto,
-        ancho,
-        largo,
-      } = req.body;
-
-      const proyecto = new Proyecto(
-        null,
-        idEmpresa,
-        idCliente,
-        idTipoObra,
-        nombre,
-        estado,
-        alto,
-        ancho,
-        largo
-      );
-
-      
-
-      const idProyecto = await this.service.crearProyecto(proyecto);
+      const idProyecto = await this.service.crearProyecto(req.body);
 
       res.status(201).json({
         mensaje: "Proyecto creado correctamente",

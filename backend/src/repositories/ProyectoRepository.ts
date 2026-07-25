@@ -1,22 +1,37 @@
 import sql from "mssql";
 import { connectDB } from "../server/database";
-import { Proyecto } from "../models/Proyecto";
+
+export interface CrearProyectoData {
+  idCliente: number;
+  idEmpresa?: number | null;
+  idTipoObra: number;
+  nombre: string;
+  descripcion?: string | null;
+  ubicacion?: string | null;
+  estado?: string;
+  alto: number;
+  ancho: number;
+  largo: number;
+}
 
 export class ProyectoRepository {
-
-  public async crearProyecto(proyecto: Proyecto): Promise<number> {
+  public async crearProyecto(
+    data: CrearProyectoData
+  ): Promise<number> {
     const pool = await connectDB();
 
     const result = await pool
       .request()
-      .input("idCliente", sql.Int, proyecto.idCliente)
-      .input("idEmpresa", sql.Int, proyecto.idEmpresa ?? null)
-      .input("idTipoObra", sql.Int, proyecto.tipoObraID)
-      .input("nombre", sql.VarChar(100), proyecto.nombre)
-      .input("estado", sql.VarChar(20), proyecto.estado ?? "Borrador")
-      .input("alto", sql.Decimal(10, 2), proyecto.alto)
-      .input("ancho", sql.Decimal(10, 2), proyecto.ancho)
-      .input("largo", sql.Decimal(10, 2), proyecto.largo)
+      .input("idCliente", sql.Int, data.idCliente)
+      .input("idEmpresa", sql.Int, data.idEmpresa ?? null)
+      .input("idTipoObra", sql.Int, data.idTipoObra)
+      .input("nombre", sql.VarChar(100), data.nombre)
+      .input("descripcion", sql.VarChar(500), data.descripcion ?? null)
+      .input("ubicacion", sql.VarChar(200), data.ubicacion ?? null)
+      .input("estado", sql.VarChar(20), data.estado ?? "Borrador")
+      .input("alto", sql.Decimal(10, 2), data.alto)
+      .input("ancho", sql.Decimal(10, 2), data.ancho)
+      .input("largo", sql.Decimal(10, 2), data.largo)
       .query(`
         INSERT INTO Proyecto
         (
@@ -60,21 +75,21 @@ export class ProyectoRepository {
       .input("idCliente", sql.Int, idCliente)
       .query(`
         SELECT
-          p.id_Proyecto AS idProyecto,
-          p.id_Cliente AS idCliente,
-          p.id_Empresa AS idEmpresa,
-          p.id_TipoObra AS idTipoObra,
-          p.nombre,
-          p.descripcion,
-          p.ubicacion,
-          p.estado,
-          p.alto,
-          p.ancho,
-          p.largo,
-          p.fechaCreacion
-        FROM Proyecto p
-        WHERE p.id_Cliente = @idCliente
-        ORDER BY p.fechaCreacion DESC, p.id_Proyecto DESC
+          id_Proyecto AS idProyecto,
+          id_Cliente AS idCliente,
+          id_Empresa AS idEmpresa,
+          id_TipoObra AS idTipoObra,
+          nombre,
+          descripcion,
+          ubicacion,
+          estado,
+          alto,
+          ancho,
+          largo,
+          fechaCreacion
+        FROM Proyecto
+        WHERE id_Cliente = @idCliente
+        ORDER BY fechaCreacion DESC, id_Proyecto DESC
       `);
 
     return result.recordset;
@@ -88,20 +103,20 @@ export class ProyectoRepository {
       .input("idProyecto", sql.Int, idProyecto)
       .query(`
         SELECT
-          p.id_Proyecto AS idProyecto,
-          p.id_Cliente AS idCliente,
-          p.id_Empresa AS idEmpresa,
-          p.id_TipoObra AS idTipoObra,
-          p.nombre,
-          p.descripcion,
-          p.ubicacion,
-          p.estado,
-          p.alto,
-          p.ancho,
-          p.largo,
-          p.fechaCreacion
-        FROM Proyecto p
-        WHERE p.id_Proyecto = @idProyecto
+          id_Proyecto AS idProyecto,
+          id_Cliente AS idCliente,
+          id_Empresa AS idEmpresa,
+          id_TipoObra AS idTipoObra,
+          nombre,
+          descripcion,
+          ubicacion,
+          estado,
+          alto,
+          ancho,
+          largo,
+          fechaCreacion
+        FROM Proyecto
+        WHERE id_Proyecto = @idProyecto
       `);
 
     return result.recordset[0] ?? null;
@@ -109,7 +124,7 @@ export class ProyectoRepository {
 
   public async actualizarProyecto(
     idProyecto: number,
-    data: Partial<Proyecto>
+    data: Partial<CrearProyectoData>
   ): Promise<boolean> {
     const pool = await connectDB();
 
@@ -117,8 +132,10 @@ export class ProyectoRepository {
       .request()
       .input("idProyecto", sql.Int, idProyecto)
       .input("idEmpresa", sql.Int, data.idEmpresa ?? null)
-      .input("idTipoObra", sql.Int, data.tipoObraID ?? null)
+      .input("idTipoObra", sql.Int, data.idTipoObra ?? null)
       .input("nombre", sql.VarChar(100), data.nombre ?? null)
+      .input("descripcion", sql.VarChar(500), data.descripcion ?? null)
+      .input("ubicacion", sql.VarChar(200), data.ubicacion ?? null)
       .input("estado", sql.VarChar(20), data.estado ?? null)
       .input("alto", sql.Decimal(10, 2), data.alto ?? null)
       .input("ancho", sql.Decimal(10, 2), data.ancho ?? null)
@@ -141,7 +158,9 @@ export class ProyectoRepository {
     return result.rowsAffected[0] > 0;
   }
 
-  public async eliminarProyecto(idProyecto: number): Promise<boolean> {
+  public async eliminarProyecto(
+    idProyecto: number
+  ): Promise<boolean> {
     const pool = await connectDB();
 
     const result = await pool
