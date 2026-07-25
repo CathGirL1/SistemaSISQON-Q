@@ -111,8 +111,10 @@ export default function AsistenteIA() {
 
       <main className="cliente-main">
         <HeaderCliente
+
           title="Asistente IA"
           subtitle="Consultá sobre materiales, costos, proyectos, cotizaciones y empresas."
+
           menuOpen={menuOpen}
           onToggleMenu={() => setMenuOpen((prev) => !prev)}
         />

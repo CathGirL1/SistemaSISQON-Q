@@ -1,4 +1,12 @@
-import { useEffect, useState } from "react";
+
+
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+
 import {
   Search,
   ChevronDown,
@@ -13,304 +21,374 @@ import {
   MoreVertical,
 } from "lucide-react";
 
-import SidebarCliente from "../../components/cliente/SidebarCliente";
+
 import { useNavigate } from "react-router-dom";
+
+
+import SidebarCliente from "../../components/cliente/SidebarCliente";
+
+
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/MisProyectos.css";
 
-type EstadoProyecto =
-  | "Activo"
-  | "Borrador"
-  | "Finalizado"
-  | "Pendiente";
 
-interface Proyecto {
-  id_Proyecto: number;
+
+
+
+interface ProyectoAPI {
+  idProyecto: number;
+  idCliente: number;
+  idEmpresa: number | null;
+  idTipoObra: number;
   nombre: string;
-  estado: EstadoProyecto;
+  descripcion: string | null;
+  ubicacion: string | null;
+  estado: string;
+
   alto: number;
   ancho: number;
   largo: number;
   fechaCreacion: string;
+
   tipoObra: string;
 }
 
-export default function MisProyectos() {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [busqueda, setBusqueda] = useState("");
-    const [proyectos, setProyectos] = useState<Proyecto[]>([]);
 
-    const navigate = useNavigate();
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-    useEffect(() => {
-      const cargarProyectos = async () => {
-        try {
-          const usuario = JSON.parse(
-            localStorage.getItem("usuario") || "{}"
-          );
+const ID_CLIENTE_TEMPORAL = 1;
 
-          const respuesta = await fetch(
-            `http://localhost:3000/api/crearProyecto/obtenerProyectos/${usuario.id_Cliente}`
-          );
+const IMAGEN_PROYECTO =
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500";
 
-          const datos = await respuesta.json();
+  
+  export default function MisProyectos() {
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
 
-          setProyectos(datos);
-        } catch (error) {
-          console.error("Error al cargar proyectos:", error);
-        }
-      };
+  const [proyectos, setProyectos] = useState<ProyectoAPI[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
 
-      cargarProyectos();
-    }, []);
+  useEffect(() => {
+    obtenerProyectos();
+  }, []);
 
-    const proyectosFiltrados = proyectos.filter((proyecto) => {
-      const texto = `${proyecto.nombre} ${proyecto.tipoObra} ${proyecto.estado}`;
-      return texto.toLowerCase().includes(busqueda.toLowerCase());
+  const obtenerProyectos = async () => {
+    try {
+      setCargando(true);
+      setError("");
+
+      const response = await fetch(
+        `${API_URL}/api/proyectos/cliente/${ID_CLIENTE_TEMPORAL}`
+      );
+
+      if (!response.ok) {
+        const respuestaError = await response.json();
+
+        throw new Error(
+          respuestaError.mensaje ||
+            "No se pudieron obtener los proyectos"
+        );
+      }
+
+      const data: ProyectoAPI[] = await response.json();
+
+      setProyectos(data);
+    } catch (error) {
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al cargar los proyectos";
+
+      setError(mensaje);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const proyectosFiltrados = useMemo(() => {
+    const textoBusqueda = busqueda.trim().toLowerCase();
+
+    if (!textoBusqueda) {
+      return proyectos;
+    }
+
+    return proyectos.filter((proyecto) => {
+      const texto = `
+        ${proyecto.nombre}
+        ${proyecto.ubicacion ?? ""}
+        ${proyecto.estado}
+        ${proyecto.idTipoObra}
+      `;
+
+      return texto.toLowerCase().includes(textoBusqueda);
     });
+  }, [busqueda, proyectos]);
 
-    const proyectosActivos = proyectos.filter(
-      (p) => p.estado === "Activo"
-    ).length;
+  const totalActivos = proyectos.filter(
+    (proyecto) =>
+      proyecto.estado.toLowerCase() === "activo" ||
+      proyecto.estado.toLowerCase() === "en proceso"
+  ).length;
 
-    const proyectosPendientes = proyectos.filter(
-      (p) => p.estado === "Pendiente"
-    ).length;
+  const totalPendientes = proyectos.filter(
+    (proyecto) =>
+      proyecto.estado.toLowerCase() === "pendiente"
+  ).length;
 
-    const proyectosFinalizados = proyectos.filter(
-      (p) => p.estado === "Finalizado"
-    ).length;
+  const totalFinalizados = proyectos.filter(
+    (proyecto) =>
+      proyecto.estado.toLowerCase() === "finalizado"
+  ).length;
 
-    return (
-      <>
-        <div className="cliente-panel">
-          <SidebarCliente
-            menuOpen={menuOpen}
-            onClose={() => setMenuOpen(false)}
+  return (
+    <div className="cliente-panel">
+      <SidebarCliente
+        menuOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+      />
+
+      <main className="cliente-main">
+       
+
+        <section className="proyectos-heading">
+          <div>
+            <h2>Mis proyectos</h2>
+
+            <p>
+              Organizá tus proyectos y generá cotizaciones a partir de
+              cada uno.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="nuevo-proyecto-button"
+            onClick={() => 
+              navigate("/panel-cliente/proyectos/crear")
+            }
+          >
+            <Plus size={20} />
+            Crear nuevo proyecto
+          </button>
+        </section>
+
+        <section className="proyectos-stats">
+          <StatCard
+            icon={<FolderOpen size={23} />}
+            value={proyectos.length.toString()}
+            label="Total proyectos"
+            variant="blue"
           />
 
-        <main className="cliente-main">
+          <StatCard
+            icon={<CircleDashed size={23} />}
+            value={totalActivos.toString()}
+            label="Activos"
+            variant="green"
+          />
 
-          <section className="proyectos-heading">
-            <div>
-              <h2>Mis proyectos</h2>
+          <StatCard
+            icon={<Clock3 size={23} />}
+            value={totalPendientes.toString()}
+            label="Pendientes"
+            variant="orange"
+          />
+
+          <StatCard
+            icon={<CircleCheck size={23} />}
+            value={totalFinalizados.toString()}
+            label="Finalizados"
+            variant="purple"
+          />
+        </section>
+
+        <section className="proyectos-filters">
+          <label className="proyectos-search">
+            <Search size={19} />
+
+            <input
+              type="search"
+              placeholder="Buscar proyecto..."
+              value={busqueda}
+              onChange={(event) =>
+                setBusqueda(event.target.value)
+              }
+            />
+          </label>
+
+          <button
+            type="button"
+            className="proyecto-filter-button"
+          >
+            Todos los tipos
+            <ChevronDown size={17} />
+          </button>
+
+          <button
+            type="button"
+            className="proyecto-filter-button"
+          >
+            Todos los estados
+            <ChevronDown size={17} />
+          </button>
+
+          <button
+            type="button"
+            className="proyecto-filter-button"
+          >
+            Más recientes
+            <ChevronDown size={17} />
+          </button>
+        </section>
+
+        {cargando && (
+          <section className="proyectos-feedback">
+            <p>Cargando proyectos...</p>
+          </section>
+        )}
+
+        {!cargando && error && (
+          <section className="proyectos-feedback">
+            <p>{error}</p>
+
+            <button
+              type="button"
+              onClick={obtenerProyectos}
+            >
+              Volver a intentar
+            </button>
+          </section>
+        )}
+
+        {!cargando &&
+          !error &&
+          proyectosFiltrados.length === 0 && (
+            <section className="proyectos-feedback">
+              <FolderOpen size={40} />
+
+              <h3>No se encontraron proyectos</h3>
+
               <p>
-                Gestioná, editá y revisá todos tus proyectos.
+                Todavía no hay proyectos registrados para este
+                cliente.
               </p>
-            </div>
+            </section>
+          )}
 
-            <button
-              type="button"
-              className="nuevo-proyecto-button"
-              onClick={() => navigate("/registro-proyecto")}
-            >
-              <Plus size={20} />
-              Crear nuevo proyecto
-            </button>
-          </section>
+        {!cargando &&
+          !error &&
+          proyectosFiltrados.length > 0 && (
+            <section className="proyectos-grid">
+              {proyectosFiltrados.map((proyecto) => (
+                <article
+                  className="proyecto-card"
+                  key={proyecto.idProyecto}
+                >
+                  <div className="proyecto-card-image">
+                    <img
+                      src={IMAGEN_PROYECTO}
+                      alt={proyecto.nombre}
+                    />
 
-          <section className="proyectos-stats">
-
-            <StatCard
-              icon={<FolderOpen size={23} />}
-              value={proyectos.length.toString()}
-              label="Total proyectos"
-              variant="blue"
-            />
-
-            <StatCard
-              icon={<CircleDashed size={23} />}
-              value={proyectosActivos.toString()}
-              label="Activos"
-              variant="green"
-            />
-
-            <StatCard
-              icon={<Clock3 size={23} />}
-              value={proyectosPendientes.toString()}
-              label="Pendientes"
-              variant="orange"
-            />
-
-            <StatCard
-              icon={<CircleCheck size={23} />}
-              value={proyectosFinalizados.toString()}
-              label="Finalizados"
-              variant="purple"
-            />
-
-          </section>
-
-          <section className="proyectos-filters">
-
-            <label className="proyectos-search">
-
-              <Search size={19} />
-
-              <input
-                type="search"
-                placeholder="Buscar proyecto..."
-                value={busqueda}
-                onChange={(event) =>
-                  setBusqueda(event.target.value)
-                }
-              />
-
-            </label>
-
-            <button
-              type="button"
-              className="proyecto-filter-button"
-            >
-              Todos los tipos
-              <ChevronDown size={17} />
-            </button>
-
-            <button
-              type="button"
-              className="proyecto-filter-button"
-            >
-              Todos los estados
-              <ChevronDown size={17} />
-            </button>
-
-            <button
-              type="button"
-              className="proyecto-filter-button"
-            >
-              Más recientes
-              <ChevronDown size={17} />
-            </button>
-
-          </section>
-
-          <section className="proyectos-grid">
-
-            {proyectosFiltrados.map((proyecto) => (
-
-              <article
-                className="proyecto-card"
-                key={proyecto.id_Proyecto}
-              >
-
-                <div className="proyecto-card-image">
-
-                  <img
-                    src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=700"
-                    alt={proyecto.nombre}
-                  />
-
-                  <EstadoProyectoBadge
-                    estado={proyecto.estado}
-                  />
-
-                  <button
-                    type="button"
-                    className="proyecto-options"
-                  >
-                    <MoreVertical size={19} />
-                  </button>
-
-                </div>
-
-                <div className="proyecto-card-content">
-
-                  <div className="proyecto-card-title">
-
-                    <div>
-
-                      <h3>{proyecto.nombre}</h3>
-
-                      <p>
-                        Proyecto N° {proyecto.id_Proyecto}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div className="proyecto-details">
-
-                    <div>
-
-                      <span>Tipo de obra</span>
-
-                      <strong>{proyecto.tipoObra}</strong>
-
-                    </div>
-
-                    <div>
-
-                      <span>Superficie</span>
-
-                      <strong>
-                        {proyecto.ancho * proyecto.largo} m²
-                      </strong>
-
-                    </div>
-
-                    <div>
-
-                      <span>Actualizado</span>
-
-                      <strong>
-                        {new Date(
-                          proyecto.fechaCreacion
-                        ).toLocaleDateString()}
-                      </strong>
-
-                    </div>
-
-                    <div>
-
-                      <span>Cotizaciones</span>
-
-                      <strong>0</strong>
-
-                    </div>
-
-                  </div>
-
-                  <div className="proyecto-card-actions">
+                    <EstadoProyectoBadge
+                      estado={proyecto.estado}
+                    />
 
                     <button
                       type="button"
-                      className="primary-action"
+                      className="proyecto-options"
+                      aria-label={`Opciones de ${proyecto.nombre}`}
                     >
-                      <Eye size={16} />
-                      Ver detalle
+                      <MoreVertical size={19} />
                     </button>
-
-                    <button type="button">
-                      <Pencil size={16} />
-                      Editar
-                    </button>
-
-                    <button type="button">
-                      <FileText size={16} />
-                      Cotizar
-                    </button>
-
                   </div>
 
-                </div>
+                  <div className="proyecto-card-content">
+                    <div className="proyecto-card-title">
+                      <div>
+                        <h3>{proyecto.nombre}</h3>
 
-              </article>
+                        <p>
+                          {proyecto.ubicacion ||
+                            "Ubicación no especificada"}
+                        </p>
+                      </div>
+                    </div>
 
-            ))}
+                    <div className="proyecto-details">
+                      <div>
+                        <span>Tipo de obra</span>
 
-          </section>
+                        <strong>
+                          Tipo #{proyecto.idTipoObra}
+                        </strong>
+                      </div>
 
-        </main>
+                      <div>
+                        <span>Superficie</span>
 
-      </div>
-      </>
-    
-    );
-  }
-  interface StatCardProps {
-  icon: React.ReactNode;
+                        <strong>
+                          {calcularSuperficie(proyecto)} m²
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Creado</span>
+
+                        <strong>
+                          {formatearFecha(
+                            proyecto.fechaCreacion
+                          )}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Altura</span>
+
+                        <strong>{proyecto.alto} m</strong>
+                      </div>
+                    </div>
+
+                    <div className="proyecto-card-actions">
+                      <button
+                        type="button"
+                        className="primary-action"
+                        onClick={() =>
+                          navigate(`/panel-cliente/proyectos/${proyecto.idProyecto}`)
+                        }
+                      >
+                        <Eye size={16} />
+                        Ver detalle
+                      </button>
+
+                      <button type="button">
+                        <Pencil size={16} />
+                        Editar
+                      </button>
+
+                      <button type="button">
+                        <FileText size={16} />
+                        Cotizar
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </section>
+          )}
+      </main>
+    </div>
+  );
+}
+
+interface StatCardProps {
+  icon: ReactNode;
+
   value: string;
   label: string;
   variant: "blue" | "green" | "orange" | "purple";
@@ -336,18 +414,43 @@ function StatCard({
   );
 }
 
-interface EstadoProyectoBadgeProps {
-  estado: EstadoProyecto;
-}
 
 function EstadoProyectoBadge({
   estado,
-}: EstadoProyectoBadgeProps) {
-  const clase = `proyecto-status proyecto-status-${estado.toLowerCase()}`;
+}: {
+  estado: string;
+}) {
+  const estadoNormalizado = estado
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-");
 
   return (
-    <span className={clase}>
+    <span className={`proyecto-status proyecto-status-${estadoNormalizado}`}>
       {estado}
     </span>
   );
 }
+
+function calcularSuperficie(proyecto: ProyectoAPI): string {
+  const superficie =
+    Number(proyecto.ancho) * Number(proyecto.largo);
+
+  return superficie.toFixed(2).replace(".00", "");
+}
+
+function formatearFecha(fecha: string): string {
+  const fechaProyecto = new Date(fecha);
+
+  if (Number.isNaN(fechaProyecto.getTime())) {
+    return "Fecha no disponible";
+  }
+
+  return new Intl.DateTimeFormat("es-UY", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(fechaProyecto);
+
+}
+

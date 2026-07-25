@@ -16,6 +16,7 @@ import {
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 
 
+
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/EmpresasCliente.css";
 
@@ -176,6 +177,8 @@ export default function Empresas() {
       />
 
       <main className="cliente-main">
+
+
         <section className="empresas-heading">
           <div>
             <h2>Empresas disponibles</h2>
