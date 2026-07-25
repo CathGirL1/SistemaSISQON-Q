@@ -1,39 +1,82 @@
 import "../../../styles/empresa/materiales/MaterialesFiltros.css";
-
-import { FaFilter } from "react-icons/fa";
 import PanelSearchBar from "../../common/PanelSearchBar";
+import { FaFilter, FaSearch } from "react-icons/fa";
 
-export default function MaterialesFiltros() {
+type Props = {
+  busqueda: string;
+  categoria: string;
+  estado: string;
+  disponibilidad: string;
+
+  categorias: string[];
+
+  onBusquedaChange: (valor: string) => void;
+  onCategoriaChange: (valor: string) => void;
+  onEstadoChange: (valor: string) => void;
+  onDisponibilidadChange: (valor: string) => void;
+};
+export default function MaterialesFiltros({
+  busqueda,
+  categoria,
+  estado,
+  disponibilidad,
+  categorias,
+  onBusquedaChange,
+  onCategoriaChange,
+  onEstadoChange,
+  onDisponibilidadChange,
+}: Props) {
   return (
     <div className="materiales-filtros">
-      <PanelSearchBar placeholder="Buscar material..." />
+      <PanelSearchBar
+      placeholder="Buscar material..."
+      value={busqueda}
+      onChange={onBusquedaChange}
+      />
 
-      <select>
-        <option>Todas las categorías</option>
-        <option>Techos</option>
-        <option>Maderas</option>
-        <option>Cubiertas</option>
-        <option>Cementos</option>
-        <option>Áridos</option>
-        <option>Hierros</option>
-        <option>Ladrillos</option>
-        <option>Terminaciones</option>
+      <select
+        value={categoria}
+        onChange={(e) =>
+          onCategoriaChange(e.target.value)
+        }
+      >
+        <option value="Todas">
+          Todas las categorías
+        </option>
+
+        {categorias.map((categoria) => (
+          <option
+            key={categoria}
+            value={categoria}
+          >
+            {categoria}
+          </option>
+        ))}
       </select>
 
-      <select>
-        <option>Estado: Todos</option>
-        <option>Activo</option>
-        <option>Inactivo</option>
+      <select
+        value={estado}
+        onChange={(e) => onEstadoChange(e.target.value)}
+      >
+        <option value="Todos">Todos los estados</option>
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
       </select>
 
-      <select>
-        <option>Disponibilidad: Todos</option>
-        <option>Disponible</option>
-        <option>Stock bajo</option>
-        <option>Sin stock</option>
+      <select
+        value={disponibilidad}
+        onChange={(e) => onDisponibilidadChange(e.target.value)}
+      >
+        <option value="Todas">Toda disponibilidad</option>
+        <option value="Disponible">Disponible</option>
+        <option value="Stock bajo">Stock bajo</option>
+        <option value="Sin stock">Sin stock</option>
       </select>
 
-      <button className="materiales-filtros-btn">
+      <button
+        type="button"
+        className="materiales-filtros-btn"
+      >
         <FaFilter />
         Filtros
       </button>

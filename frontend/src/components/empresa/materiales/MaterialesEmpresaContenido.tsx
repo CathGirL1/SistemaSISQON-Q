@@ -9,7 +9,6 @@ import TablaMateriales from "./TablaMateriales";
 import PanelBottomCard from "../../common/PanelBottomCard";
 import MaterialModal from "./MaterialModal";
 
-
 import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
 
 import {
@@ -29,6 +28,13 @@ export default function MaterialesEmpresaContenido() {
 
   const [modalCrearAbierto, setModalCrearAbierto] =
     useState(false);
+
+  // Estados de filtros
+  const [busqueda, setBusqueda] = useState("");
+  const [categoria, setCategoria] = useState("Todas");
+  const [estado, setEstado] = useState("Todos");
+  const [disponibilidad, setDisponibilidad] =
+    useState("Todas");
 
   const cargarMateriales = useCallback(async () => {
     try {
@@ -62,7 +68,8 @@ export default function MaterialesEmpresaContenido() {
   const guardarNuevoMaterial = async (
     datos: CrearMaterialRequest
   ) => {
-    const materialCreado = await crearMaterial(datos);
+    const materialCreado =
+      await crearMaterial(datos);
 
     setMateriales((listaActual) => [
       materialCreado,
@@ -72,21 +79,80 @@ export default function MaterialesEmpresaContenido() {
     setModalCrearAbierto(false);
   };
 
+  // Categorías dinámicas
+  const categorias = [
+    ...new Set(
+      materiales.map(
+        (material) => material.categoria
+      )
+    ),
+  ].sort();
+
+  // Materiales filtrados
+  const materialesFiltrados =
+    materiales.filter((material) => {
+      const coincideBusqueda =
+        material.nombre
+          .toLowerCase()
+          .includes(busqueda.toLowerCase()) ||
+        material.descripcion
+          .toLowerCase()
+          .includes(busqueda.toLowerCase());
+
+      const coincideCategoria =
+        categoria === "Todas" ||
+        material.categoria === categoria;
+
+      const coincideEstado =
+        estado === "Todos" ||
+        material.estado === estado;
+
+      const coincideDisponibilidad =
+        disponibilidad === "Todas" ||
+        material.disponibilidad ===
+          disponibilidad;
+
+      return (
+        coincideBusqueda &&
+        coincideCategoria &&
+        coincideEstado &&
+        coincideDisponibilidad
+      );
+    });
+
   return (
     <section className="materiales-page">
       <PageHeader
         title="Gestión de materiales"
         subtitle="Administra los materiales, precios y disponibilidad del sistema."
         buttonText="Agregar material"
-        onButtonClick={() => setModalCrearAbierto(true)}
+        onButtonClick={() =>
+          setModalCrearAbierto(true)
+        }
       />
 
-      <MaterialesKPIs />
+      <MaterialesKPIs
+        materiales={materiales}
+      />
 
-      <MaterialesFiltros />
+      <MaterialesFiltros
+        busqueda={busqueda}
+        categoria={categoria}
+        estado={estado}
+        disponibilidad={disponibilidad}
+        categorias={categorias}
+        onBusquedaChange={setBusqueda}
+        onCategoriaChange={setCategoria}
+        onEstadoChange={setEstado}
+        onDisponibilidadChange={
+          setDisponibilidad
+        }
+      />
 
       <TablaMateriales
-        materialesIniciales={materiales}
+        materialesIniciales={
+          materialesFiltrados
+        }
         cargando={cargando}
         error={error}
       />
@@ -100,7 +166,9 @@ export default function MaterialesEmpresaContenido() {
         abierto={modalCrearAbierto}
         modo="crear"
         material={null}
-        onCerrar={() => setModalCrearAbierto(false)}
+        onCerrar={() =>
+          setModalCrearAbierto(false)
+        }
         onGuardar={guardarNuevoMaterial}
       />
     </section>
