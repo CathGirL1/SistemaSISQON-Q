@@ -16,11 +16,14 @@ import MaterialesEmpresa from "../pages/MaterialesEmpresa";
 import TiposObraEmpresa from "../pages/TiposObraEmpresa";
 import ManoObraEmpresa from "../pages/ManoObraEmpresa";
 
+
 import MisProyectos from "../pages/cliente/MisProyectos";
 import MisCotizaciones from "../pages/cliente/MisCotizaciones";
 import CatalogoMateriales from "../pages/cliente/CatalogoMateriales";
 import Comparador from "../pages/cliente/Comparador";
 import Empresas from "../pages/cliente/Empresas";
+
+import RegistroProyecto from "../pages/cliente/gestionProyecto/RegistroProyecto";
 
 import AsistenteIA from "../pages/cliente/AsistenteIA";
 
@@ -34,6 +37,8 @@ export default function AppRoutes() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />}/>
           <Route path="/panel-cliente" element={<PanelCliente />}/>
+          <Route path="/registro-proyecto" element={<RegistroProyecto />}
+/>
 
           <Route path="/panel-empresa" element={<PanelEmpresa />}/>
           <Route path="/recuperar-password" element={<RecuperarContrasenia />}/>

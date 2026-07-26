@@ -16,12 +16,15 @@ export class LoginRepository {
             .input("password", sql.VarChar, password)
             .query(`
                 SELECT
-                    id_Usuario,
-                    nombreUsuario,
-                    rol
-                FROM Usuario
-                WHERE gmail = @gmail
-                AND password = @password
+                    u.id_Usuario,
+                    c.id_Cliente,
+                    u.nombreUsuario,
+                    u.rol
+                FROM Usuario u
+                LEFT JOIN Cliente c
+                    ON c.id_Usuario = u.id_Usuario
+                WHERE u.gmail = @gmail
+                AND u.password = @password
             `);
         
         console.log(result.recordset);

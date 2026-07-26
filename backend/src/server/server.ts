@@ -10,6 +10,7 @@ import materialRoutes from "../routes/materialRoutes";
 import clienteRoutes from "../routes/clienteRoutes";
 import tipoObraRoutes from "../routes/tipoObraRoutes";
 import manoObraRoutes from "../routes/ManoObraRoutes";
+import proyectoCrear from "../routes/crearProyectoRoutes"
 
 import { connectDB } from "./database";
 
@@ -35,6 +36,7 @@ servidor.use("/api/materiales", materialRoutes);
 servidor.use("/api/clientes", clienteRoutes);
 servidor.use("/api/tipos-obra",tipoObraRoutes);
 servidor.use("/api/mano-obra", manoObraRoutes);
+servidor.use("/api/crearProyecto", proyectoCrear);
 
 const puerto = Number(process.env.PORT) || 3000;
 
