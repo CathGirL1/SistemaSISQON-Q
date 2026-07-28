@@ -38,6 +38,10 @@ export default function useTiposObra() {
     null
   );
 
+  const limpiarSeleccion = () => {
+  setTipoSeleccionado(null);
+  };
+
   const [tipoAccion, setTipoAccion] =
     useState<TipoObraEmpresa | null>(null);
 
@@ -67,6 +71,12 @@ export default function useTiposObra() {
 
   const [error, setError] =
     useState<string | null>(null);
+
+  const [busqueda, setBusqueda] =
+    useState("");
+
+  const [estadoFiltro, setEstadoFiltro] =
+  useState("Todos");
 
   const [toastVisible, setToastVisible] =
     useState(false);
@@ -477,8 +487,36 @@ export default function useTiposObra() {
       }
     };
 
+  const tiposObraFiltrados =
+  tiposObra.filter((tipoObra) => {
+    const coincideBusqueda =
+      tipoObra.nombre
+        .toLowerCase()
+        .includes(busqueda.toLowerCase()) ||
+      tipoObra.codigo
+        .toLowerCase()
+        .includes(busqueda.toLowerCase());
+
+    const coincideEstado =
+      estadoFiltro === "Todos" ||
+      tipoObra.estado === estadoFiltro;
+
+    return (
+      coincideBusqueda &&
+      coincideEstado
+    );
+  });
+
   return {
     tiposObra,
+    tiposObraFiltrados,
+
+    busqueda,
+    estadoFiltro,
+
+    setBusqueda,
+    setEstadoFiltro,
+
     tipoSeleccionado,
     tipoAccion,
 
@@ -497,7 +535,7 @@ export default function useTiposObra() {
     toastTipo,
 
     seleccionarTipoObra,
-
+    limpiarSeleccion,
     abrirCrear,
     abrirEditar,
     abrirObservaciones,

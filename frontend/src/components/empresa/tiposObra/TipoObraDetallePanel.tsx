@@ -1,6 +1,6 @@
 import "../../../styles/empresa/tiposObra/TipoObraDetallePanel.css";
 
-import { FaTimes, FaEdit} from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 
 import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
 import TipoObraEstadoBadge from "./TipoObraEstadoBadge";
@@ -9,12 +9,15 @@ import IconoTipoObra from "./IconoTipoObra";
 
 type Props = {
   tipoObra: TipoObraEmpresa;
+  onCerrar: () => void;
 };
 
-export default function TipoObraDetallePanel({ tipoObra }: Props) {
+export default function TipoObraDetallePanel({ tipoObra, onCerrar }: Props) {
   return (
     <aside className="tipo-obra-detalle-panel">
-      <button className="tipo-obra-panel-close">
+      <button className="tipo-obra-panel-close"
+      onClick={onCerrar}
+      >
         <FaTimes />
       </button>
 
@@ -31,21 +34,11 @@ export default function TipoObraDetallePanel({ tipoObra }: Props) {
 
       <div className="tipo-obra-panel-status">
         <TipoObraEstadoBadge estado={tipoObra.estado} />
-        <span>{tipoObra.materialesAsociados} materiales asociados</span>
       </div>
 
       <TipoObraTabs tipoObra={tipoObra} />
 
-      <div className="tipo-obra-panel-actions">
-        <button className="desactivar-btn">
-          {tipoObra.estado === "Activo" ? "Desactivar" : "Activar"}
-        </button>
-
-        <button className="editar-config-btn">
-          <FaEdit />
-          Editar configuración
-        </button>
-      </div>
+      
     </aside>
   );
 }

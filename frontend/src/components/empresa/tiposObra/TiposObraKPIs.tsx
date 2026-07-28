@@ -1,15 +1,54 @@
 import "../../../styles/empresa/tiposObra/TiposObraKPIs.css";
 
-import { FaFileAlt, FaLightbulb, FaUserCog, FaPuzzlePiece } from "react-icons/fa";
+import {
+  FaFileAlt,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
+
 import KpiCard from "../../common/KpiCard";
 
-export default function TiposObraKPIs() {
+import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
+
+type Props = {
+  tiposObra: TipoObraEmpresa[];
+};
+
+export default function TiposObraKPIs({
+  tiposObra,
+}: Props) {
+  const total = tiposObra.length;
+
+  const activos = tiposObra.filter(
+    (tipo) => tipo.estado === "Activo"
+  ).length;
+
+  const inactivos = tiposObra.filter(
+    (tipo) => tipo.estado === "Inactivo"
+  ).length;
+
   return (
     <div className="tipos-obra-kpis">
-      <KpiCard title="Total tipos de obra" value={6} icon={<FaFileAlt />} variant="blue" />
-      <KpiCard title="Con cálculo automático" value={6} icon={<FaLightbulb />} variant="green" />
-      <KpiCard title="Mano de obra configurada" value={6} icon={<FaUserCog />} variant="yellow" />
-      <KpiCard title="Extras configurados" value={6} icon={<FaPuzzlePiece />} variant="purple" />
+      <KpiCard
+        title="Total tipos de obra"
+        value={total}
+        icon={<FaFileAlt />}
+        variant="blue"
+      />
+
+      <KpiCard
+        title="Activos"
+        value={activos}
+        icon={<FaCheckCircle />}
+        variant="green"
+      />
+
+      <KpiCard
+        title="Inactivos"
+        value={inactivos}
+        icon={<FaTimesCircle />}
+        variant="yellow"
+      />
     </div>
   );
 }
