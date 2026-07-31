@@ -1,0 +1,86 @@
+.perfil-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 1.8rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+  text-align: center;
+}
+
+.perfil-avatar-empresa {
+  width: 92px;
+  height: 92px;
+  border-radius: 24px;
+  background: rgba(66, 180, 138, 0.15);
+  color: #42b48a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin: 0 auto 1rem;
+}
+
+.perfil-card h2 {
+  margin: 0;
+  color: #08255b;
+}
+
+.perfil-rubro {
+  margin: .4rem 0 1rem;
+  color: #64748b;
+}
+
+.perfil-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  background: #ecfdf5;
+  color: #15803d;
+  padding: .45rem .85rem;
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.perfil-divider {
+  margin: 1.6rem 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.perfil-resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.perfil-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.perfil-label {
+  color: #64748b;
+  font-size: .85rem;
+}
+
+.perfil-item strong {
+  color: #08255b;
+}
+
+.perfil-card-btn {
+  margin-top: 1.6rem;
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  background: #08255b;
+  color: white;
+  padding: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.perfil-card-btn:hover {
+  background: #0b347d;
+}
