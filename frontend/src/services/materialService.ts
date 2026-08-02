@@ -17,9 +17,11 @@ export type MaterialApi = {
   ultimaActualizacion: string;
   disponibilidad: DisponibilidadMaterial;
   estado: EstadoMaterial;
+  imagenUrl: string | null;
 };
 
 export type GuardarMaterialRequest = {
+  idEmpresa: number;
   nombre: string;
   descripcion?: string | null;
   stock: number;
@@ -27,7 +29,13 @@ export type GuardarMaterialRequest = {
   categoria?: string | null;
   unidad?: string | null;
   estado?: EstadoMaterial;
+  imagenUrl?: string | null;
 };
+
+export type MaterialFormulario = Omit<
+  GuardarMaterialRequest,
+  "idEmpresa"
+>;
 
 export type CrearMaterialRequest = GuardarMaterialRequest;
 export type ActualizarMaterialRequest = GuardarMaterialRequest;
@@ -69,6 +77,8 @@ const transformarMaterial = (
 
     costoUnitario: Number(material.costoUnitario),
     stockCantidad: Number(material.stock),
+
+    imagenUrl: material.imagenUrl ?? "",
 
     precioActual: formatearPrecio(
       Number(material.costoUnitario)

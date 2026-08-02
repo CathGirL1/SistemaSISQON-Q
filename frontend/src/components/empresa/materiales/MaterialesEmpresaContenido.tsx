@@ -16,7 +16,7 @@ import {
   obtenerMateriales,
 } from "../../../services/materialService";
 
-import type { CrearMaterialRequest } from "../../../services/materialService";
+import type { CrearMaterialRequest, MaterialFormulario } from "../../../services/materialService";
 
 export default function MaterialesEmpresaContenido() {
   const [materiales, setMateriales] = useState<
@@ -66,10 +66,24 @@ export default function MaterialesEmpresaContenido() {
   }, [cargarMateriales]);
 
   const guardarNuevoMaterial = async (
-    datos: CrearMaterialRequest
+    datos: MaterialFormulario
   ) => {
-    const materialCreado =
-      await crearMaterial(datos);
+
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario")!
+    );
+
+    console.log("Usuario:", usuario);
+    console.log("usuario.idEmpresa:", usuario.idEmpresa);
+
+    const datosEnviar = {
+      ...datos,
+      idEmpresa: usuario.idEmpresa,
+    };
+
+    console.log("Datos a enviar:", datosEnviar);
+
+    const materialCreado = await crearMaterial(datosEnviar);
 
     setMateriales((listaActual) => [
       materialCreado,

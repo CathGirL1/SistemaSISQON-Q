@@ -20,7 +20,20 @@ export default function FilaMaterial({
     <tr>
       <td>
         <div className="material-cell">
-          <div className="material-img">{material.nombre.charAt(0)}</div>
+          <div className="material-img">
+            {material.imagenUrl ? (
+              <img
+                src={material.imagenUrl}
+                alt={material.nombre}
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "https://placehold.co/50x50?text=Sin";
+                }}
+              />
+            ) : (
+              material.nombre.charAt(0)
+            )}
+          </div>
 
           <div>
             <h4>{material.nombre}</h4>
@@ -40,7 +53,9 @@ export default function FilaMaterial({
       <td>{material.ultimaActualizacion}</td>
 
       <td>
-        <MaterialDisponibilidad disponibilidad={material.disponibilidad} />
+        <MaterialDisponibilidad
+          disponibilidad={material.disponibilidad}
+        />
       </td>
 
       <td>
@@ -49,13 +64,17 @@ export default function FilaMaterial({
       </td>
 
       <td>
-        <MaterialEstadoBadge estado={material.estado} />
+        <MaterialEstadoBadge
+          estado={material.estado}
+        />
       </td>
 
       <td>
         <MaterialAcciones
           onEditar={() => onEditar(material)}
-          onActualizarPrecio={() => onActualizarPrecio(material)}
+          onActualizarPrecio={() =>
+            onActualizarPrecio(material)
+          }
           onEliminar={() => onEliminar(material)}
         />
       </td>

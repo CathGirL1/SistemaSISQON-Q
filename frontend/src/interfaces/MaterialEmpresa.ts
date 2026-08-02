@@ -16,6 +16,8 @@ export interface MaterialEmpresa {
   costoUnitario: number;
   stockCantidad: number;
 
+  imagenUrl: string;
+
   precioActual: string;
   precioDetalle: string;
   ultimaActualizacion: string;

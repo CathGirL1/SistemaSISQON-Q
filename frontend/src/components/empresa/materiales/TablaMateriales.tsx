@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
 
-import type { GuardarMaterialRequest } from "../../../services/materialService";
+import type { GuardarMaterialRequest, MaterialFormulario } from "../../../services/materialService";
 import { actualizarMaterial, eliminarMaterial } from "../../../services/materialService";
 
 import FilaMaterial from "./FilaMaterial";
@@ -63,7 +63,7 @@ export default function TablaMateriales({
   };
 
   const guardarEdicion = async (
-    datos: GuardarMaterialRequest
+    datos: MaterialFormulario
   ) => {
     if (!materialSeleccionado) {
       throw new Error(
@@ -73,58 +73,68 @@ export default function TablaMateriales({
 
   
 
-    const materialActualizado =
-      await actualizarMaterial(
-        materialSeleccionado.id,
-        datos
-      );
-
-    setMateriales((listaActual) =>
-      listaActual.map((material) =>
-        material.id === materialActualizado.id
-          ? materialActualizado
-          : material
-      )
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario")!
     );
 
-    cerrarModales();
-  };
+    const materialActualizado =
+        await actualizarMaterial(
+            materialSeleccionado.id,
+            {
+                ...datos,
+                idEmpresa: usuario.idEmpresa,
+            }
+      );
+
+      setMateriales((listaActual) =>
+        listaActual.map((material) =>
+          material.id === materialActualizado.id
+            ? materialActualizado
+            : material
+        )
+      );
+
+      cerrarModales();
+    };
 
   const guardarNuevoPrecio = async (
-  nuevoPrecio: number
-  ) => {
-    if (!materialSeleccionado) {
-      throw new Error(
-        "No se pudo identificar el material."
-      );
-    }
-
-  const materialActualizado =
-    await actualizarMaterial(
-      materialSeleccionado.id,
-      {
-        nombre: materialSeleccionado.nombre,
-        descripcion:
-          materialSeleccionado.descripcion || null,
-        categoria:
-          materialSeleccionado.categoria,
-        unidad: materialSeleccionado.unidad,
-        costoUnitario: nuevoPrecio,
-        stock: materialSeleccionado.stockCantidad,
-        estado: materialSeleccionado.estado,
+    nuevoPrecio: number
+    ) => {
+      if (!materialSeleccionado) {
+        throw new Error(
+          "No se pudo identificar el material."
+        );
       }
+
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario")!
     );
 
-  setMateriales((listaActual) =>
-    listaActual.map((material) =>
-      material.id === materialActualizado.id
-        ? materialActualizado
-        : material
-    )
-  );
+    const materialActualizado =
+        await actualizarMaterial(
+            materialSeleccionado.id,
+            {
+                idEmpresa: usuario.idEmpresa,
+                nombre: materialSeleccionado.nombre,
+                descripcion: materialSeleccionado.descripcion || null,
+                categoria: materialSeleccionado.categoria,
+                unidad: materialSeleccionado.unidad,
+                costoUnitario: nuevoPrecio,
+                stock: materialSeleccionado.stockCantidad,
+                estado: materialSeleccionado.estado,
+            }
+        );
 
-  cerrarModales();
-};
+      setMateriales((listaActual) =>
+        listaActual.map((material) =>
+          material.id === materialActualizado.id
+            ? materialActualizado
+            : material
+        )
+      );
+
+      cerrarModales();
+  };
 
   const confirmarEliminarMaterial = async () => {
     if (!materialSeleccionado) {

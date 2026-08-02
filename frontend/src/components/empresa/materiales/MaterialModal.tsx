@@ -10,7 +10,7 @@ import type {
 } from "../../../interfaces/MaterialEmpresa";
 
 import type {
-  GuardarMaterialRequest,
+  MaterialFormulario,
 } from "../../../services/materialService";
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
   material: MaterialEmpresa | null;
   onCerrar: () => void;
   onGuardar?: (
-    datos: GuardarMaterialRequest
+    datos: MaterialFormulario
   ) => Promise<void> | void;
 };
 
@@ -30,6 +30,7 @@ type FormularioMaterial = {
   unidad: string;
   costoUnitario: string;
   stock: string;
+  imagenUrl: string;
   estado: EstadoMaterial;
 };
 
@@ -40,6 +41,7 @@ const formularioInicial: FormularioMaterial = {
   unidad: "",
   costoUnitario: "",
   stock: "",
+  imagenUrl: "",
   estado: "Activo",
 };
 
@@ -67,7 +69,9 @@ export default function MaterialModal({
         unidad: material.unidad,
         costoUnitario: String(material.costoUnitario),
         stock: String(material.stockCantidad),
+        imagenUrl: String(material.imagenUrl),
         estado: material.estado,
+        
       });
     } else {
       setFormulario(formularioInicial);
@@ -132,7 +136,8 @@ export default function MaterialModal({
       return;
     }
 
-    const datos: GuardarMaterialRequest = {
+    const datos: MaterialFormulario = {
+      
       nombre: formulario.nombre.trim(),
       descripcion:
         formulario.descripcion.trim() || null,
@@ -141,6 +146,7 @@ export default function MaterialModal({
       costoUnitario,
       stock,
       estado: formulario.estado,
+      imagenUrl: formulario.imagenUrl.trim() || "",
     };
 
     try {
@@ -280,6 +286,22 @@ export default function MaterialModal({
             <option value="Activo">Activo</option>
             <option value="Inactivo">Inactivo</option>
           </select>
+        </div>
+
+        <div className="form-group-material material-campo-completo">
+          <label htmlFor="material-imagen">
+            URL de la imagen
+          </label>
+
+          <input
+            id="material-imagen"
+            type="url"
+            placeholder="https://..."
+            value={formulario.imagenUrl}
+            onChange={(e) =>
+              actualizarCampo("imagenUrl", e.target.value)
+            }
+          />
         </div>
 
         <div className="form-group-material material-campo-completo">

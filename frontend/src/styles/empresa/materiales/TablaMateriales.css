@@ -191,3 +191,36 @@
   text-align: center !important;
   color: #64748b !important;
 }
+
+.material-img {
+  width: clamp(38px, 5vw, 50px);
+  height: clamp(38px, 5vw, 50px);
+
+  border-radius: 12px;
+  overflow: hidden;
+
+  background: #e6f5ef;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  font-weight: 700;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: #0f4d3f;
+}
+
+.material-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .material-img {
+    border-radius: 10px;
+  }
+}
