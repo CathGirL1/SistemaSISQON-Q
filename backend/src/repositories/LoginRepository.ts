@@ -18,11 +18,17 @@ export class LoginRepository {
                 SELECT
                     u.id_Usuario,
                     c.id_Cliente,
+                    e.id_Empresa AS idEmpresa,
                     u.nombreUsuario,
                     u.rol
                 FROM Usuario u
+
                 LEFT JOIN Cliente c
                     ON c.id_Usuario = u.id_Usuario
+
+                LEFT JOIN Empresa e
+                    ON e.id_Usuario = u.id_Usuario
+
                 WHERE u.gmail = @gmail
                 AND u.password = @password
             `);

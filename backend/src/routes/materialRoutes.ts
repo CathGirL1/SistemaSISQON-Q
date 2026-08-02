@@ -1,16 +1,34 @@
 import { Router } from "express";
 
-
-import {
-  obtenerMateriales,
-  obtenerMaterialPorId,
-} from "../controllers/materialController";
+import { MaterialController } from "../controllers/MaterialController";
 
 const router = Router();
 
+const controller = new MaterialController();
 
-router.get("/", obtenerMateriales);
+router.get(
+  "/",
+  controller.obtenerMateriales
+);
 
-router.get("/:idMaterial", obtenerMaterialPorId);
+router.get(
+  "/:id",
+  controller.obtenerMaterialPorId
+);
+
+router.post(
+  "/",
+  controller.crearMaterial
+);
+
+router.put(
+  "/:id",
+  controller.actualizarMaterial
+);
+
+router.delete(
+  "/:id",
+  controller.eliminarMaterial
+);
 
 export default router;

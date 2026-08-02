@@ -16,7 +16,10 @@ export class Material {
     public unidad: string | null,
     public ultimaActualizacion: Date,
     public disponibilidad: DisponibilidadMaterial,
-    public estado: EstadoMaterial
+    public estado: EstadoMaterial,
+    public idEmpresa: number,
+    public imagenUrl?: string | null,
+    
   ) {}
 }
 
@@ -29,6 +32,8 @@ export interface CrearMaterialDTO {
   unidad?: string | null;
   disponibilidad?: DisponibilidadMaterial;
   estado?: EstadoMaterial;
+  imagenUrl?: string | null;
+  idEmpresa: number;
 }
 
 export interface ActualizarMaterialDTO extends CrearMaterialDTO {}
