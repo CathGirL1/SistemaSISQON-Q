@@ -1,11 +1,17 @@
 import "../../../styles/empresa/materiales/TablaMateriales.css";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
 
-import type { GuardarMaterialRequest, MaterialFormulario } from "../../../services/materialService";
-import { actualizarMaterial, eliminarMaterial } from "../../../services/materialService";
+import type {
+  MaterialFormulario,
+} from "../../../services/materialService";
+
+import {
+  actualizarMaterial,
+  eliminarMaterial,
+} from "../../../services/materialService";
 
 import FilaMaterial from "./FilaMaterial";
 import MaterialModal from "./MaterialModal";
@@ -16,18 +22,25 @@ type Props = {
   materialesIniciales: MaterialEmpresa[];
   cargando: boolean;
   error: string;
+
+  onActualizarMaterial: (
+    material: MaterialEmpresa
+  ) => void;
+
+  onEliminarMaterial: (
+    idMaterial: string
+  ) => void;
 };
 
 export default function TablaMateriales({
   materialesIniciales,
   cargando,
   error,
+  onActualizarMaterial,
+  onEliminarMaterial,
 }: Props) {
-  const [materiales, setMateriales] =
-    useState<MaterialEmpresa[]>(
-      materialesIniciales
-    );
-
+  
+  
   const [materialSeleccionado, setMaterialSeleccionado] =
     useState<MaterialEmpresa | null>(null);
 
@@ -35,10 +48,6 @@ export default function TablaMateriales({
   const [modalPrecio, setModalPrecio] = useState(false);
   const [modalEliminar, setModalEliminar] =
     useState(false);
-
-  useEffect(() => {
-    setMateriales(materialesIniciales);
-  }, [materialesIniciales]);
 
   const abrirEditar = (material: MaterialEmpresa) => {
     setMaterialSeleccionado(material);
@@ -71,69 +80,59 @@ export default function TablaMateriales({
       );
     }
 
-  
-
     const usuario = JSON.parse(
       localStorage.getItem("usuario")!
     );
 
     const materialActualizado =
-        await actualizarMaterial(
-            materialSeleccionado.id,
-            {
-                ...datos,
-                idEmpresa: usuario.idEmpresa,
-            }
+      await actualizarMaterial(
+        materialSeleccionado.id,
+        {
+          ...datos,
+          idEmpresa: usuario.idEmpresa,
+        }
       );
 
-      setMateriales((listaActual) =>
-        listaActual.map((material) =>
-          material.id === materialActualizado.id
-            ? materialActualizado
-            : material
-        )
-      );
+    onActualizarMaterial(materialActualizado);
 
-      cerrarModales();
-    };
+    cerrarModales();
+  };
 
   const guardarNuevoPrecio = async (
     nuevoPrecio: number
-    ) => {
-      if (!materialSeleccionado) {
-        throw new Error(
-          "No se pudo identificar el material."
-        );
-      }
+  ) => {
+    if (!materialSeleccionado) {
+      throw new Error(
+        "No se pudo identificar el material."
+      );
+    }
 
     const usuario = JSON.parse(
       localStorage.getItem("usuario")!
     );
 
     const materialActualizado =
-        await actualizarMaterial(
-            materialSeleccionado.id,
-            {
-                idEmpresa: usuario.idEmpresa,
-                nombre: materialSeleccionado.nombre,
-                descripcion: materialSeleccionado.descripcion || null,
-                categoria: materialSeleccionado.categoria,
-                unidad: materialSeleccionado.unidad,
-                costoUnitario: nuevoPrecio,
-                stock: materialSeleccionado.stockCantidad,
-                estado: materialSeleccionado.estado,
-            }
-        );
-
-      setMateriales((listaActual) =>
-        listaActual.map((material) =>
-          material.id === materialActualizado.id
-            ? materialActualizado
-            : material
-        )
+      await actualizarMaterial(
+        materialSeleccionado.id,
+        {
+          idEmpresa: usuario.idEmpresa,
+          nombre: materialSeleccionado.nombre,
+          descripcion:
+            materialSeleccionado.descripcion || null,
+          categoria:
+            materialSeleccionado.categoria,
+          unidad: materialSeleccionado.unidad,
+          costoUnitario: nuevoPrecio,
+          stock: materialSeleccionado.stockCantidad,
+          estado: materialSeleccionado.estado,
+          imagenUrl:
+            materialSeleccionado.imagenUrl || "",
+        }
       );
 
-      cerrarModales();
+    onActualizarMaterial(materialActualizado);
+
+    cerrarModales();
   };
 
   const confirmarEliminarMaterial = async () => {
@@ -145,12 +144,7 @@ export default function TablaMateriales({
 
     await eliminarMaterial(materialSeleccionado.id);
 
-    setMateriales((listaActual) =>
-      listaActual.filter(
-        (material) =>
-          material.id !== materialSeleccionado.id
-      )
-    );
+    onEliminarMaterial(materialSeleccionado.id);
 
     cerrarModales();
   };
@@ -200,8 +194,8 @@ export default function TablaMateriales({
           </thead>
 
           <tbody>
-            {materiales.length > 0 ? (
-              materiales.map((material) => (
+            {materialesIniciales.length > 0 ? (
+              materialesIniciales.map((material) => (
                 <FilaMaterial
                   key={material.id}
                   material={material}
@@ -225,9 +219,9 @@ export default function TablaMateriales({
       </div>
 
       <div className="materiales-table-footer">
-        {materiales.length === 0
+        {materialesIniciales.length === 0
           ? "No hay materiales para mostrar"
-          : `Mostrando 1 a ${materiales.length} de ${materiales.length} materiales`}
+          : `Mostrando 1 a ${materialesIniciales.length} de ${materialesIniciales.length} materiales`}
       </div>
 
       <MaterialModal

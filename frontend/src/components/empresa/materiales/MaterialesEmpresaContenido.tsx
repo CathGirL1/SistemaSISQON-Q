@@ -8,6 +8,7 @@ import MaterialesFiltros from "./MaterialesFiltros";
 import TablaMateriales from "./TablaMateriales";
 import PanelBottomCard from "../../common/PanelBottomCard";
 import MaterialModal from "./MaterialModal";
+import PaginacionMateriales from "../../common/PaginacionMateriales";
 
 import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
 
@@ -16,25 +17,26 @@ import {
   obtenerMateriales,
 } from "../../../services/materialService";
 
-import type { CrearMaterialRequest, MaterialFormulario } from "../../../services/materialService";
+import type { MaterialFormulario } from "../../../services/materialService";
 
 export default function MaterialesEmpresaContenido() {
-  const [materiales, setMateriales] = useState<
-    MaterialEmpresa[]
-  >([]);
+  const [materiales, setMateriales] = useState<MaterialEmpresa[]>([]);
 
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
-  const [modalCrearAbierto, setModalCrearAbierto] =
-    useState(false);
+  const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
 
-  // Estados de filtros
+  const [paginaActual, setPaginaActual] = useState(1);
+
+  const materialesPorPagina = 10;
+
+  // filtros
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("Todas");
   const [estado, setEstado] = useState("Todos");
-  const [disponibilidad, setDisponibilidad] =
-    useState("Todas");
+  const [disponibilidad, setDisponibilidad] = useState("Todas");
+
 
   const cargarMateriales = useCallback(async () => {
     try {
@@ -65,6 +67,16 @@ export default function MaterialesEmpresaContenido() {
     cargarMateriales();
   }, [cargarMateriales]);
 
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [
+    busqueda,
+    categoria,
+    estado,
+    disponibilidad,
+  ]);
+
+
   const guardarNuevoMaterial = async (
     datos: MaterialFormulario
   ) => {
@@ -85,12 +97,41 @@ export default function MaterialesEmpresaContenido() {
 
     const materialCreado = await crearMaterial(datosEnviar);
 
-    setMateriales((listaActual) => [
-      materialCreado,
-      ...listaActual,
-    ]);
+    agregarMaterialLista(materialCreado);
+    setPaginaActual(1);
 
     setModalCrearAbierto(false);
+  };
+
+  const actualizarMaterialLista = (
+    materialActualizado: MaterialEmpresa
+  ) => {
+    setMateriales((listaActual) =>
+      listaActual.map((material) =>
+        material.id === materialActualizado.id
+          ? materialActualizado
+          : material
+      )
+    );
+  };
+
+  const eliminarMaterialLista = (
+    idMaterial: string
+  ) => {
+    setMateriales((listaActual) =>
+      listaActual.filter(
+        (material) => material.id !== idMaterial
+      )
+    );
+  };
+
+  const agregarMaterialLista = (
+    material: MaterialEmpresa
+  ) => {
+    setMateriales((listaActual) => [
+      material,
+      ...listaActual,
+    ]);
   };
 
   // Categorías dinámicas
@@ -134,6 +175,25 @@ export default function MaterialesEmpresaContenido() {
       );
     });
 
+    const totalPaginas = Math.ceil(
+      materialesFiltrados.length /
+      materialesPorPagina
+    );
+
+    const indiceInicial =
+      (paginaActual - 1) *
+      materialesPorPagina;
+
+    const indiceFinal =
+      indiceInicial +
+      materialesPorPagina;
+
+    const materialesPagina =
+      materialesFiltrados.slice(
+        indiceInicial,
+        indiceFinal
+    );
+
   return (
     <section className="materiales-page">
       <PageHeader
@@ -164,11 +224,17 @@ export default function MaterialesEmpresaContenido() {
       />
 
       <TablaMateriales
-        materialesIniciales={
-          materialesFiltrados
-        }
+        materialesIniciales={materialesPagina}
         cargando={cargando}
         error={error}
+        onActualizarMaterial={actualizarMaterialLista}
+        onEliminarMaterial={eliminarMaterialLista}
+      />
+
+      <PaginacionMateriales
+        paginaActual={paginaActual}
+        totalPaginas={totalPaginas}
+        onCambiarPagina={setPaginaActual}
       />
 
       <PanelBottomCard
