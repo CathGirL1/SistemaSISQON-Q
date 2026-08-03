@@ -121,4 +121,45 @@ export class EmpresaController {
 
     return "Error interno del servidor";
   }
+
+    public actualizarLogoEmpresa = async (
+    req: Request,
+    res: Response
+    ): Promise<void> => {
+    try {
+      const idEmpresa = this.convertirId(
+        req.params.id,
+        "El identificador de la empresa no es válido"
+      );
+
+      if (!req.file) {
+        res.status(400).json({
+          mensaje: "Debés seleccionar una imagen.",
+        });
+
+        return;
+      }
+
+      const logo =
+        `/uploads/logos/${req.file.filename}`;
+
+      const empresa =
+        await this.service.actualizarLogoEmpresa(
+          idEmpresa,
+          logo
+        );
+
+      res.status(200).json(empresa);
+      } catch (error) {
+      const mensaje =
+        this.obtenerMensajeError(error);
+
+      const estado =
+        mensaje === "Empresa no encontrada"
+          ? 404
+          : 400;
+
+      res.status(estado).json({ mensaje });
+      }
+    };
 }

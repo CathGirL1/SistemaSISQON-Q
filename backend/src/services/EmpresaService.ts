@@ -208,4 +208,32 @@ export class EmpresaService {
       mensaje.includes("rut")
     );
   }
+
+  public async actualizarLogoEmpresa(
+  idEmpresa: number,
+  logo: string
+): Promise<PerfilEmpresa> {
+  this.validarId(
+    idEmpresa,
+    "El identificador de la empresa no es válido"
+  );
+
+  if (!logo.trim()) {
+    throw new Error(
+      "No se recibió un logo válido"
+    );
+  }
+
+  const empresa =
+    await this.repository.actualizarLogoEmpresa(
+      idEmpresa,
+      logo.trim()
+    );
+
+  if (!empresa) {
+    throw new Error("Empresa no encontrada");
+  }
+
+  return empresa;
+}
 }

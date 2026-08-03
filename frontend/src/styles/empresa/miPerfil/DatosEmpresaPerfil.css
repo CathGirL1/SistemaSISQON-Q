@@ -41,14 +41,39 @@
   color: #334155;
 }
 
-.form-group input {
-  height: 46px;
-  padding: 0 .9rem;
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 0.85rem 0.9rem;
+
   border: 1px solid #dbe3ef;
   border-radius: 12px;
+
   outline: none;
-  transition: .2s;
+
   font-size: .95rem;
+  font-family: inherit;
+
+  transition: .2s;
+
+  background: #fff;
+}
+
+.form-group textarea {
+  resize: vertical;
+
+  min-height: 80px;
+
+  line-height: 1.5;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #42b48a;
+
+  box-shadow: 0 0 0 3px rgba(66,180,138,.15);
 }
 
 .form-group input:focus {

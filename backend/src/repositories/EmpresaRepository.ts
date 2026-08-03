@@ -106,7 +106,8 @@ export class EmpresaRepository {
     const pool = await connectDB();
 
     const nombreEmpresa =
-      empresa.nombreComercial || empresa.razonSocial;
+      empresa.nombreComercial ||
+      empresa.razonSocial;
 
     const resultado = await pool
       .request()
@@ -167,10 +168,30 @@ export class EmpresaRepository {
         WHERE id_Empresa = @idEmpresa
       `);
 
-    const filasAfectadas =
-      resultado.rowsAffected[0] ?? 0;
+    if ((resultado.rowsAffected[0] ?? 0) === 0) {
+      return null;
+    }
 
-    if (filasAfectadas === 0) {
+    return this.obtenerEmpresaPorId(idEmpresa);
+  }
+
+  public async actualizarLogoEmpresa(
+    idEmpresa: number,
+    logo: string
+  ): Promise<PerfilEmpresa | null> {
+    const pool = await connectDB();
+
+    const resultado = await pool
+      .request()
+      .input("idEmpresa", sql.Int, idEmpresa)
+      .input("logo", sql.VarChar(255), logo)
+      .query(`
+        UPDATE Empresa
+        SET logo = @logo
+        WHERE id_Empresa = @idEmpresa
+      `);
+
+    if ((resultado.rowsAffected[0] ?? 0) === 0) {
       return null;
     }
 

@@ -1,88 +1,73 @@
 import "../styles/NavbarEmpresa.css";
 
 import {
-    FaBell,
-    FaSearch,
-    FaChevronDown,
-    FaBars
+  FaBell,
+  FaSearch,
+  FaChevronDown,
+  FaBars,
 } from "react-icons/fa";
 
+import useEmpresa from "../hooks/useEmpresa";
+
 type NavbarEmpresaProps = {
-    empresa?: string;
-    usuario?: string;
-    onMenuClick?: () => void;
-}
+  onMenuClick?: () => void;
+};
 
 export default function NavbarEmpresa({
+  onMenuClick,
+}: NavbarEmpresaProps) {
+  const { empresa } = useEmpresa();
 
-    empresa = "Constructora XYZ",
-    usuario = "Administrador",
-    onMenuClick
+  const nombreEmpresa =
+    empresa?.nombreComercial ||
+    empresa?.razonSocial ||
+    "Empresa";
 
-}: NavbarEmpresaProps){
+  return (
+    <header className="navbar-empresa">
+      <div className="navbar-left">
+        <button
+          className="navbar-menu-btn"
+          onClick={onMenuClick}
+        >
+          <FaBars />
+        </button>
 
-    return(
+        <div className="navbar-search">
+          <FaSearch />
 
-        <header className="navbar-empresa">
+          <input
+            type="text"
+            placeholder="Buscar..."
+          />
+        </div>
+      </div>
 
-            <div className="navbar-left">
+      <div className="navbar-right">
+        
 
-                <button
-                    className="navbar-menu-btn"
-                    onClick={onMenuClick}
-                >
-                    <FaBars/>
-                </button>
+        <div className="navbar-user">
+          <div className="navbar-avatar">
+            {empresa?.logo ? (
+              <img
+                src={empresa.logo}
+                alt={nombreEmpresa}
+                className="navbar-avatar-img"
+              />
+            ) : (
+              nombreEmpresa.charAt(0).toUpperCase()
+            )}
+          </div>
 
-                <div className="navbar-search">
+          <div className="navbar-user-info">
+            <h4>{nombreEmpresa}</h4>
 
-                    <FaSearch/>
+            <p>Administrador</p>
+          </div>
 
-                    <input
-                        type="text"
-                        placeholder="Buscar..."
-                    />
-
-                </div>
-
-            </div>
-
-            <div className="navbar-right">
-
-                <button className="navbar-notificacion">
-
-                    <FaBell/>
-
-                    <span className="notificacion-badge">
-                        3
-                    </span>
-
-                </button>
-
-                <div className="navbar-user">
-
-                    <div className="navbar-avatar">
-
-                        {empresa.charAt(0)}
-
-                    </div>
-
-                    <div className="navbar-user-info">
-
-                        <h4>{empresa}</h4>
-
-                        <p>{usuario}</p>
-
-                    </div>
-
-                    <FaChevronDown/>
-
-                </div>
-
-            </div>
-
-        </header>
-
-    );
-
+          <FaChevronDown />
+        </div>
+      </div>
+    </header>
+  );
 }

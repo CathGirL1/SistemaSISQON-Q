@@ -1,32 +1,82 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+
 import type { Usuario } from "../types/Usuario";
 
-const usuarioInicial: Usuario = {
-  idUsuario: 1,
+import {
+  obtenerUsuarioPorId,
+  actualizarUsuario,
+} from "../services/usuarioService";
 
-  nombreUsuario: "constructora.demo",
-  nombre: "Juan",
-  apellido: "Pérez",
+const usuarioVacio: Usuario = {
+  idUsuario: 0,
 
-  gmail: "constructora@email.com",
-  telefono: "099123456",
+  nombreUsuario: "",
 
-  cargo: "Administrador",
-  departamento: "Administración",
+  nombre: "",
+  apellido: "",
 
-  ciudad: "Maldonado",
-  pais: "Uruguay",
+  gmail: "",
+  telefono: "",
 
-  fechaRegistro: "15/06/2026",
-  ultimoAcceso: "27/07/2026 20:13",
+  cargo: "",
+  departamento: "",
+
+  ciudad: "",
+  pais: "",
+
+  fechaRegistro: "",
+  ultimoAcceso: "",
 };
 
 export default function useCuentaUsuario() {
-  const [usuario, setUsuario] = useState<Usuario>(usuarioInicial);
+  const [usuario, setUsuario] =
+    useState<Usuario>(usuarioVacio);
+
+  const [usuarioOriginal, setUsuarioOriginal] =
+    useState<Usuario>(usuarioVacio);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+    cargarUsuario();
+  }, []);
+
+  const cargarUsuario = async () => {
+    try {
+      const usuarioSesion = JSON.parse(
+        localStorage.getItem("usuario") || "{}"
+      );
+
+      const idUsuario = usuarioSesion.id_Usuario;
+
+      if (!idUsuario) {
+        throw new Error(
+          "No existe una sesión iniciada."
+        );
+      }
+
+      const datos =
+        await obtenerUsuarioPorId(idUsuario);
+
+      setUsuario(datos);
+      setUsuarioOriginal(datos);
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        "No fue posible cargar la información del usuario."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
 
@@ -37,7 +87,7 @@ export default function useCuentaUsuario() {
   };
 
   const handleCancelar = () => {
-    setUsuario(usuarioInicial);
+    setUsuario(usuarioOriginal);
   };
 
   const handleSubmit = async (
@@ -46,21 +96,38 @@ export default function useCuentaUsuario() {
     e.preventDefault();
 
     try {
-      console.log("Guardar usuario:", usuario);
+      const usuarioSesion = JSON.parse(
+        localStorage.getItem("usuario") || "{}"
+      );
 
-      // TODO:
-      // await UsuarioService.actualizar(usuario);
+      const idUsuario =
+        usuarioSesion.id_Usuario;
 
-      alert("Datos actualizados correctamente.");
+      const actualizado =
+        await actualizarUsuario(
+          idUsuario,
+          usuario
+        );
+
+      setUsuario(actualizado);
+      setUsuarioOriginal(actualizado);
+
+      alert(
+        "Datos actualizados correctamente."
+      );
     } catch (error) {
       console.error(error);
 
-      alert("Ocurrió un error al guardar los cambios.");
+      alert(
+        "Ocurrió un error al guardar los cambios."
+      );
     }
   };
 
   return {
     usuario,
+    loading,
+
     handleChange,
     handleCancelar,
     handleSubmit,

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
 
 import rutaPrueba from "../routes/rutaPrueba";
 import registroRoutes from "../routes/RegistroUsuario";
@@ -27,6 +28,7 @@ servidor.use(
 );
 
 servidor.use(express.json());
+servidor.use("/uploads",express.static(path.resolve(process.cwd(), "uploads")));
 
 servidor.use("/", rutaPrueba);
 servidor.use("/api/registro", registroRoutes);
