@@ -1,0 +1,111 @@
+.paginacion{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+
+    margin:30px 0;
+}
+
+.paginacion-boton,
+.paginacion-numero{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    min-width:44px;
+    height:44px;
+
+    padding:0 18px;
+
+    border:none;
+    border-radius:8px;
+    border:1px solid #dbe5f1;
+
+    background:#fff;
+
+    color:#17315f;
+
+    font-size:14px;
+    font-weight:500;
+
+    cursor:pointer;
+
+    transition:all .25s ease;
+}
+
+.paginacion-boton:hover:not(:disabled),
+.paginacion-numero:hover{
+    background:#0d4aa2;
+    color:#fff;
+}
+
+.paginacion-numero.activo{
+    background:#0d4aa2;
+    color:#fff;
+    font-weight:700;
+}
+
+.paginacion-boton:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+.paginacion-numeros{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+/* ========================= */
+/* Tablets */
+/* ========================= */
+
+@media (max-width: 992px){
+
+    .paginacion{
+        gap:12px;
+    }
+
+    .paginacion-boton{
+        padding:0 16px;
+        font-size:13px;
+    }
+
+    .paginacion-numero{
+        width:42px;
+        height:42px;
+    }
+
+}
+
+/* ========================= */
+/* Celulares */
+/* ========================= */
+
+@media (max-width: 576px){
+
+    .paginacion{
+        flex-direction:column;
+        gap:16px;
+    }
+
+    .paginacion-numeros{
+        justify-content:center;
+        order:2;
+    }
+
+    .paginacion-boton{
+        width:100%;
+        max-width:260px;
+        height:46px;
+    }
+
+    .paginacion-numero{
+        width:42px;
+        height:42px;
+        padding:0;
+    }
+
+}

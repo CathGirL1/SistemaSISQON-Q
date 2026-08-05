@@ -1,0 +1,24 @@
+.category-red {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.category-yellow {
+  background: #fef9c3;
+  color: #ca8a04;
+}
+
+.category-gray {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.category-indigo {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.category-pink {
+  background: #fce7f3;
+  color: #db2777;
+}
