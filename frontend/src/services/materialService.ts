@@ -18,6 +18,9 @@ export type MaterialApi = {
   disponibilidad: DisponibilidadMaterial;
   estado: EstadoMaterial;
   imagenUrl: string | null;
+
+  idEmpresa: number;
+  nombreEmpresa: string;
 };
 
 export type GuardarMaterialRequest = {
@@ -91,6 +94,10 @@ const transformarMaterial = (
     disponibilidad: material.disponibilidad,
     stock: `${material.stock} ${unidad}`,
     estado: material.estado,
+
+    empresaNombre: material.nombreEmpresa,
+
+    idEmpresa: material.idEmpresa,
   };
 };
 
@@ -135,6 +142,8 @@ export const obtenerMateriales = async (): Promise<
 
   return materialesApi.map(transformarMaterial);
 };
+
+
 
 export const crearMaterial = async (
   datos: CrearMaterialRequest

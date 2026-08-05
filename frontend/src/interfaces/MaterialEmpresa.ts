@@ -25,4 +25,7 @@ export interface MaterialEmpresa {
   disponibilidad: DisponibilidadMaterial;
   stock: string;
   estado: EstadoMaterial;
+
+  empresaNombre: string;
+  idEmpresa: number;
 }

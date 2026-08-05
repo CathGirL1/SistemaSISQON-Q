@@ -291,12 +291,27 @@
   white-space: nowrap;
 }
 
-.material-stock.available {
-  color: #07835e;
+.material-stock.available{
+    color:#16a34a;
 }
 
-.material-stock.limited {
-  color: #c87500;
+.material-stock.warning{
+    color:#f59e0b;
+}
+
+.material-stock.out{
+    color:#ef4444;
+}
+
+.material-image-placeholder p{
+
+  width: 100%;
+  height: 100%;
+  transform: translateY(85px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
 }
 
 .material-footer button {

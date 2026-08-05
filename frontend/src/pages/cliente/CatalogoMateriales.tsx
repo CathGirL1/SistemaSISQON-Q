@@ -1,120 +1,110 @@
-
-
 import { useEffect, useState } from "react";
 
 import {
   Search,
   ChevronDown,
   SlidersHorizontal,
-  Heart,
-  Plus,
   Star,
   Hammer,
   ShieldCheck,
   Droplets,
   Sparkles,
+  Building2
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 
-
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/CatalogoMateriales.css";
 
-
-
-interface MaterialAPI {
-  idMaterial: number;
-  nombre: string;
-  categoria: string;
-  descripcion: string | null;
-  unidadMedida: string;
-  precioReferencia: number | null;
-  marca: string | null;
-  imagen: string | null;
-  activo: boolean;
-}
+import { obtenerMateriales } from "../../services/materialService";
 
 interface Material {
-  id: number;
+  id: string;
+
   nombre: string;
   categoria: string;
-  imagen: string;
   descripcion: string;
+
+  imagen: string;
+
   precio: string;
   unidad: string;
+
+  disponibilidad: string;
+
+  empresaNombre: string;
+  idEmpresa: number;
+
   durabilidad: string;
   mantenimiento: string;
-  disponibilidad: string;
+
   destacado?: boolean;
 }
 
-
 export default function CatalogoMateriales() {
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
-
-  const API_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:3000";
 
   const [materiales, setMateriales] = useState<Material[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    obtenerMateriales();
+    cargarMateriales();
   }, []);
 
+  const cargarMateriales = async () => {
+    try {
+      setCargando(true);
+      setError("");
 
+      const materialesEmpresa = await obtenerMateriales();
 
-  const obtenerMateriales = async () => {
-  try {
-    setCargando(true);
-    setError("");
+      const materialesAdaptados: Material[] =
+        materialesEmpresa.map((material) => ({
+          id: material.id,
 
-    const response = await fetch(`${API_URL}/api/materiales`);
+          nombre: material.nombre,
+          categoria: material.categoria,
+          descripcion: material.descripcion,
 
-    if (!response.ok) {
-      throw new Error("No se pudieron cargar los materiales");
+          imagen:
+            material.imagenUrl,
+
+          precio: material.precioActual,
+          unidad: material.unidad,
+
+          disponibilidad: material.disponibilidad,
+
+          empresaNombre: material.empresaNombre,
+          idEmpresa: material.idEmpresa,
+
+          durabilidad: "Alta",
+          mantenimiento: "Bajo",
+
+          destacado: false,
+        }));
+
+      setMateriales(materialesAdaptados);
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Error al cargar materiales"
+      );
+    } finally {
+      setCargando(false);
     }
-
-    const data: MaterialAPI[] = await response.json();
-
-    const materialesAdaptados: Material[] = data.map((material) => ({
-      id: material.idMaterial,
-      nombre: material.nombre,
-      categoria: material.categoria,
-      descripcion: material.descripcion ?? "",
-      imagen: material.imagen ?? "/material-default.png",
-      precio: material.precioReferencia
-        ? `$ ${material.precioReferencia.toLocaleString("es-UY")}`
-        : "Sin precio",
-      unidad: material.unidadMedida,
-      durabilidad: "Alta",
-      mantenimiento: "Bajo",
-      disponibilidad: "Disponible",
-      destacado: false,
-    }));
-
-    setMateriales(materialesAdaptados);
-  } catch (error) {
-    setError(
-      error instanceof Error
-        ? error.message
-        : "Error al cargar materiales"
-    );
-  } finally {
-    setCargando(false);
-  }
-};
-
+  };
 
   const materialesFiltrados = materiales.filter((material) => {
-    const contenido = `${material.nombre} ${material.categoria} ${material.descripcion}`;
+    const contenido =
+      `${material.nombre} ${material.categoria} ${material.descripcion}`;
 
-    return contenido.toLowerCase().includes(busqueda.toLowerCase());
+    return contenido
+      .toLowerCase()
+      .includes(busqueda.toLowerCase());
   });
 
   return (
@@ -226,7 +216,20 @@ export default function CatalogoMateriales() {
           {materialesFiltrados.map((material) => (
             <article className="material-card" key={material.id}>
               <div className="material-image">
-                <img src={material.imagen} alt={material.nombre} />
+                {material.imagen ? (
+                  <img
+                    src={material.imagen}
+                    alt={material.nombre}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div className="material-image-placeholder">
+                    
+                    <p>Sin imagen</p>
+                  </div>
+                )}
 
                 {material.destacado && (
                   <span className="material-featured">
@@ -235,13 +238,7 @@ export default function CatalogoMateriales() {
                   </span>
                 )}
 
-                <button
-                  type="button"
-                  className="material-favorite"
-                  aria-label={`Agregar ${material.nombre} a favoritos`}
-                >
-                  <Heart size={19} />
-                </button>
+              
               </div>
 
               <div className="material-content">
@@ -250,13 +247,19 @@ export default function CatalogoMateriales() {
                 </span>
 
                 <h3>{material.nombre}</h3>
+
+                <p className="material-company">
+                  <Building2 size={14} />
+                  {material.empresaNombre}
+                </p>
+
                 <p className="material-description">
-                  {material.descripcion}
+                  {material.descripcion || "Sin descripción"}
                 </p>
 
                 <div className="material-price">
                   <strong>{material.precio}</strong>
-                  <span>{material.unidad}</span>
+                  <span>por {material.unidad}</span>
                 </div>
 
                 <div className="material-properties">
@@ -277,7 +280,9 @@ export default function CatalogoMateriales() {
                     className={`material-stock ${
                       material.disponibilidad === "Disponible"
                         ? "available"
-                        : "limited"
+                        : material.disponibilidad === "Stock bajo"
+                        ? "warning"
+                        : "out"
                     }`}
 
                     
@@ -286,10 +291,6 @@ export default function CatalogoMateriales() {
                     {material.disponibilidad}
                   </span>
 
-                  <button type="button">
-                    <Plus size={17} />
-                    Agregar al proyecto
-                  </button>
                 </div>
               </div>
             </article>
