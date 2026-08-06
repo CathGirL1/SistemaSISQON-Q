@@ -12,6 +12,7 @@ import tipoObraRoutes from "../routes/tipoObraRoutes";
 import manoObraRoutes from "../routes/ManoObraRoutes";
 import empresaRoutes from "../routes/empresaRoutes";
 import usuarioRoutes from "../routes/usuarioRoutes";
+import dashboardRoutes from "../routes/dashboardRoutes";
 
 import { connectDB } from "./database";
 
@@ -39,6 +40,7 @@ servidor.use("/api/tipos-obra",tipoObraRoutes);
 servidor.use("/api/mano-obra", manoObraRoutes);
 servidor.use("/api/empresa", empresaRoutes);
 servidor.use("/api/usuario",usuarioRoutes);
+servidor.use("/api/dashboard",dashboardRoutes);
 
 
 const puerto = Number(process.env.PORT) || 3000;

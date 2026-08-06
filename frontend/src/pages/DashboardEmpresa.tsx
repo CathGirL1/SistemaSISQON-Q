@@ -1,5 +1,5 @@
 import EmpresaLayout from "../layouts/EmpresaLayout";
-import DashboardEmpresaContenido from "../components/DashboardEmpresaContenido";
+import DashboardEmpresaContenido from "../components/empresa/dashboard/DashboardEmpresaContenido";
 
 export default function DashboardEmpresa() {
   return (
