@@ -1,19 +1,27 @@
 import type { Dashboard } from "../interfaces/Dashboard";
 
 export async function obtenerDashboard(): Promise<Dashboard> {
+  const usuario = JSON.parse(
+    localStorage.getItem("usuario") || "{}"
+  );
 
-    const respuesta = await fetch(
-        "http://localhost:3000/api/dashboard/1"
+  const idEmpresa = usuario.idEmpresa;
+
+  if (!idEmpresa) {
+    throw new Error(
+      "No se encontró la empresa asociada al usuario."
     );
+  }
 
-    if (!respuesta.ok) {
+  const respuesta = await fetch(
+    `http://localhost:3000/api/dashboard/${idEmpresa}`
+  );
 
-        throw new Error(
-            "No fue posible obtener el Dashboard"
-        );
+  if (!respuesta.ok) {
+    throw new Error(
+      "No fue posible obtener el Dashboard"
+    );
+  }
 
-    }
-
-    return await respuesta.json();
-
+  return await respuesta.json();
 }
