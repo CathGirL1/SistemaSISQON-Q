@@ -39,7 +39,6 @@ servidor.use("/api/registro", registroRoutes);
 servidor.use("/api/login", loginRoutes);
 
 servidor.use("/api/recuperacionAcceso", recuperacionAcceso);
-servidor.use("/api/materiales", materialRoutes);
 servidor.use("/api/clientes", clienteRoutes);
 servidor.use("/api/tipos-obra",tipoObraRoutes);
 servidor.use("/api/mano-obra", manoObraRoutes);

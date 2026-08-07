@@ -15,6 +15,7 @@ export class MaterialRepository {
     const resultado = await pool.request().query<Material>(`
       SELECT
         id_Material,
+        id_Empresa AS idEmpresa,
         nombre,
         descripcion,
         stock,
@@ -23,7 +24,8 @@ export class MaterialRepository {
         unidad,
         ultimaActualizacion,
         disponibilidad,
-        estado
+        estado,
+        imagenUrl
       FROM Material
       ORDER BY id_Material DESC
     `);
@@ -42,6 +44,7 @@ export class MaterialRepository {
       .query<Material>(`
         SELECT
           id_Material,
+          id_Empresa AS idEmpresa,
           nombre,
           descripcion,
           stock,
@@ -50,7 +53,8 @@ export class MaterialRepository {
           unidad,
           ultimaActualizacion,
           disponibilidad,
-          estado
+          estado,
+          imagenUrl
         FROM Material
         WHERE id_Material = @idMaterial
       `);
@@ -97,6 +101,16 @@ export class MaterialRepository {
         sql.VarChar(20),
         material.estado ?? "Activo"
       )
+      .input(
+        "idEmpresa",
+        sql.Int,
+        material.idEmpresa
+      )
+      .input(
+        "imagenUrl",
+        sql.NVarChar(500),
+        material.imagenUrl ?? null
+      )
       .query<Material>(`
         INSERT INTO Material (
           nombre,
@@ -107,10 +121,13 @@ export class MaterialRepository {
           unidad,
           ultimaActualizacion,
           disponibilidad,
-          estado
+          estado,
+          id_Empresa,
+          imagenUrl
         )
         OUTPUT
           INSERTED.id_Material,
+          INSERTED.id_Empresa AS idEmpresa,
           INSERTED.nombre,
           INSERTED.descripcion,
           INSERTED.stock,
@@ -119,7 +136,8 @@ export class MaterialRepository {
           INSERTED.unidad,
           INSERTED.ultimaActualizacion,
           INSERTED.disponibilidad,
-          INSERTED.estado
+          INSERTED.estado,
+          INSERTED.imagenUrl
         VALUES (
           @nombre,
           @descripcion,
@@ -129,7 +147,9 @@ export class MaterialRepository {
           @unidad,
           GETDATE(),
           @disponibilidad,
-          @estado
+          @estado,
+          @idEmpresa,
+          @imagenUrl
         )
       `);
 
@@ -177,6 +197,11 @@ export class MaterialRepository {
         sql.VarChar(20),
         material.estado ?? "Activo"
       )
+      .input(
+        "imagenUrl",
+        sql.NVarChar(500),
+        material.imagenUrl ?? null
+      )
       .query<Material>(`
         UPDATE Material
         SET
@@ -188,9 +213,11 @@ export class MaterialRepository {
           unidad = @unidad,
           ultimaActualizacion = GETDATE(),
           disponibilidad = @disponibilidad,
-          estado = @estado
+          estado = @estado,
+          imagenUrl = @imagenUrl
         OUTPUT
           INSERTED.id_Material,
+          INSERTED.id_Empresa AS idEmpresa,
           INSERTED.nombre,
           INSERTED.descripcion,
           INSERTED.stock,
@@ -199,7 +226,8 @@ export class MaterialRepository {
           INSERTED.unidad,
           INSERTED.ultimaActualizacion,
           INSERTED.disponibilidad,
-          INSERTED.estado
+          INSERTED.estado,
+          INSERTED.imagenUrl
         WHERE id_Material = @idMaterial
       `);
 
