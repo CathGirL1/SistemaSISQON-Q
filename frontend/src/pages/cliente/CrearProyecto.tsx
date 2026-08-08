@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,10 +10,15 @@ import {
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-import HeaderCliente from "../../components/cliente/HeaderCliente";
+
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/CrearProyecto.css";
+
+interface TipoObra {
+  idTipoObra: number;
+  nombre: string;
+}
 
 interface FormularioProyecto {
   nombre: string;
@@ -48,11 +53,50 @@ export default function CrearProyecto() {
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
+
   const [formulario, setFormulario] =
     useState<FormularioProyecto>(formularioInicial);
 
+  const [tiposObra, setTiposObra] = useState<TipoObra[]>([]);
+
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+
+  // ==========================================
+  // OBTENER TIPOS DE OBRA
+  // ==========================================
+
+  useEffect(() => {
+    obtenerTiposObra();
+  }, []);
+
+  const obtenerTiposObra = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/tipos-obra`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "No se pudieron obtener los tipos de obra."
+        );
+      }
+
+      const data: TipoObra[] = await response.json();
+
+      setTiposObra(data);
+    } catch (error) {
+      console.error(error);
+
+      setError(
+        "No se pudieron cargar los tipos de obra."
+      );
+    }
+  };
+
+  // ==========================================
+  // ACTUALIZAR CAMPOS
+  // ==========================================
 
   const actualizarCampo = (
     campo: keyof FormularioProyecto,
@@ -63,6 +107,8 @@ export default function CrearProyecto() {
       [campo]: valor,
     }));
   };
+
+ 
 
   const enviarFormulario = async (
     event: FormEvent<HTMLFormElement>
@@ -75,35 +121,50 @@ export default function CrearProyecto() {
 
       const proyecto = {
         idCliente: ID_CLIENTE_TEMPORAL,
+
+        // Acá sigue enviándose el ID
         idTipoObra: Number(formulario.idTipoObra),
+
         nombre: formulario.nombre.trim(),
-        descripcion: formulario.descripcion.trim() || null,
-        ubicacion: formulario.ubicacion.trim() || null,
+
+        descripcion:
+          formulario.descripcion.trim() || null,
+
+        ubicacion:
+          formulario.ubicacion.trim() || null,
+
         alto: Number(formulario.alto),
         ancho: Number(formulario.ancho),
         largo: Number(formulario.largo),
       };
 
+      console.log("Proyecto a enviar:", proyecto);
+
       const response = await fetch(
         `${API_URL}/api/proyectos`,
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
           },
+
           body: JSON.stringify(proyecto),
         }
       );
 
-      const data: RespuestaError = await response.json();
+      const data: RespuestaError =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.mensaje || "No se pudo crear el proyecto"
+          data.mensaje ||
+            "No se pudo crear el proyecto"
         );
       }
 
       navigate("/panel-cliente/proyectos");
+
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -111,6 +172,7 @@ export default function CrearProyecto() {
           : "Ocurrió un error al crear el proyecto";
 
       setError(mensaje);
+
     } finally {
       setGuardando(false);
     }
@@ -118,63 +180,82 @@ export default function CrearProyecto() {
 
   return (
     <div className="cliente-panel">
+
       <SidebarCliente
         menuOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
       />
 
       <main className="cliente-main">
-        <HeaderCliente
-          title="Crear proyecto"
-          subtitle="Ingresá los datos principales de tu obra."
-          menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((prev) => !prev)}
-        />
+
+     
 
         <section className="crear-proyecto-heading">
+
           <div>
+
             <button
               type="button"
               className="crear-proyecto-back"
               onClick={() =>
-                navigate("/panel-cliente/proyectos")
+                navigate(
+                  "/panel-cliente/proyectos"
+                )
               }
             >
               <ArrowLeft size={18} />
+
               Volver a Mis proyectos
             </button>
 
             <h2>Nuevo proyecto</h2>
 
             <p>
-              Completá la información básica para comenzar a
-              configurar la obra.
+              Completá la información básica para
+              comenzar a configurar la obra.
             </p>
+
           </div>
+
         </section>
 
         <form
           className="crear-proyecto-form"
           onSubmit={enviarFormulario}
         >
+
+          {/* ==========================================
+              INFORMACIÓN GENERAL
+          ========================================== */}
+
           <section className="crear-proyecto-card">
+
             <div className="crear-proyecto-card-title">
+
               <div className="crear-proyecto-icon">
                 <FileText size={21} />
               </div>
 
               <div>
+
                 <h3>Información general</h3>
+
                 <p>
-                  Identificá el proyecto y agregá una breve
-                  descripción.
+                  Identificá el proyecto y agregá una
+                  breve descripción.
                 </p>
+
               </div>
+
             </div>
 
             <div className="crear-proyecto-grid">
+
               <label className="crear-proyecto-field">
-                <span>Nombre del proyecto</span>
+
+                <span>
+                  Nombre del proyecto
+                </span>
 
                 <input
                   type="text"
@@ -189,12 +270,17 @@ export default function CrearProyecto() {
                   maxLength={100}
                   required
                 />
+
               </label>
 
               <label className="crear-proyecto-field">
-                <span>Ubicación</span>
+
+                <span>
+                  Ubicación
+                </span>
 
                 <div className="crear-proyecto-input-icon">
+
                   <MapPin size={18} />
 
                   <input
@@ -209,11 +295,16 @@ export default function CrearProyecto() {
                     placeholder="Ej.: Maldonado, Uruguay"
                     maxLength={200}
                   />
+
                 </div>
+
               </label>
 
               <label className="crear-proyecto-field crear-proyecto-field-full">
-                <span>Descripción</span>
+
+                <span>
+                  Descripción
+                </span>
 
                 <textarea
                   value={formulario.descripcion}
@@ -227,32 +318,45 @@ export default function CrearProyecto() {
                   maxLength={500}
                   rows={5}
                 />
+
               </label>
+
             </div>
+
           </section>
 
+          {/* ==========================================
+              TIPO DE OBRA
+          ========================================== */}
+
           <section className="crear-proyecto-card">
+
             <div className="crear-proyecto-card-title">
+
               <div className="crear-proyecto-icon">
                 <Hammer size={21} />
               </div>
 
               <div>
+
                 <h3>Tipo de obra</h3>
+
                 <p>
-                  Seleccioná el tipo de construcción que querés
-                  realizar.
+                  Seleccioná el tipo de construcción
+                  que querés realizar.
                 </p>
+
               </div>
+
             </div>
 
             <label className="crear-proyecto-field">
-              <span>ID del tipo de obra</span>
 
-              <input
-                type="number"
-                min="1"
-                step="1"
+              <span>
+                Tipo de obra
+              </span>
+
+              <select
                 value={formulario.idTipoObra}
                 onChange={(event) =>
                   actualizarCampo(
@@ -260,35 +364,60 @@ export default function CrearProyecto() {
                     event.target.value
                   )
                 }
-                placeholder="Ej.: 2"
                 required
-              />
+              >
 
-              <small>
-                Por ahora usamos el ID existente en la tabla
-                TipoObra. Luego lo cambiaremos por un selector con
-                nombres reales.
-              </small>
+                <option value="">
+                  Seleccioná un tipo de obra
+                </option>
+
+                {tiposObra.map((tipo) => (
+                  <option
+                    key={tipo.idTipoObra}
+                    value={tipo.idTipoObra}
+                  >
+                    {tipo.nombre}
+                  </option>
+                ))}
+
+              </select>
+
             </label>
+
           </section>
 
+          {/* ==========================================
+              MEDIDAS
+          ========================================== */}
+
           <section className="crear-proyecto-card">
+
             <div className="crear-proyecto-card-title">
+
               <div className="crear-proyecto-icon">
                 <Ruler size={21} />
               </div>
 
               <div>
+
                 <h3>Medidas</h3>
+
                 <p>
-                  Ingresá las dimensiones principales en metros.
+                  Ingresá las dimensiones principales
+                  en metros.
                 </p>
+
               </div>
+
             </div>
 
             <div className="crear-proyecto-measures">
+
               <label className="crear-proyecto-field">
-                <span>Alto</span>
+
+                <span>
+                  Alto
+                </span>
 
                 <input
                   type="number"
@@ -304,10 +433,14 @@ export default function CrearProyecto() {
                   placeholder="2.50"
                   required
                 />
+
               </label>
 
               <label className="crear-proyecto-field">
-                <span>Ancho</span>
+
+                <span>
+                  Ancho
+                </span>
 
                 <input
                   type="number"
@@ -323,10 +456,14 @@ export default function CrearProyecto() {
                   placeholder="5.00"
                   required
                 />
+
               </label>
 
               <label className="crear-proyecto-field">
-                <span>Largo</span>
+
+                <span>
+                  Largo
+                </span>
 
                 <input
                   type="number"
@@ -342,9 +479,14 @@ export default function CrearProyecto() {
                   placeholder="7.00"
                   required
                 />
+
               </label>
+
             </div>
+
           </section>
+
+          {/* ERROR */}
 
           {error && (
             <div className="crear-proyecto-error">
@@ -352,12 +494,17 @@ export default function CrearProyecto() {
             </div>
           )}
 
+          {/* BOTONES */}
+
           <div className="crear-proyecto-actions">
+
             <button
               type="button"
               className="crear-proyecto-cancel"
               onClick={() =>
-                navigate("/panel-cliente/proyectos")
+                navigate(
+                  "/panel-cliente/proyectos"
+                )
               }
               disabled={guardando}
             >
@@ -369,15 +516,21 @@ export default function CrearProyecto() {
               className="crear-proyecto-save"
               disabled={guardando}
             >
+
               <Save size={18} />
 
               {guardando
                 ? "Guardando..."
                 : "Guardar proyecto"}
+
             </button>
+
           </div>
+
         </form>
+
       </main>
+
     </div>
   );
 }

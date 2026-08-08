@@ -8,8 +8,7 @@ import {
 } from "react";
 
 import {
-  Search,
-  ChevronDown,
+ 
   Plus,
   FolderOpen,
   Clock3,
@@ -23,7 +22,7 @@ import {
 
 
 import { useNavigate } from "react-router-dom";
-
+import FiltrosProyecto from "./FiltrosProyecto";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 
@@ -36,7 +35,7 @@ import "../../styles/MisProyectos.css";
 
 
 
-interface ProyectoAPI {
+export interface ProyectoAPI {
   idProyecto: number;
   idCliente: number;
   idEmpresa: number | null;
@@ -68,6 +67,9 @@ const IMAGEN_PROYECTO =
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [estado, setEstado] = useState("");
+  const [tipoObra, setTipoObra] = useState("");
+  const [orden, setOrden] = useState("recientes");
 
   const [proyectos, setProyectos] = useState<ProyectoAPI[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -111,23 +113,75 @@ const IMAGEN_PROYECTO =
   };
 
   const proyectosFiltrados = useMemo(() => {
-    const textoBusqueda = busqueda.trim().toLowerCase();
+      let resultado = [...proyectos];
 
-    if (!textoBusqueda) {
-      return proyectos;
-    }
+      // BUSCADOR
+      if (busqueda.trim()) {
+          const texto = busqueda.toLowerCase();
 
-    return proyectos.filter((proyecto) => {
-      const texto = `
-        ${proyecto.nombre}
-        ${proyecto.ubicacion ?? ""}
-        ${proyecto.estado}
-        ${proyecto.idTipoObra}
-      `;
+          resultado = resultado.filter((proyecto) =>
+              `
+              ${proyecto.nombre}
+              ${proyecto.ubicacion ?? ""}
+              ${proyecto.estado}
+              ${proyecto.tipoObra}
+              `
+              .toLowerCase()
+              .includes(texto)
+          );
+      }
 
-      return texto.toLowerCase().includes(textoBusqueda);
-    });
-  }, [busqueda, proyectos]);
+      // ESTADO
+      if (estado) {
+          resultado = resultado.filter(
+              (proyecto) =>
+                  proyecto.estado.toLowerCase() ===
+                  estado.toLowerCase()
+          );
+      }
+
+      // TIPO DE OBRA
+      if (tipoObra) {
+        resultado = resultado.filter(
+            (proyecto) =>
+                proyecto.tipoObra?.trim().toLowerCase() ===
+                tipoObra.trim().toLowerCase()
+        );
+      }
+
+      // ORDEN
+      switch (orden) {
+          case "recientes":
+              resultado.sort(
+                  (a, b) =>
+                      new Date(b.fechaCreacion).getTime() -
+                      new Date(a.fechaCreacion).getTime()
+              );
+              break;
+
+          case "antiguos":
+              resultado.sort(
+                  (a, b) =>
+                      new Date(a.fechaCreacion).getTime() -
+                      new Date(b.fechaCreacion).getTime()
+              );
+              break;
+
+          case "az":
+              resultado.sort((a, b) =>
+                  a.nombre.localeCompare(b.nombre)
+              );
+              break;
+
+          case "za":
+              resultado.sort((a, b) =>
+                  b.nombre.localeCompare(a.nombre)
+              );
+              break;
+      }
+
+      return resultado;
+  }, [proyectos, busqueda, estado, tipoObra, orden]);
 
   const totalActivos = proyectos.filter(
     (proyecto) =>
@@ -207,44 +261,18 @@ const IMAGEN_PROYECTO =
           />
         </section>
 
-        <section className="proyectos-filters">
-          <label className="proyectos-search">
-            <Search size={19} />
-
-            <input
-              type="search"
-              placeholder="Buscar proyecto..."
-              value={busqueda}
-              onChange={(event) =>
-                setBusqueda(event.target.value)
-              }
-            />
-          </label>
-
-          <button
-            type="button"
-            className="proyecto-filter-button"
-          >
-            Todos los tipos
-            <ChevronDown size={17} />
-          </button>
-
-          <button
-            type="button"
-            className="proyecto-filter-button"
-          >
-            Todos los estados
-            <ChevronDown size={17} />
-          </button>
-
-          <button
-            type="button"
-            className="proyecto-filter-button"
-          >
-            Más recientes
-            <ChevronDown size={17} />
-          </button>
-        </section>
+        <FiltrosProyecto
+          busqueda={busqueda}
+          setBusqueda={setBusqueda}
+          estado={estado}
+          setEstado={setEstado}
+          tipoObra={tipoObra}
+          setTipoObra={setTipoObra}
+          orden={orden}
+          setOrden={setOrden}
+          
+        
+        />
 
         {cargando && (
           <section className="proyectos-feedback">
@@ -325,7 +353,7 @@ const IMAGEN_PROYECTO =
                         <span>Tipo de obra</span>
 
                         <strong>
-                          Tipo #{proyecto.idTipoObra}
+                          {proyecto.tipoObra}
                         </strong>
                       </div>
 
@@ -366,12 +394,22 @@ const IMAGEN_PROYECTO =
                         Ver detalle
                       </button>
 
-                      <button type="button">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(`/panel-cliente/proyectos/${proyecto.idProyecto}/editar`)
+                        }
+                      >
                         <Pencil size={16} />
                         Editar
                       </button>
 
-                      <button type="button">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(`/panel-cliente/proyectos/${proyecto.idProyecto}/cotizar`)
+                        }
+                      >
                         <FileText size={16} />
                         Cotizar
                       </button>
