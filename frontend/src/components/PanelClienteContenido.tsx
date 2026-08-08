@@ -6,15 +6,14 @@ import AsistenteCliente from "./cliente/AssistantCard";
 import DashboardCard from "./cliente/DashboardCard";
 import ProjectItem from "./cliente/ProjectItem";
 import QuoteItem from "./cliente/QuoteItem";
-import CompanyItem from "./cliente/CompanyItem";
 import ResponseItem from "./cliente/ResponseItem";
 import { useState } from "react";
 
-export default function PanelClienteContenido(){
+export default function PanelClienteContenido() {
 
     const [menuOpen, setMenuOpen] = useState(false);
 
-    return(
+    return (
         <div className="cliente-panel">
             <SidebarCliente
                 menuOpen={menuOpen}
@@ -69,70 +68,37 @@ export default function PanelClienteContenido(){
                         title="Mis cotizaciones recientes"
                         linkText="Ver todas mis cotizaciones"
                     >
-                    <QuoteItem
-                        code="CTZ-2024-0007"
-                        project="Quincho Familiar"
-                        amount="$ 2.450.000"
-                        date="28/05/2024"
-                        tag="Estándar"
-                    />
+                        <QuoteItem
+                            code="CTZ-2024-0007"
+                            project="Quincho Familiar"
+                            amount="$ 2.450.000"
+                            date="28/05/2024"
+                            tag="Estándar"
+                        />
 
-                    <QuoteItem
-                        code="CTZ-2024-0006"
-                        project="Ampliación Cocina"
-                        amount="$ 1.780.000"
-                        date="26/05/2024"
-                        tag="Económica"
-                    />
+                        <QuoteItem
+                            code="CTZ-2024-0006"
+                            project="Ampliación Cocina"
+                            amount="$ 1.780.000"
+                            date="26/05/2024"
+                            tag="Económica"
+                        />
 
-                    <QuoteItem
-                        code="CTZ-2024-0005"
-                        project="Ampliación Cocina"
-                        amount="$ 2.950.000"
-                        date="26/05/2024"
-                        tag="Premium"
-                    />
+                        <QuoteItem
+                            code="CTZ-2024-0005"
+                            project="Ampliación Cocina"
+                            amount="$ 2.950.000"
+                            date="26/05/2024"
+                            tag="Premium"
+                        />
 
-                    <QuoteItem
-                        code="CTZ-2024-0004"
-                        project="Remodelación Baño"
-                        amount="$ 1.250.000"
-                        date="24/05/2024"
-                        tag="Estándar"
-                    />
-                </DashboardCard>
-
-                <DashboardCard
-                    title="Empresas favoritas"
-                    linkText="Ver todas mis favoritas"
-                >
-                    <CompanyItem
-                        logo="ABC"
-                        name="Constructora ABC"
-                        category="Quinchos y Terrazas"
-                        rating="4.8"
-                    />
-
-                    <CompanyItem
-                        logo="NORTE"
-                        name="Construcciones del Norte"
-                        category="Ampliaciones y Obras"
-                        rating="4.6"
-                    />
-
-                    <CompanyItem
-                        logo="HC"
-                        name="Hogar Construcciones"
-                        category="Remodelaciones"
-                        rating="4.5"
-                    />
-
-                    <CompanyItem
-                        logo="OS"
-                        name="Obras y Servicios SRL"
-                        category="Construcción en general"
-                        rating="4.3"
-                    />
+                        <QuoteItem
+                            code="CTZ-2024-0004"
+                            project="Remodelación Baño"
+                            amount="$ 1.250.000"
+                            date="24/05/2024"
+                            tag="Estándar"
+                        />
                     </DashboardCard>
 
                     <DashboardCard
@@ -173,10 +139,10 @@ export default function PanelClienteContenido(){
                     </DashboardCard>
                 </section>
 
-    
+
 
                 <AsistenteCliente />
             </main>
         </div>
-    ); 
+    );
 }

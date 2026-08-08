@@ -11,7 +11,6 @@ import MisCotizaciones from "../pages/cliente/MisCotizaciones";
 import CatalogoMateriales from "../pages/cliente/CatalogoMateriales";
 import Comparador from "../pages/cliente/Comparador";
 import Empresas from "../pages/cliente/Empresas";
-import EmpresasFavoritas from "../pages/cliente/EmpresasFavoritas";
 import AsistenteIA from "../pages/cliente/AsistenteIA";
 import CrearProyecto from "../pages/cliente/CrearProyecto";
 import DetalleProyecto from "../pages/cliente/DetalleProyecto"
@@ -35,7 +34,6 @@ export default function AppRoutes() {
           <Route path="/panel-cliente/materiales" element={<CatalogoMateriales />} />
           <Route path="/panel-cliente/comparador" element={<Comparador />} />
           <Route path="/panel-cliente/empresas" element={<Empresas />} />
-          <Route path="/panel-cliente/favoritas" element={<EmpresasFavoritas />} />
           <Route path="/panel-cliente/asistente" element={<AsistenteIA />} />
           <Route path="/panel-empresa" element={<PanelEmpresa />} />
         </Routes>

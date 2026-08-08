@@ -127,33 +127,176 @@ export class ProyectoRepository {
     const result = await pool
       .request()
       .input("idProyecto", sql.Int, idProyecto)
-      .input("idEmpresa", sql.Int, data.idEmpresa ?? null)
-      .input("idTipoObra", sql.Int, data.idTipoObra)
-      .input("nombre", sql.VarChar(100), data.nombre)
-      .input("descripcion", sql.VarChar(500), data.descripcion ?? null)
-      .input("ubicacion", sql.VarChar(200), data.ubicacion ?? null)
-      .input("estado", sql.VarChar(20), data.estado)
-      .input("alto", sql.Decimal(10, 2), data.alto)
-      .input("ancho", sql.Decimal(10, 2), data.ancho)
-      .input("largo", sql.Decimal(10, 2), data.largo)
+
+      .input(
+        "actualizarIdEmpresa",
+        sql.Bit,
+        data.idEmpresa !== undefined
+      )
+      .input(
+        "idEmpresa",
+        sql.Int,
+        data.idEmpresa ?? null
+      )
+
+      .input(
+        "actualizarIdTipoObra",
+        sql.Bit,
+        data.idTipoObra !== undefined
+      )
+      .input(
+        "idTipoObra",
+        sql.Int,
+        data.idTipoObra ?? null
+      )
+
+      .input(
+        "actualizarNombre",
+        sql.Bit,
+        data.nombre !== undefined
+      )
+      .input(
+        "nombre",
+        sql.VarChar(100),
+        data.nombre ?? null
+      )
+
+      .input(
+        "actualizarDescripcion",
+        sql.Bit,
+        data.descripcion !== undefined
+      )
+      .input(
+        "descripcion",
+        sql.VarChar(500),
+        data.descripcion ?? null
+      )
+
+      .input(
+        "actualizarUbicacion",
+        sql.Bit,
+        data.ubicacion !== undefined
+      )
+      .input(
+        "ubicacion",
+        sql.VarChar(200),
+        data.ubicacion ?? null
+      )
+
+      .input(
+        "actualizarEstado",
+        sql.Bit,
+        data.estado !== undefined
+      )
+      .input(
+        "estado",
+        sql.VarChar(20),
+        data.estado ?? null
+      )
+
+      .input(
+        "actualizarAlto",
+        sql.Bit,
+        data.alto !== undefined
+      )
+      .input(
+        "alto",
+        sql.Decimal(10, 2),
+        data.alto ?? null
+      )
+
+      .input(
+        "actualizarAncho",
+        sql.Bit,
+        data.ancho !== undefined
+      )
+      .input(
+        "ancho",
+        sql.Decimal(10, 2),
+        data.ancho ?? null
+      )
+
+      .input(
+        "actualizarLargo",
+        sql.Bit,
+        data.largo !== undefined
+      )
+      .input(
+        "largo",
+        sql.Decimal(10, 2),
+        data.largo ?? null
+      )
       .query(`
-        UPDATE Proyecto
-        SET
-          id_Empresa = COALESCE(@idEmpresa, id_Empresa),
-          id_TipoObra = COALESCE(@idTipoObra, id_TipoObra),
-          nombre = COALESCE(@nombre, nombre),
-          descripcion = COALESCE(@descripcion, descripcion),
-          ubicacion = COALESCE(@ubicacion, ubicacion),
-          estado = COALESCE(@estado, estado),
-          alto = COALESCE(@alto, alto),
-          ancho = COALESCE(@ancho, ancho),
-          largo = COALESCE(@largo, largo)
-        WHERE id_Proyecto = @idProyecto
-      `);
+      UPDATE Proyecto
+      SET
+        id_Empresa =
+          CASE
+            WHEN @actualizarIdEmpresa = 1
+            THEN @idEmpresa
+            ELSE id_Empresa
+          END,
+
+        id_TipoObra =
+          CASE
+            WHEN @actualizarIdTipoObra = 1
+            THEN @idTipoObra
+            ELSE id_TipoObra
+          END,
+
+        nombre =
+          CASE
+            WHEN @actualizarNombre = 1
+            THEN @nombre
+            ELSE nombre
+          END,
+
+        descripcion =
+          CASE
+            WHEN @actualizarDescripcion = 1
+            THEN @descripcion
+            ELSE descripcion
+          END,
+
+        ubicacion =
+          CASE
+            WHEN @actualizarUbicacion = 1
+            THEN @ubicacion
+            ELSE ubicacion
+          END,
+
+        estado =
+          CASE
+            WHEN @actualizarEstado = 1
+            THEN @estado
+            ELSE estado
+          END,
+
+        alto =
+          CASE
+            WHEN @actualizarAlto = 1
+            THEN @alto
+            ELSE alto
+          END,
+
+        ancho =
+          CASE
+            WHEN @actualizarAncho = 1
+            THEN @ancho
+            ELSE ancho
+          END,
+
+        largo =
+          CASE
+            WHEN @actualizarLargo = 1
+            THEN @largo
+            ELSE largo
+          END
+      WHERE id_Proyecto = @idProyecto
+    `);
 
     return result.rowsAffected[0] > 0;
   }
-
+  
   public async eliminarProyecto(idProyecto: number): Promise<boolean> {
     const pool = await connectDB();
 
