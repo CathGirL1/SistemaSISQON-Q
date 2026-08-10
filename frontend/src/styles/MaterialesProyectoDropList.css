@@ -1,0 +1,622 @@
+.materiales-proyecto {
+  width: 100%;
+  margin-top: 30px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.materiales-proyecto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.materiales-proyecto-header h2 {
+  margin: 0 0 6px;
+  color: #17315f;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.materiales-proyecto-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.materiales-proyecto-icono {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  background: #eef4ff;
+  color: #0d4aa2;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   SELECTOR
+========================================== */
+
+.material-selector {
+  padding: 22px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.material-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.material-selector-header h3 {
+  margin: 0;
+  color: #17315f;
+  font-size: 17px;
+}
+
+.material-selector-header span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* ==========================================
+   BUSCADOR
+========================================== */
+
+.material-busqueda {
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 13px;
+  margin-bottom: 18px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  color: #64748b;
+}
+
+.material-busqueda input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #17315f;
+  font-size: 14px;
+}
+
+/* ==========================================
+   FORMULARIO
+========================================== */
+
+.material-formulario {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.material-select-container,
+.material-cantidad-container {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.material-select-container label,
+.material-cantidad-container label {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.material-select-container select,
+.material-cantidad-container input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17315f;
+  font-size: 14px;
+  outline: none;
+}
+
+.material-select-container select:focus,
+.material-cantidad-container input:focus,
+.material-busqueda:focus-within {
+  border-color: #0d4aa2;
+}
+
+/* ==========================================
+   BOTÓN AGREGAR
+========================================== */
+
+.material-agregar-button {
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  background: #0d4aa2;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.material-agregar-button:hover:not(:disabled) {
+  background: #093b85;
+}
+
+.material-agregar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   PREVIEW MATERIAL
+========================================== */
+
+.material-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+}
+
+.material-preview-imagen {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.material-preview-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.material-preview-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.material-preview-info strong {
+  color: #17315f;
+  font-size: 15px;
+}
+
+.material-preview-info span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.material-ver-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17315f;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.material-ver-button:hover {
+  border-color: #0d4aa2;
+  color: #0d4aa2;
+}
+
+/* ==========================================
+   ERROR
+========================================== */
+
+.materiales-error {
+  margin: 15px 0 0;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+/* ==========================================
+   LISTA
+========================================== */
+
+.materiales-lista {
+  margin-top: 28px;
+}
+
+.materiales-lista > h3 {
+  margin: 0 0 15px;
+  color: #17315f;
+  font-size: 17px;
+}
+
+/* ==========================================
+   VACÍO
+========================================== */
+
+.materiales-vacio {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  padding: 25px;
+  box-sizing: border-box;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.materiales-vacio p {
+  margin: 8px 0 0;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.materiales-vacio span {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* ==========================================
+   ITEMS
+========================================== */
+
+.materiales-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.material-item {
+  display: grid;
+  grid-template-columns: 70px minmax(180px, 1fr) auto auto;
+  align-items: center;
+  gap: 18px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  transition: 0.2s ease;
+}
+
+.material-item:hover {
+  border-color: #cbd5e1;
+}
+
+/* ==========================================
+   IMAGEN ITEM
+========================================== */
+
+.material-item-imagen {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.material-item-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================
+   INFO ITEM
+========================================== */
+
+.material-item-info {
+  min-width: 0;
+}
+
+.material-item-info h4 {
+  margin: 0 0 7px;
+  color: #17315f;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.material-item-info p {
+  margin: 3px 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.material-item-info strong {
+  color: #334155;
+}
+
+/* ==========================================
+   CANTIDAD
+========================================== */
+
+.material-item-cantidad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.material-item-cantidad > span {
+  color: #64748b;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.cantidad-controles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cantidad-controles button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border: 1px solid #dbe3ef;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #17315f;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.cantidad-controles button:hover:not(:disabled) {
+  border-color: #0d4aa2;
+  color: #0d4aa2;
+}
+
+.cantidad-controles button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cantidad-controles strong {
+  min-width: 30px;
+  color: #17315f;
+  text-align: center;
+}
+
+/* ==========================================
+   ACCIONES
+========================================== */
+
+.material-item-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.material-eliminar-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.material-eliminar-button:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+/* ==========================================
+   TABLETS
+========================================== */
+
+@media (max-width: 992px) {
+  .materiales-proyecto {
+    padding: 22px;
+  }
+
+  .material-formulario {
+    grid-template-columns: 1fr 130px;
+  }
+
+  .material-agregar-button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .material-item {
+    grid-template-columns: 65px 1fr;
+  }
+
+  .material-item-cantidad {
+    align-items: flex-start;
+    grid-column: 2;
+  }
+
+  .material-item-acciones {
+    grid-column: 2;
+    flex-direction: row;
+  }
+}
+
+/* ==========================================
+   CELULARES
+========================================== */
+
+@media (max-width: 600px) {
+  .materiales-proyecto {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  .materiales-proyecto-header {
+    align-items: flex-start;
+  }
+
+  .materiales-proyecto-header h2 {
+    font-size: 19px;
+  }
+
+  .materiales-proyecto-icono {
+    width: 40px;
+    height: 40px;
+  }
+
+  .material-selector {
+    padding: 15px;
+  }
+
+  .material-selector-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .material-formulario {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .material-select-container,
+  .material-cantidad-container {
+    width: 100%;
+  }
+
+  .material-agregar-button {
+    width: 100%;
+  }
+
+  .material-preview {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .material-preview-imagen {
+    width: 100%;
+    height: 140px;
+  }
+
+  .material-ver-button {
+    width: 100%;
+  }
+
+  .material-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 13px;
+    padding: 14px;
+  }
+
+  .material-item-imagen {
+    width: 100%;
+    height: 150px;
+  }
+
+  .material-item-info {
+    width: 100%;
+  }
+
+  .material-item-cantidad {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .cantidad-controles {
+    justify-content: center;
+  }
+
+  .material-item-acciones {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .material-item-acciones button {
+    width: 100%;
+  }
+}
+
+/* ==========================================
+   CELULARES PEQUEÑOS
+========================================== */
+
+@media (max-width: 400px) {
+  .materiales-proyecto {
+    padding: 12px;
+  }
+
+  .material-selector {
+    padding: 12px;
+  }
+
+  .material-preview-imagen,
+  .material-item-imagen {
+    height: 120px;
+  }
+
+  .material-preview-info span,
+  .material-item-info p {
+    font-size: 12px;
+  }
+}

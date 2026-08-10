@@ -10,8 +10,11 @@ import {
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
+import MaterialesProyectoDropList, {
+  type Material,
+} from "../../components/cliente/MaterialesProyectoDropList";
 
-
+import ModalDatosMaterial from "../../components/cliente/ModalDatosMaterial";
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/CrearProyecto.css";
 
@@ -31,9 +34,7 @@ interface FormularioProyecto {
   imagenUrl: string; 
 }
 
-interface RespuestaError {
-  mensaje?: string;
-}
+
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -64,6 +65,23 @@ export default function CrearProyecto() {
 
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+
+  const [materialesSeleccionados, setMaterialesSeleccionados] = useState<Material[]>([]);
+  const [materialModal, setMaterialModal] =
+  useState<Material | null>(null);
+
+  const [modalMaterialAbierto, setModalMaterialAbierto] =
+  useState(false);
+
+  const abrirModalMaterial = (material: Material) => {
+    setMaterialModal(material);
+    setModalMaterialAbierto(true);
+  };
+
+  const cerrarModalMaterial = () => {
+    setModalMaterialAbierto(false);
+    setMaterialModal(null);
+  };
 
   // ==========================================
   // OBTENER TIPOS DE OBRA
@@ -114,25 +132,31 @@ export default function CrearProyecto() {
  
 
   const enviarFormulario = async (
-    event: FormEvent<HTMLFormElement>
-  ) => {
+    event: FormEvent
+    ) => {
     event.preventDefault();
 
     try {
       setGuardando(true);
       setError("");
 
+      // ==========================================
+      // 1. CREAR PROYECTO
+      // ==========================================
+
       const proyecto = {
         idCliente: ID_CLIENTE_TEMPORAL,
 
-        // Acá sigue enviándose el ID
-        idTipoObra: Number(formulario.idTipoObra),
+        idTipoObra: Number(
+          formulario.idTipoObra
+        ),
 
-        nombre: formulario.nombre.trim(),
+        nombre:
+          formulario.nombre.trim(),
 
         descripcion:
           formulario.descripcion.trim() || null,
-        
+
         imagenUrl:
           formulario.imagenUrl.trim() || null,
 
@@ -140,11 +164,16 @@ export default function CrearProyecto() {
           formulario.ubicacion.trim() || null,
 
         alto: Number(formulario.alto),
+
         ancho: Number(formulario.ancho),
+
         largo: Number(formulario.largo),
       };
 
-      console.log("Proyecto a enviar:", proyecto);
+      console.log(
+        "Proyecto a enviar:",
+        proyecto
+      );
 
       const response = await fetch(
         `${API_URL}/api/proyectos`,
@@ -159,8 +188,7 @@ export default function CrearProyecto() {
         }
       );
 
-      const data: RespuestaError =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -169,9 +197,92 @@ export default function CrearProyecto() {
         );
       }
 
-      navigate("/panel-cliente/proyectos");
+      // ==========================================
+      // 2. OBTENER ID DEL PROYECTO CREADO
+      // ==========================================
+
+      const idProyecto =
+        data.idProyecto;
+
+      console.log(
+        "Proyecto creado con ID:",
+        idProyecto
+      );
+
+      if (!idProyecto) {
+        throw new Error(
+          "El backend no devolvió el ID del proyecto creado."
+        );
+      }
+
+      // ==========================================
+      // 3. GUARDAR MATERIALES DEL PROYECTO
+      // ==========================================
+
+      for (
+        const material
+        of materialesSeleccionados
+      ) {
+
+        const materialProyecto = {
+          idProyecto:
+            idProyecto,
+
+          idMaterial:
+            material.idMaterial,
+
+          cantidad:
+            material.cantidad ?? 1,
+        };
+
+        console.log(
+          "Material a guardar:",
+          materialProyecto
+        );
+
+        const respuestaMaterial =
+          await fetch(
+            `${API_URL}/api/materiales-proyecto/agregarMaterialAProyecto`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json",
+              },
+
+              body: JSON.stringify(
+                materialProyecto
+              ),
+            }
+          );
+
+        const datosMaterial =
+          await respuestaMaterial.json();
+
+        if (!respuestaMaterial.ok) {
+          throw new Error(
+            datosMaterial.mensaje ||
+              `No se pudo guardar el material ${material.nombre}`
+          );
+        }
+      }
+
+      // ==========================================
+      // 4. TODO CORRECTO
+      // ==========================================
+
+      console.log(
+        "Proyecto y materiales guardados correctamente."
+      );
+
+      navigate(
+        "/panel-cliente/proyectos"
+      );
 
     } catch (error) {
+
+      console.error(error);
+
       const mensaje =
         error instanceof Error
           ? error.message
@@ -180,9 +291,11 @@ export default function CrearProyecto() {
       setError(mensaje);
 
     } finally {
+
       setGuardando(false);
+
     }
-  };
+    };
 
   return (
     <div className="cliente-panel">
@@ -514,6 +627,16 @@ export default function CrearProyecto() {
 
           </section>
 
+            {/* ==========================================
+                MATERIALES DEL PROYECTO
+            ========================================== */}
+
+        <MaterialesProyectoDropList
+           materialesSeleccionados={materialesSeleccionados}
+           onMaterialesChange={setMaterialesSeleccionados}
+           onVerDatosMaterial={abrirModalMaterial}
+        />
+
           {/* ERROR */}
 
           {error && (
@@ -558,6 +681,11 @@ export default function CrearProyecto() {
         </form>
 
       </main>
+      <ModalDatosMaterial
+        material={materialModal}
+        abierto={modalMaterialAbierto}
+        onCerrar={cerrarModalMaterial}
+      />
 
     </div>
   );
