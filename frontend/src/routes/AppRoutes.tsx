@@ -26,9 +26,10 @@ import Comparador from "../pages/cliente/Comparador";
 import Empresas from "../pages/cliente/Empresas";
 
 
-import RegistroProyecto from "../pages/cliente/gestionProyecto/RegistroProyecto";
 
 
+import EditarProyecto from "../pages/cliente/EditarProyecto";
+import GenerarCotizacion from "../pages/cliente/GenerarCotizacion";
 
 import EmpresasFavoritas from "../pages/cliente/EmpresasFavoritas";
 import AsistenteIA from "../pages/cliente/AsistenteIA";
@@ -48,8 +49,6 @@ export default function AppRoutes() {
           <Route path="/register" element={<Register />}/>
           <Route path="/panel-cliente" element={<PanelCliente />}/>
 
-          <Route path="/registro-proyecto" element={<RegistroProyecto />}
-/>
 
           <Route path="/panel-empresa" element={<PanelEmpresa />}/>
           <Route path="/recuperar-password" element={<RecuperarContrasenia />}/>
@@ -72,6 +71,8 @@ export default function AppRoutes() {
 
           <Route path="/panel-cliente/proyectos" element={<MisProyectos />} />
           <Route path="/panel-cliente/proyectos/crear" element={<CrearProyecto />} />
+          <Route path="/panel-cliente/proyectos/:idProyecto/editar" element={<EditarProyecto />}/>
+          <Route path="/panel-cliente/proyectos/:idProyecto/cotizar" element={<GenerarCotizacion />}/>
           <Route path="/panel-cliente/proyectos/:idProyecto" element={<DetalleProyecto />}/>
           <Route path="/panel-cliente/cotizaciones/:idCotizacion" element={<DetalleCotizacion />} />
           <Route path="/panel-cliente/favoritas" element={<EmpresasFavoritas />} />

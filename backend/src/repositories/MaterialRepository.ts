@@ -1,4 +1,4 @@
-import sql from "mssql";
+﻿import sql from "mssql";
 
 import { connectDB } from "../server/database";
 
@@ -14,20 +14,23 @@ export class MaterialRepository {
 
     const resultado = await pool.request().query<Material>(`
       SELECT
-        id_Material,
-        id_Empresa AS idEmpresa,
-        nombre,
-        descripcion,
-        stock,
-        costoUnitario,
-        categoria,
-        unidad,
-        ultimaActualizacion,
-        disponibilidad,
-        estado,
-        imagenUrl
-      FROM Material
-      ORDER BY id_Material DESC
+          m.id_Material,
+          m.id_Empresa AS idEmpresa,
+          e.nombreEmpresa AS nombreEmpresa,
+          m.nombre,
+          m.descripcion,
+          m.stock,
+          m.costoUnitario,
+          m.categoria,
+          m.unidad,
+          m.ultimaActualizacion,
+          m.disponibilidad,
+          m.estado,
+          m.imagenUrl
+      FROM Material m
+      INNER JOIN Empresa e
+          ON m.id_Empresa = e.id_Empresa
+      ORDER BY m.id_Material DESC
     `);
 
     return resultado.recordset;
@@ -43,195 +46,170 @@ export class MaterialRepository {
       .input("idMaterial", sql.Int, idMaterial)
       .query<Material>(`
         SELECT
-          id_Material,
-          id_Empresa AS idEmpresa,
-          nombre,
-          descripcion,
-          stock,
-          costoUnitario,
-          categoria,
-          unidad,
-          ultimaActualizacion,
-          disponibilidad,
-          estado,
-          imagenUrl
-        FROM Material
-        WHERE id_Material = @idMaterial
+            m.id_Material,
+            m.id_Empresa AS idEmpresa,
+            e.nombreEmpresa AS nombreEmpresa,
+            m.nombre,
+            m.descripcion,
+            m.stock,
+            m.costoUnitario,
+            m.categoria,
+            m.unidad,
+            m.ultimaActualizacion,
+            m.disponibilidad,
+            m.estado,
+            m.imagenUrl
+        FROM Material m
+        INNER JOIN Empresa e
+            ON m.id_Empresa = e.id_Empresa
+        WHERE m.id_Material = @idMaterial
       `);
 
     return resultado.recordset[0] ?? null;
   }
 
-  public async crearMaterial(
-    material: CrearMaterialDTO
-  ): Promise<Material> {
+  public async crearMaterial( material: CrearMaterialDTO ): Promise<Material> {
     const pool = await connectDB();
 
     const resultado = await pool
-      .request()
-      .input("nombre", sql.VarChar(100), material.nombre)
-      .input(
-        "descripcion",
-        sql.VarChar(255),
-        material.descripcion ?? null
-      )
-      .input("stock", sql.Int, material.stock)
-      .input(
-        "costoUnitario",
-        sql.Decimal(12, 2),
-        material.costoUnitario
-      )
-      .input(
-        "categoria",
-        sql.VarChar(100),
-        material.categoria ?? null
-      )
-      .input(
-        "unidad",
-        sql.VarChar(50),
-        material.unidad ?? null
-      )
-      .input(
-        "disponibilidad",
-        sql.VarChar(20),
-        material.disponibilidad ?? "Disponible"
-      )
-      .input(
-        "estado",
-        sql.VarChar(20),
-        material.estado ?? "Activo"
-      )
-      .input(
-        "idEmpresa",
-        sql.Int,
-        material.idEmpresa
-      )
-      .input(
-        "imagenUrl",
-        sql.NVarChar(500),
-        material.imagenUrl ?? null
-      )
-      .query<Material>(`
-        INSERT INTO Material (
-          nombre,
-          descripcion,
-          stock,
-          costoUnitario,
-          categoria,
-          unidad,
-          ultimaActualizacion,
-          disponibilidad,
-          estado,
-          id_Empresa,
-          imagenUrl
+        .request()
+        .input("nombre", sql.VarChar(100), material.nombre)
+        .input(
+          "descripcion",
+          sql.VarChar(255),
+          material.descripcion ?? null
         )
-        OUTPUT
-          INSERTED.id_Material,
-          INSERTED.id_Empresa AS idEmpresa,
-          INSERTED.nombre,
-          INSERTED.descripcion,
-          INSERTED.stock,
-          INSERTED.costoUnitario,
-          INSERTED.categoria,
-          INSERTED.unidad,
-          INSERTED.ultimaActualizacion,
-          INSERTED.disponibilidad,
-          INSERTED.estado,
-          INSERTED.imagenUrl
-        VALUES (
-          @nombre,
-          @descripcion,
-          @stock,
-          @costoUnitario,
-          @categoria,
-          @unidad,
-          GETDATE(),
-          @disponibilidad,
-          @estado,
-          @idEmpresa,
-          @imagenUrl
+        .input("stock", sql.Int, material.stock)
+        .input(
+          "costoUnitario",
+          sql.Decimal(12, 2),
+          material.costoUnitario
         )
-      `);
+        .input(
+          "categoria",
+          sql.VarChar(100),
+          material.categoria ?? null
+        )
+        .input(
+          "unidad",
+          sql.VarChar(50),
+          material.unidad ?? null
+        )
+        .input(
+          "disponibilidad",
+          sql.VarChar(20),
+          material.disponibilidad ?? "Disponible"
+        )
+        .input(
+          "estado",
+          sql.VarChar(20),
+          material.estado ?? "Activo"
+        )
+        .input(
+          "idEmpresa",
+          sql.Int,
+          material.idEmpresa
+        )
+        .input(
+          "imagenUrl",
+          sql.NVarChar(500),
+          material.imagenUrl ?? null
+        )
+        .query(`
+          INSERT INTO Material (
+            nombre,
+            descripcion,
+            stock,
+            costoUnitario,
+            categoria,
+            unidad,
+            ultimaActualizacion,
+            disponibilidad,
+            estado,
+            id_Empresa,
+            imagenUrl
+          )
+          OUTPUT INSERTED.id_Material
+          VALUES (
+            @nombre,
+            @descripcion,
+            @stock,
+            @costoUnitario,
+            @categoria,
+            @unidad,
+            GETDATE(),
+            @disponibilidad,
+            @estado,
+            @idEmpresa,
+            @imagenUrl
+          )
+        `);
 
-    return resultado.recordset[0];
+    const idMaterial = resultado.recordset[0].id_Material;
+
+    return (await this.obtenerMaterialPorId(idMaterial))!;
   }
 
-  public async actualizarMaterial(
-    idMaterial: number,
-    material: ActualizarMaterialDTO
-  ): Promise<Material | null> {
+  public async actualizarMaterial(idMaterial: number, material: ActualizarMaterialDTO): Promise<Material | null> {
     const pool = await connectDB();
 
-    const resultado = await pool
-      .request()
-      .input("idMaterial", sql.Int, idMaterial)
-      .input("nombre", sql.VarChar(100), material.nombre)
-      .input(
-        "descripcion",
-        sql.VarChar(255),
-        material.descripcion ?? null
-      )
-      .input("stock", sql.Int, material.stock)
-      .input(
-        "costoUnitario",
-        sql.Decimal(12, 2),
-        material.costoUnitario
-      )
-      .input(
-        "categoria",
-        sql.VarChar(100),
-        material.categoria ?? null
-      )
-      .input(
-        "unidad",
-        sql.VarChar(50),
-        material.unidad ?? null
-      )
-      .input(
-        "disponibilidad",
-        sql.VarChar(20),
-        material.disponibilidad ?? "Disponible"
-      )
-      .input(
-        "estado",
-        sql.VarChar(20),
-        material.estado ?? "Activo"
-      )
-      .input(
-        "imagenUrl",
-        sql.NVarChar(500),
-        material.imagenUrl ?? null
-      )
-      .query<Material>(`
-        UPDATE Material
-        SET
-          nombre = @nombre,
-          descripcion = @descripcion,
-          stock = @stock,
-          costoUnitario = @costoUnitario,
-          categoria = @categoria,
-          unidad = @unidad,
-          ultimaActualizacion = GETDATE(),
-          disponibilidad = @disponibilidad,
-          estado = @estado,
-          imagenUrl = @imagenUrl
-        OUTPUT
-          INSERTED.id_Material,
-          INSERTED.id_Empresa AS idEmpresa,
-          INSERTED.nombre,
-          INSERTED.descripcion,
-          INSERTED.stock,
-          INSERTED.costoUnitario,
-          INSERTED.categoria,
-          INSERTED.unidad,
-          INSERTED.ultimaActualizacion,
-          INSERTED.disponibilidad,
-          INSERTED.estado,
-          INSERTED.imagenUrl
-        WHERE id_Material = @idMaterial
-      `);
+      await pool
+        .request()
+        .input("idMaterial", sql.Int, idMaterial)
+        .input("nombre", sql.VarChar(100), material.nombre)
+        .input(
+          "descripcion",
+          sql.VarChar(255),
+          material.descripcion ?? null
+        )
+        .input("stock", sql.Int, material.stock)
+        .input(
+          "costoUnitario",
+          sql.Decimal(12, 2),
+          material.costoUnitario
+        )
+        .input(
+          "categoria",
+          sql.VarChar(100),
+          material.categoria ?? null
+        )
+        .input(
+          "unidad",
+          sql.VarChar(50),
+          material.unidad ?? null
+        )
+        .input(
+          "disponibilidad",
+          sql.VarChar(20),
+          material.disponibilidad ?? "Disponible"
+        )
+        .input(
+          "estado",
+          sql.VarChar(20),
+          material.estado ?? "Activo"
+        )
+        .input(
+          "imagenUrl",
+          sql.NVarChar(500),
+          material.imagenUrl ?? null
+        )
+        .query(`
+          UPDATE Material
+          SET
+            nombre = @nombre,
+            descripcion = @descripcion,
+            stock = @stock,
+            costoUnitario = @costoUnitario,
+            categoria = @categoria,
+            unidad = @unidad,
+            ultimaActualizacion = GETDATE(),
+            disponibilidad = @disponibilidad,
+            estado = @estado,
+            imagenUrl = @imagenUrl
+          WHERE id_Material = @idMaterial
+        `);
 
-    return resultado.recordset[0] ?? null;
+      return await this.obtenerMaterialPorId(idMaterial);
   }
 
   public async eliminarMaterial(

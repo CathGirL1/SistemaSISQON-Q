@@ -19,7 +19,7 @@ export class Material {
     public estado: EstadoMaterial,
     public idEmpresa: number,
     public imagenUrl?: string | null,
-    
+    public nombreEmpresa?: string
   ) {}
 }
 
