@@ -30,6 +30,7 @@ export interface Proyecto {
   idTipoObra: number;
   nombre: string;
   descripcion: string | null;
+  imagenUrl: string | null;
   ubicacion: string | null;
   estado: string;
   alto: number;
@@ -42,6 +43,7 @@ export interface Proyecto {
 interface FormularioProyecto {
   nombre: string;
   descripcion: string;
+  imagenUrl: string | null;
   ubicacion: string;
   idTipoObra: string;
   estado: string;
@@ -328,6 +330,12 @@ export default function DetalleProyecto() {
                 <InfoItem
                   label="Estado"
                   value={proyecto.estado}
+                />
+
+                <InfoItem
+                  label="Imagen de proyecto"
+                  value={proyecto.imagenUrl ||
+                    "No especificada"}
                 />
 
                 <div className="detalle-proyecto-description">

@@ -25,6 +25,7 @@ import "../../styles/EditarProyecto.css";
 interface FormularioProyecto {
   nombre: string;
   descripcion: string;
+  imagenUrl: string;
   ubicacion: string;
   idTipoObra: string;
   estado: string;
@@ -40,6 +41,9 @@ interface TipoObra {
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+const IMAGEN_PREDETERMINADA =
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500";
 
 export default function EditarProyecto() {
   const navigate = useNavigate();
@@ -158,6 +162,8 @@ export default function EditarProyecto() {
       descripcion:
         proyectoActual.descripcion ?? "",
 
+      imagenUrl: proyectoActual.imagenUrl ?? "",
+
       ubicacion:
         proyectoActual.ubicacion ?? "",
 
@@ -238,6 +244,8 @@ export default function EditarProyecto() {
         descripcion:
           formulario.descripcion.trim() ||
           null,
+
+        imagenUrl: formulario.imagenUrl?.trim() || null,
 
         ubicacion:
           formulario.ubicacion.trim() ||
@@ -481,6 +489,36 @@ export default function EditarProyecto() {
               maxLength={500}
               placeholder="Describa el proyecto, materiales, características o cualquier información relevante..."
             />
+
+          </label>
+
+          <label className="editar-proyecto-field">
+
+            <span>
+              Enlace de imagen
+            </span>
+
+            <input
+              type="url"
+              name="imagenUrl"
+              value={formulario.imagenUrl}
+              onChange={actualizarCampo}
+              placeholder="Ingresá un enlace de imagen (opcional)"
+              autoComplete="off"
+            />
+
+            <div className="editar-proyecto-imagen-preview">
+            <img
+              src={
+                formulario.imagenUrl.trim() ||
+                IMAGEN_PREDETERMINADA
+              }
+              alt="Vista previa del proyecto"
+              onError={(e) => {
+                e.currentTarget.src = IMAGEN_PREDETERMINADA;
+              }}
+            />
+          </div>
 
           </label>
 

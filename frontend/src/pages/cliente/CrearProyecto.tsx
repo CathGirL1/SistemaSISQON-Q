@@ -28,6 +28,7 @@ interface FormularioProyecto {
   alto: string;
   ancho: string;
   largo: string;
+  imagenUrl: string; 
 }
 
 interface RespuestaError {
@@ -47,6 +48,7 @@ const formularioInicial: FormularioProyecto = {
   alto: "",
   ancho: "",
   largo: "",
+  imagenUrl: ""
 };
 
 export default function CrearProyecto() {
@@ -58,6 +60,7 @@ export default function CrearProyecto() {
     useState<FormularioProyecto>(formularioInicial);
 
   const [tiposObra, setTiposObra] = useState<TipoObra[]>([]);
+ 
 
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
@@ -129,6 +132,9 @@ export default function CrearProyecto() {
 
         descripcion:
           formulario.descripcion.trim() || null,
+        
+        imagenUrl:
+          formulario.imagenUrl.trim() || null,
 
         ubicacion:
           formulario.ubicacion.trim() || null,
@@ -317,6 +323,28 @@ export default function CrearProyecto() {
                   placeholder="Describí brevemente el proyecto..."
                   maxLength={500}
                   rows={5}
+                />
+
+              </label>
+
+              <label className="crear-proyecto-field">
+
+                <span>
+                  Imagen de proyecto
+                </span>
+
+               <input
+                  type="text"
+                  value={formulario.imagenUrl}
+                  onChange={(event) =>
+                    actualizarCampo(
+                      "imagenUrl",
+                      event.target.value
+                    )
+                  }
+                  placeholder="Ingrese un enlace de imagen"
+                  maxLength={100}
+                  required
                 />
 
               </label>

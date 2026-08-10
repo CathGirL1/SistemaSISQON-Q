@@ -23,12 +23,13 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import FiltrosProyecto from "./FiltrosProyecto";
-
+import PaginacionProyecto from "./PaginacionProyecto";
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 
 
 
 import "../../styles/PanelClienteContenido.css";
+import "../../styles/PaginacionProyecto.css";
 import "../../styles/MisProyectos.css";
 
 
@@ -42,6 +43,7 @@ export interface ProyectoAPI {
   idTipoObra: number;
   nombre: string;
   descripcion: string | null;
+  imagenUrl: string | null;
   ubicacion: string | null;
   estado: string;
 
@@ -59,6 +61,10 @@ const API_URL =
 
 const ID_CLIENTE_TEMPORAL = 1;
 
+const PROYECTOS_POR_PAGINA = 6;
+
+
+
 const IMAGEN_PROYECTO =
   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500";
 
@@ -69,7 +75,9 @@ const IMAGEN_PROYECTO =
   const [busqueda, setBusqueda] = useState("");
   const [estado, setEstado] = useState("");
   const [tipoObra, setTipoObra] = useState("");
+ 
   const [orden, setOrden] = useState("recientes");
+  const [paginaActual, setPaginaActual] = useState(1);
 
   const [proyectos, setProyectos] = useState<ProyectoAPI[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -78,6 +86,10 @@ const IMAGEN_PROYECTO =
   useEffect(() => {
     obtenerProyectos();
   }, []);
+
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [busqueda, tipoObra, estado]);
 
   const obtenerProyectos = async () => {
     try {
@@ -111,6 +123,8 @@ const IMAGEN_PROYECTO =
       setCargando(false);
     }
   };
+
+  
 
   const proyectosFiltrados = useMemo(() => {
       let resultado = [...proyectos];
@@ -183,6 +197,30 @@ const IMAGEN_PROYECTO =
       return resultado;
   }, [proyectos, busqueda, estado, tipoObra, orden]);
 
+
+
+  const totalProyectos = proyectosFiltrados.length;
+
+  const totalPaginas = Math.ceil(
+    totalProyectos / PROYECTOS_POR_PAGINA
+  );
+
+  const indiceInicio =
+    (paginaActual - 1) * PROYECTOS_POR_PAGINA;
+
+  const indiceFin = Math.min(
+    indiceInicio + PROYECTOS_POR_PAGINA,
+    totalProyectos
+  );
+
+  const proyectosPaginados = proyectosFiltrados.slice(
+    indiceInicio,
+    indiceFin
+  );
+
+  
+
+
   const totalActivos = proyectos.filter(
     (proyecto) =>
       proyecto.estado.toLowerCase() === "activo" ||
@@ -198,6 +236,8 @@ const IMAGEN_PROYECTO =
     (proyecto) =>
       proyecto.estado.toLowerCase() === "finalizado"
   ).length;
+
+  
 
   return (
     <div className="cliente-panel">
@@ -312,15 +352,19 @@ const IMAGEN_PROYECTO =
           !error &&
           proyectosFiltrados.length > 0 && (
             <section className="proyectos-grid">
-              {proyectosFiltrados.map((proyecto) => (
+              {proyectosPaginados.map((proyecto) => (
                 <article
                   className="proyecto-card"
                   key={proyecto.idProyecto}
                 >
                   <div className="proyecto-card-image">
+                    
                     <img
-                      src={IMAGEN_PROYECTO}
+                      src={proyecto.imagenUrl?.trim() || IMAGEN_PROYECTO}
                       alt={proyecto.nombre}
+                      onError={(e) => {
+                        e.currentTarget.src = IMAGEN_PROYECTO;
+                      }}
                     />
 
                     <EstadoProyectoBadge
@@ -415,8 +459,27 @@ const IMAGEN_PROYECTO =
                       </button>
                     </div>
                   </div>
+
+                  
                 </article>
+                
               ))}
+              <PaginacionProyecto
+                paginaActual={paginaActual}
+                totalPaginas={totalPaginas}
+                indiceInicio={indiceInicio + 1}
+                indiceFin={indiceFin}
+                totalElementos={totalProyectos}
+                onPaginaAnterior={() =>
+                  setPaginaActual((prev) => Math.max(prev - 1, 1))
+                }
+                onPaginaSiguiente={() =>
+                  setPaginaActual((prev) =>
+                    Math.min(prev + 1, totalPaginas)
+                  )
+                }
+                onCambiarPagina={setPaginaActual}
+              />
             </section>
           )}
       </main>
