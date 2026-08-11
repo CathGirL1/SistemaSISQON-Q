@@ -20,6 +20,38 @@ type ClienteApi = {
   notas: string | null;
 };
 
+type HistorialCotizacionApi = {
+  idCotizacion: number;
+  fechaRealizada: string;
+  totalCotizacion: number;
+  estado: string;
+  observaciones: string | null;
+  idProyecto: number;
+  nombreProyecto: string;
+};
+
+export const obtenerClientesPorEmpresa = async (
+  idEmpresa: number
+): Promise<ClienteEmpresa[]> => {
+  const respuesta = await fetch(
+    `${API_URL}/empresa/${idEmpresa}`
+  );
+
+  if (!respuesta.ok) {
+    throw new Error(
+      await obtenerMensajeError(
+        respuesta,
+        "No se pudieron obtener los clientes de la empresa."
+      )
+    );
+  }
+
+  const clientes: ClienteApi[] =
+    await respuesta.json();
+
+  return clientes.map(transformarCliente);
+};
+
 export type CrearClienteRequest = {
   nombreUsuario: string;
   gmail: string;
@@ -190,4 +222,44 @@ export const eliminarCliente = async (
       )
     );
   }
+};
+
+export const obtenerHistorialCotizacionesCliente = async (
+  idCliente: number,
+  idEmpresa: number
+) => {
+  const respuesta = await fetch(
+    `${API_URL}/${idCliente}/cotizaciones/empresa/${idEmpresa}`
+  );
+
+  if (!respuesta.ok) {
+    throw new Error(
+      await obtenerMensajeError(
+        respuesta,
+        "No se pudo obtener el historial de cotizaciones."
+      )
+    );
+  }
+
+  const historial: HistorialCotizacionApi[] =
+    await respuesta.json();
+
+  return historial.map((cotizacion) => ({
+    id: `COT-${String(cotizacion.idCotizacion).padStart(
+      3,
+      "0"
+    )}`,
+
+    fecha: new Date(
+      cotizacion.fechaRealizada
+    ).toLocaleDateString("es-UY"),
+
+    total: Number(
+      cotizacion.totalCotizacion
+    ).toLocaleString("es-UY", {
+      style: "currency",
+      currency: "UYU",
+      maximumFractionDigits: 0,
+    }),
+  }));
 };

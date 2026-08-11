@@ -1,31 +1,95 @@
 import "../../../styles/empresa/clientes/ClientesFiltros.css";
 
 import { FaFilter } from "react-icons/fa";
+
 import PanelSearchBar from "../../common/PanelSearchBar";
 
-export default function ClientesFiltros() {
+type Props = {
+  busqueda: string;
+  estado: string;
+  ciudad: string;
+
+  ciudades: string[];
+
+  onBusquedaChange: (valor: string) => void;
+  onEstadoChange: (valor: string) => void;
+  onCiudadChange: (valor: string) => void;
+
+  onLimpiarFiltros: () => void;
+};
+
+export default function ClientesFiltros({
+  busqueda,
+  estado,
+  ciudad,
+  ciudades,
+  onBusquedaChange,
+  onEstadoChange,
+  onCiudadChange,
+  onLimpiarFiltros,
+}: Props) {
   return (
     <div className="clientes-filtros">
-      <PanelSearchBar placeholder="Buscar por nombre, email o teléfono..." />
+      <PanelSearchBar
+        placeholder="Buscar por nombre, email o teléfono..."
+        value={busqueda}
+        onChange={onBusquedaChange}
+      />
 
-      <select>
-        <option>Todos los estados</option>
-        <option>Nuevo</option>
-        <option>Interesado</option>
-        <option>Contactado</option>
-        <option>Cliente confirmado</option>
+      <select
+        value={estado}
+        onChange={(evento) =>
+          onEstadoChange(evento.target.value)
+        }
+      >
+        <option value="">
+          Todos los estados
+        </option>
+
+        <option value="Nuevo">
+          Nuevo
+        </option>
+
+        <option value="Interesado">
+          Interesado
+        </option>
+
+        <option value="Contactado">
+          Contactado
+        </option>
+
+        <option value="Cliente confirmado">
+          Cliente confirmado
+        </option>
       </select>
 
-      <select>
-        <option>Todas las ciudades</option>
-        <option>Maldonado</option>
-        <option>Montevideo</option>
-        <option>Punta del Este</option>
+      <select
+        value={ciudad}
+        onChange={(evento) =>
+          onCiudadChange(evento.target.value)
+        }
+      >
+        <option value="">
+          Todas las ciudades
+        </option>
+
+        {ciudades.map((nombreCiudad) => (
+          <option
+            key={nombreCiudad}
+            value={nombreCiudad}
+          >
+            {nombreCiudad}
+          </option>
+        ))}
       </select>
 
-      <button className="clientes-filtros-btn">
+      <button
+        type="button"
+        className="clientes-filtros-btn"
+        onClick={onLimpiarFiltros}
+      >
         <FaFilter />
-        Filtros
+        Limpiar filtros
       </button>
     </div>
   );
