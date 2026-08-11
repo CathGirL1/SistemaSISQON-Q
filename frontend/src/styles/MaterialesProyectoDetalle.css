@@ -1,0 +1,408 @@
+/* ======================================================
+   CARD PRINCIPAL
+====================================================== */
+
+.materiales-detalle-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+
+/* ======================================================
+   TITULO
+====================================================== */
+
+.materiales-detalle-titulo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.materiales-detalle-titulo h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f2747;
+}
+
+.materiales-detalle-titulo p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+
+/* ======================================================
+   ICONO
+====================================================== */
+
+.materiales-detalle-icono {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #eef4ff;
+  color: #2563eb;
+
+  flex-shrink: 0;
+}
+
+
+/* ======================================================
+   LISTA
+====================================================== */
+
+.materiales-detalle-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* ======================================================
+   ITEM
+====================================================== */
+
+.materiales-detalle-item {
+  display: grid;
+
+  grid-template-columns:
+    76px
+    minmax(220px, 1fr)
+    100px
+    130px;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 16px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.materiales-detalle-item:hover {
+  border-color: #cbd5e1;
+
+  box-shadow:
+    0 4px 12px rgba(15, 39, 71, 0.06);
+}
+
+
+/* ======================================================
+   IMAGEN
+====================================================== */
+
+.materiales-detalle-imagen {
+  width: 76px;
+  height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #f1f5f9;
+
+  color: #64748b;
+
+  flex-shrink: 0;
+}
+
+.materiales-detalle-imagen img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+
+/* ======================================================
+   INFORMACIÓN
+====================================================== */
+
+.materiales-detalle-info {
+  min-width: 0;
+}
+
+.materiales-detalle-info h4 {
+  margin: 0 0 8px;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  color: #0f2747;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.materiales-detalle-info p {
+  margin: 4px 0;
+
+  font-size: 14px;
+
+  color: #64748b;
+}
+
+.materiales-detalle-info strong {
+  color: #334155;
+}
+
+
+/* ======================================================
+   DATOS
+====================================================== */
+
+.materiales-detalle-dato {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.materiales-detalle-dato span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.materiales-detalle-dato strong {
+  font-size: 16px;
+  color: #0f2747;
+}
+
+
+/* ======================================================
+   SUBTOTAL
+====================================================== */
+
+.materiales-detalle-subtotal {
+  text-align: right;
+}
+
+.materiales-detalle-subtotal strong {
+  color: #0f766e;
+}
+
+
+/* ======================================================
+   ESTADOS
+====================================================== */
+
+.materiales-detalle-feedback {
+  padding: 20px 0;
+
+  font-size: 15px;
+
+  color: #64748b;
+}
+
+.materiales-detalle-error {
+  padding: 14px 16px;
+
+  border-radius: 10px;
+
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+
+  color: #b91c1c;
+
+  font-size: 14px;
+}
+
+
+/* ======================================================
+   SIN MATERIALES
+====================================================== */
+
+.materiales-detalle-vacio {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 40px 20px;
+
+  color: #94a3b8;
+}
+
+.materiales-detalle-vacio h4 {
+  margin: 14px 0 6px;
+
+  font-size: 16px;
+
+  color: #475569;
+}
+
+.materiales-detalle-vacio p {
+  margin: 0;
+
+  font-size: 14px;
+
+  color: #64748b;
+}
+
+
+/* ======================================================
+   TABLET
+====================================================== */
+
+@media (max-width: 900px) {
+
+  .materiales-detalle-item {
+    grid-template-columns:
+      70px
+      minmax(180px, 1fr)
+      90px;
+
+    gap: 16px;
+  }
+
+  .materiales-detalle-subtotal {
+    text-align: left;
+  }
+
+}
+
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media (max-width: 650px) {
+
+  .materiales-detalle-card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+
+  .materiales-detalle-titulo {
+    margin-bottom: 18px;
+  }
+
+
+  .materiales-detalle-titulo h3 {
+    font-size: 18px;
+  }
+
+
+  .materiales-detalle-item {
+    display: grid;
+
+    grid-template-columns:
+      64px
+      minmax(0, 1fr);
+
+    gap: 14px;
+
+    padding: 14px;
+  }
+
+
+  .materiales-detalle-imagen {
+    width: 64px;
+    height: 64px;
+
+    grid-row: span 1;
+  }
+
+
+  .materiales-detalle-info h4 {
+    font-size: 15px;
+  }
+
+
+  .materiales-detalle-info p {
+    font-size: 13px;
+  }
+
+
+  .materiales-detalle-dato {
+    grid-column: 1 / -1;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding-top: 10px;
+
+    border-top: 1px solid #e2e8f0;
+  }
+
+
+  .materiales-detalle-subtotal {
+    text-align: left;
+  }
+
+}
+
+
+/* ======================================================
+   MOBILE PEQUEÑO
+====================================================== */
+
+@media (max-width: 420px) {
+
+  .materiales-detalle-card {
+    padding: 14px;
+  }
+
+
+  .materiales-detalle-titulo {
+    gap: 10px;
+  }
+
+
+  .materiales-detalle-icono {
+    width: 38px;
+    height: 38px;
+  }
+
+
+  .materiales-detalle-titulo h3 {
+    font-size: 17px;
+  }
+
+
+  .materiales-detalle-item {
+    grid-template-columns: 56px minmax(0, 1fr);
+
+    padding: 12px;
+  }
+
+
+  .materiales-detalle-imagen {
+    width: 56px;
+    height: 56px;
+  }
+
+}

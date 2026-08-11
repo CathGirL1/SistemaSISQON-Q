@@ -1,0 +1,843 @@
+/* =========================================================
+   CARD PRINCIPAL
+========================================================= */
+
+.editar-materiales-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #dce3ee;
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.editar-materiales-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.editar-materiales-header-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.editar-materiales-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #eef4ff;
+  color: #2563eb;
+
+  flex-shrink: 0;
+}
+
+.editar-materiales-header h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.editar-materiales-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.editar-materiales-contador {
+  padding: 7px 12px;
+  border-radius: 20px;
+
+  background: #f1f5f9;
+  color: #475569;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.editar-materiales-error {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+
+  background: #fef2f2;
+  color: #b91c1c;
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   LISTA
+========================================================= */
+
+.editar-materiales-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* =========================================================
+   CARGANDO
+========================================================= */
+
+.editar-materiales-cargando {
+  min-height: 140px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* =========================================================
+   VACÍO
+========================================================= */
+
+.editar-materiales-vacio {
+  min-height: 150px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+
+  color: #64748b;
+
+  text-align: center;
+}
+
+.editar-materiales-vacio svg {
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.editar-materiales-vacio strong {
+  color: #334155;
+  font-size: 15px;
+}
+
+.editar-materiales-vacio span {
+  font-size: 13px;
+}
+
+/* =========================================================
+   MATERIAL
+========================================================= */
+
+.editar-material-item {
+  display: grid;
+
+  grid-template-columns:
+    72px
+    minmax(180px, 1fr)
+    auto
+    auto;
+
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 16px;
+
+  border: 1px solid #dce3ee;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.editar-material-item:hover {
+  border-color: #c7d2e3;
+
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+/* =========================================================
+   IMAGEN
+========================================================= */
+
+.editar-material-imagen {
+  width: 72px;
+  height: 72px;
+
+  border-radius: 10px;
+
+  background: #f1f5f9;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  color: #64748b;
+}
+
+.editar-material-imagen img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* =========================================================
+   INFORMACIÓN
+========================================================= */
+
+.editar-material-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.editar-material-info h4 {
+  margin: 0 0 4px;
+
+  color: #0f172a;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editar-material-info p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+.editar-material-info strong {
+  color: #334155;
+}
+
+/* =========================================================
+   CANTIDAD
+========================================================= */
+
+.editar-material-cantidad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.editar-material-cantidad > span {
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+.editar-cantidad-controles {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.editar-cantidad-controles button {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d7dfeb;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #1e3a5f;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.editar-cantidad-controles button:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.editar-cantidad-controles button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.editar-cantidad-controles strong {
+  min-width: 25px;
+
+  text-align: center;
+
+  color: #0f172a;
+  font-size: 15px;
+}
+
+/* =========================================================
+   ACCIONES
+========================================================= */
+
+.editar-material-acciones {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  min-width: 115px;
+}
+
+.editar-material-acciones button {
+  min-height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 7px 11px;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.editar-material-ver {
+  border: 1px solid #cbd5e1;
+
+  background: #ffffff;
+
+  color: #1e3a5f;
+}
+
+.editar-material-ver:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.editar-material-eliminar {
+  border: 1px solid #fecaca;
+
+  background: #ffffff;
+
+  color: #dc2626;
+}
+
+.editar-material-eliminar:hover {
+  background: #fef2f2;
+}
+
+.editar-material-eliminar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   SECCIÓN AGREGAR
+========================================================= */
+
+.editar-materiales-agregar {
+  margin-top: 28px;
+
+  padding-top: 24px;
+
+  border-top: 1px solid #e2e8f0;
+}
+
+.editar-materiales-agregar-header {
+  margin-bottom: 16px;
+}
+
+.editar-materiales-agregar-header h4 {
+  margin: 0 0 4px;
+
+  color: #0f172a;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.editar-materiales-agregar-header p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+/* =========================================================
+   BUSCADOR
+========================================================= */
+
+.editar-material-busqueda {
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 13px;
+
+  margin-bottom: 14px;
+
+  border: 1px solid #d7dfeb;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #64748b;
+}
+
+.editar-material-busqueda:focus-within {
+  border-color: #8aa9d6;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.editar-material-busqueda input {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #0f172a;
+
+  font-size: 14px;
+}
+
+.editar-material-busqueda input::placeholder {
+  color: #94a3b8;
+}
+
+/* =========================================================
+   FORMULARIO AGREGAR
+========================================================= */
+
+.editar-material-formulario {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    140px
+    125px;
+
+  align-items: end;
+
+  gap: 14px;
+}
+
+.editar-material-select,
+.editar-material-cantidad-input {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.editar-material-select label,
+.editar-material-cantidad-input label {
+  color: #334155;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editar-material-select select,
+.editar-material-cantidad-input input {
+  width: 100%;
+  height: 44px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: 1px solid #d7dfeb;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #0f172a;
+
+  outline: none;
+
+  font-size: 14px;
+}
+
+.editar-material-select select:focus,
+.editar-material-cantidad-input input:focus {
+  border-color: #8aa9d6;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+/* =========================================================
+   BOTÓN AGREGAR
+========================================================= */
+
+.editar-material-agregar-button {
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #82a3d1;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.editar-material-agregar-button:hover:not(:disabled) {
+  background: #6f91c1;
+}
+
+.editar-material-agregar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+.editar-material-preview {
+  margin-top: 14px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 12px;
+
+  border: 1px solid #dce3ee;
+  border-radius: 10px;
+
+  background: #f8fafc;
+}
+
+.editar-material-preview-imagen {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  border-radius: 8px;
+
+  background: #e2e8f0;
+
+  color: #64748b;
+}
+
+.editar-material-preview-imagen img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.editar-material-preview-info {
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.editar-material-preview-info strong {
+  color: #0f172a;
+
+  font-size: 14px;
+}
+
+.editar-material-preview-info span {
+  color: #64748b;
+
+  font-size: 12px;
+}
+
+.editar-material-preview-ver {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 8px 11px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #1e3a5f;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.editar-material-preview-ver:hover {
+  background: #f1f5f9;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+  .editar-material-item {
+    grid-template-columns:
+      64px
+      minmax(180px, 1fr)
+      auto;
+
+    gap: 14px;
+  }
+
+  .editar-material-imagen {
+    width: 64px;
+    height: 64px;
+  }
+
+  .editar-material-acciones {
+    grid-column: 2 / -1;
+
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .editar-material-formulario {
+    grid-template-columns:
+      minmax(0, 1fr)
+      130px;
+  }
+
+  .editar-material-agregar-button {
+    grid-column: 1 / -1;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .editar-materiales-card {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .editar-materiales-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 12px;
+  }
+
+  .editar-materiales-header-info {
+    align-items: flex-start;
+  }
+
+  .editar-materiales-contador {
+    align-self: flex-start;
+  }
+
+  .editar-material-item {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: flex-start;
+
+    gap: 13px;
+  }
+
+  .editar-material-imagen {
+    width: 62px;
+    height: 62px;
+  }
+
+  .editar-material-info {
+    flex: 1;
+
+    min-width: calc(100% - 80px);
+  }
+
+  .editar-material-cantidad {
+    width: 100%;
+
+    flex-direction: row;
+    justify-content: space-between;
+
+    padding-top: 10px;
+
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .editar-material-acciones {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+  }
+
+  .editar-material-formulario {
+    display: flex;
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 12px;
+  }
+
+  .editar-material-select,
+  .editar-material-cantidad-input {
+    width: 100%;
+  }
+
+  .editar-material-agregar-button {
+    width: 100%;
+  }
+
+  .editar-material-preview {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .editar-material-preview-info {
+    min-width: calc(100% - 70px);
+  }
+
+  .editar-material-preview-ver {
+    width: 100%;
+
+    justify-content: center;
+  }
+}
+
+/* =========================================================
+   MOBILE PEQUEÑO
+========================================================= */
+
+@media (max-width: 450px) {
+  .editar-materiales-card {
+    padding: 14px;
+  }
+
+  .editar-materiales-header h3 {
+    font-size: 16px;
+  }
+
+  .editar-materiales-header p {
+    font-size: 13px;
+  }
+
+  .editar-material-item {
+    padding: 12px;
+  }
+
+  .editar-material-info h4 {
+    font-size: 14px;
+  }
+
+  .editar-material-info p {
+    font-size: 12px;
+  }
+
+  .editar-material-acciones {
+    grid-template-columns: 1fr;
+  }
+
+  .editar-material-acciones button {
+    width: 100%;
+  }
+}
