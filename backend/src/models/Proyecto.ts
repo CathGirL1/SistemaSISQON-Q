@@ -1,4 +1,5 @@
 export class Proyecto {
+
   constructor(
     private _idProyecto: number | null,
     private _idEmpresa: number | null,
@@ -8,13 +9,15 @@ export class Proyecto {
     private _nombre: string,
     private _descripcion: string | null,
     private _ubicacion: string | null,
+    private _imagenUrl: string | null,
     private _estado: string,
 
     private _alto: number,
     private _ancho: number,
     private _largo: number,
 
-    private _fechaCreacion?: Date
+    private _fechaCreacion?: Date,
+    
   ) {}
 
   public get idProyecto(): number | null {
@@ -112,4 +115,27 @@ export class Proyecto {
   public set fechaCreacion(value: Date | undefined) {
     this._fechaCreacion = value;
   }
+  
+  public get imagenUrl(): string | null {
+    return this._imagenUrl;
+  }
+  public set imagenUrl(value: string | null) {
+    this._imagenUrl = value;
+  }
+}
+
+
+export interface CrearProyectoDTO {
+  idCliente: number;
+  idEmpresa?: number | null;
+  idTipoObra: number;
+  nombre: string;
+  descripcion?: string | null;
+  imagenUrl?: string | null;
+  ubicacion?: string | null;
+  estado?: string;
+  alto: number;
+  ancho: number;
+  largo: number;
+  
 }

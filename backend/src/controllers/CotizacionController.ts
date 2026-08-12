@@ -4,6 +4,7 @@ import { CotizacionService } from "../services/CotizacionService";
 export class CotizacionController {
   private service = new CotizacionService();
 
+  // POST /api/cotizaciones
   public crearCotizacion = async (
     req: Request,
     res: Response
@@ -30,6 +31,7 @@ export class CotizacionController {
     }
   };
 
+  // GET /api/cotizaciones/cliente/:idCliente
   public obtenerCotizacionesPorCliente = async (
     req: Request,
     res: Response
@@ -57,6 +59,7 @@ export class CotizacionController {
     }
   };
 
+  // GET /api/cotizaciones/proyecto/:idProyecto
   public obtenerCotizacionesPorProyecto = async (
     req: Request,
     res: Response
@@ -84,6 +87,7 @@ export class CotizacionController {
     }
   };
 
+  // GET /api/cotizaciones/:idCotizacion
   public obtenerCotizacionPorId = async (
     req: Request,
     res: Response
@@ -113,6 +117,7 @@ export class CotizacionController {
     }
   };
 
+  // PUT /api/cotizaciones/:idCotizacion
   public actualizarCotizacion = async (
     req: Request,
     res: Response
@@ -144,6 +149,7 @@ export class CotizacionController {
     }
   };
 
+  // DELETE /api/cotizaciones/:idCotizacion
   public eliminarCotizacion = async (
     req: Request,
     res: Response
