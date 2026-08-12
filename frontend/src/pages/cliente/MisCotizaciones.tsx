@@ -8,7 +8,6 @@ import {
   ClipboardCheck,
   CircleCheck,
   CircleX,
-  Plus,
   Eye,
   Download,
   Pencil,
@@ -179,11 +178,6 @@ export default function MisCotizaciones() {
               lugar.
             </p>
           </div>
-
-          <button type="button" className="nueva-cotizacion-button">
-            <Plus size={20} />
-            Nueva cotización
-          </button>
           
 
         </section>

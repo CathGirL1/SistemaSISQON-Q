@@ -1,174 +1,315 @@
-.generar-cotizacion{
-    max-width:900px;
-    margin:auto;
-    display:flex;
-    flex-direction:column;
-    gap:24px;
+.generar-cotizacion {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-sizing: border-box;
 }
 
-.gc-back{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    border:none;
-    background:none;
-    color:#3767d6;
-    cursor:pointer;
-    font-weight:600;
-    width:max-content;
+/* ================================
+   HEADER
+================================ */
+
+.gc-header {
+    width: 100%;
 }
 
-.gc-header h2{
-    margin:0;
-    color:#172033;
-    font-size:32px;
+.gc-header h2 {
+    margin: 0;
+    color: #172033;
+    font-size: 32px;
+    font-weight: 700;
 }
 
-.gc-header p{
-    margin-top:8px;
-    color:#6d7786;
+.gc-header p {
+    margin: 8px 0 0;
+    color: #6d7786;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
-.gc-card{
 
-    background:white;
+/* ================================
+   CARD
+================================ */
 
-    border-radius:18px;
+.gc-card {
+    width: 100%;
+    box-sizing: border-box;
 
-    padding:50px;
+    background: #ffffff;
+    border: 1px solid #e4e8f0;
+    border-radius: 18px;
 
-    border:1px solid #e4e8f0;
+    padding: 50px 40px;
 
-    text-align:center;
+    text-align: center;
 
-    box-shadow:0 10px 35px rgba(0,0,0,.06);
-
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06);
 }
 
-.gc-icon{
 
-    width:80px;
+/* ================================
+   ICONO DE ÉXITO
+================================ */
 
-    height:80px;
+.gc-success-icon {
+    width: 90px;
+    height: 90px;
 
-    border-radius:50%;
+    margin: 0 auto 25px;
 
-    margin:auto;
+    border-radius: 50%;
 
-    display:flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    align-items:center;
-
-    justify-content:center;
-
-    background:#edf3ff;
-
-    color:#3767d6;
-
+    background: #e8f8f1;
+    color: #078b63;
 }
 
-.gc-card h3{
 
-    margin-top:25px;
+/* ================================
+   TITULO
+================================ */
 
-    margin-bottom:15px;
+.gc-success-card h3 {
+    margin: 0 0 15px;
 
+    color: #172033;
+    font-size: 24px;
+    font-weight: 700;
 }
 
-.gc-card>p{
 
-    color:#6d7786;
+/* ================================
+   MENSAJE
+================================ */
 
+.gc-message {
+    margin: 0 auto;
+
+    max-width: 600px;
+
+    color: #6d7786;
+
+    font-size: 16px;
+    line-height: 1.6;
 }
 
-.gc-list{
-
-    display:grid;
-
-    grid-template-columns:repeat(2,1fr);
-
-    gap:15px;
-
-    margin:35px 0;
-
+.gc-message strong {
+    color: #172033;
+    font-weight: 700;
 }
 
-.gc-list div{
 
-    display:flex;
+/* ================================
+   TOTAL
+================================ */
 
-    align-items:center;
+.gc-total {
+    margin: 30px auto;
 
-    gap:10px;
+    width: 100%;
+    max-width: 350px;
 
-    padding:14px;
+    padding: 20px;
 
-    border-radius:10px;
+    box-sizing: border-box;
 
-    background:#f8fafc;
+    border-radius: 12px;
 
+    background: #f8fafc;
+    border: 1px solid #e4e8f0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.gc-info{
-
-    background:#eef7ff;
-
-    border:1px solid #d5e7ff;
-
-    padding:18px;
-
-    border-radius:12px;
-
-    color:#4d6077;
-
-    line-height:1.7;
-
+.gc-total span {
+    color: #6d7786;
+    font-size: 14px;
 }
 
-.gc-button{
-
-    margin-top:30px;
-
-    border:none;
-
-    background:#3767d6;
-
-    color:white;
-
-    padding:13px 24px;
-
-    border-radius:10px;
-
-    cursor:pointer;
-
-    font-weight:600;
-
+.gc-total strong {
+    color: #172033;
+    font-size: 28px;
+    font-weight: 700;
 }
 
-.gc-button:hover{
 
-    background:#2f59bc;
+/* ================================
+   BOTONES
+================================ */
 
+.gc-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 25px;
 }
 
-@media(max-width:700px){
+.gc-button {
+    min-height: 46px;
 
-.gc-list{
+    padding: 12px 22px;
 
-grid-template-columns:1fr;
+    border-radius: 10px;
 
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
 
-.gc-card{
-
-padding:30px 20px;
-
+.gc-button:hover {
+    transform: translateY(-1px);
 }
 
-.gc-header h2{
 
-font-size:28px;
+/* Botón principal */
 
+.gc-primary {
+    border: 1px solid #3767d6;
+
+    background: #3767d6;
+    color: #ffffff;
 }
 
+.gc-primary:hover {
+    background: #2f59bc;
+    border-color: #2f59bc;
+}
+
+
+/* Botón secundario */
+
+.gc-secondary {
+    border: 1px solid #b8c5dc;
+
+    background: #ffffff;
+    color: #3767d6;
+}
+
+.gc-secondary:hover {
+    background: #f4f7fc;
+    border-color: #3767d6;
+}
+
+
+/* ================================
+   TABLET
+================================ */
+
+@media (max-width: 700px) {
+
+    .generar-cotizacion {
+        padding: 16px;
+        gap: 20px;
+    }
+
+    .gc-header h2 {
+        font-size: 28px;
+    }
+
+    .gc-header p {
+        font-size: 15px;
+    }
+
+    .gc-card {
+        padding: 40px 25px;
+    }
+
+    .gc-success-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .gc-success-card h3 {
+        font-size: 21px;
+    }
+
+    .gc-total strong {
+        font-size: 25px;
+    }
+
+    .gc-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .gc-button {
+        width: 100%;
+    }
+}
+
+
+/* ================================
+   CELULAR
+================================ */
+
+@media (max-width: 450px) {
+
+    .generar-cotizacion {
+        padding: 12px;
+    }
+
+    .gc-header h2 {
+        font-size: 24px;
+    }
+
+    .gc-header p {
+        font-size: 14px;
+    }
+
+    .gc-card {
+        padding: 30px 18px;
+        border-radius: 14px;
+    }
+
+    .gc-success-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .gc-success-icon svg {
+        width: 45px;
+        height: 45px;
+    }
+
+    .gc-success-card h3 {
+        font-size: 19px;
+    }
+
+    .gc-message {
+        font-size: 14px;
+    }
+
+    .gc-total {
+        padding: 16px;
+        margin: 25px auto;
+    }
+
+    .gc-total strong {
+        font-size: 23px;
+    }
 }
