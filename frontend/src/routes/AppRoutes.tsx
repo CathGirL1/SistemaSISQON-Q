@@ -36,6 +36,7 @@ import AsistenteIA from "../pages/cliente/AsistenteIA";
 import CrearProyecto from "../pages/cliente/CrearProyecto";
 import DetalleProyecto from "../pages/cliente/DetalleProyecto"
 import DetalleCotizacion from "../pages/cliente/DetalleCotizacion";
+import EditarCotizacion from "../pages/cliente/EditarCotizacion";
 
 
 
@@ -75,6 +76,7 @@ export default function AppRoutes() {
           <Route path="/panel-cliente/proyectos/:idProyecto/cotizar" element={<GenerarCotizacion />}/>
           <Route path="/panel-cliente/proyectos/:idProyecto" element={<DetalleProyecto />}/>
           <Route path="/panel-cliente/cotizaciones/:idCotizacion" element={<DetalleCotizacion />} />
+          <Route path="/panel-cliente/cotizaciones/:idCotizacion/editar" element={<EditarCotizacion />}/>
           <Route path="/panel-cliente/favoritas" element={<EmpresasFavoritas />} />
           <Route path="/panel-cliente/asistente" element={<AsistenteIA />} />
 

@@ -1,8 +1,6 @@
 import {
   useEffect,
   useState,
-  type ChangeEvent,
-  type FormEvent,
   type ReactNode,
 } from "react";
 
@@ -10,9 +8,6 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import {
   ArrowLeft,
-  Pencil,
-  Save,
-  X,
   Trash2,
   FileText,
   CircleDollarSign,
@@ -20,7 +15,11 @@ import {
   FolderOpen,
   Ruler,
   MapPin,
+  Package,
 } from "lucide-react";
+
+import { type ProyectoAPI } from "../cliente/MisProyectos";
+import type { Material } from "../../components/cliente/MaterialesProyectoDropList";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
@@ -56,12 +55,6 @@ interface Cotizacion {
   superficie: number;
 }
 
-interface FormularioCotizacion {
-  estado: EstadoCotizacion;
-  precioEstimado: string;
-  observaciones: string;
-}
-
 interface RespuestaAPI {
   mensaje?: string;
 }
@@ -74,23 +67,78 @@ export default function DetalleCotizacion() {
   const { idCotizacion } = useParams();
 
   const [menuOpen, setMenuOpen] = useState(false);
+
   const [cotizacion, setCotizacion] =
     useState<Cotizacion | null>(null);
 
-  const [formulario, setFormulario] =
-    useState<FormularioCotizacion | null>(null);
+  const [proyecto, setProyecto] =
+  useState<ProyectoAPI | null>(null); 
+  
+  const [materiales, setMateriales] = useState<Material[]>([]);
+  const [cargandoMateriales, setCargandoMateriales] = useState(true);
 
   const [cargando, setCargando] = useState(true);
-  const [modoEdicion, setModoEdicion] = useState(false);
-  const [guardando, setGuardando] = useState(false);
+
   const [eliminando, setEliminando] = useState(false);
+
   const [mostrarConfirmacion, setMostrarConfirmacion] =
     useState(false);
 
   const [error, setError] = useState("");
 
+  // -----------------------------------------
+  // OBTENER MATERIALES DE PROYECTOS
+  // -----------------------------------------
+
+  const obtenerMaterialesProyecto = async (
+    idProyecto: number
+  ) => {
+    try {
+      setCargandoMateriales(true);
+
+      const response = await fetch(
+        `${API_URL}/api/materiales-proyecto/proyecto/${idProyecto}`
+      );
+
+      const data = await response.json();
+
+      console.log(
+        "MATERIALES DEL PROYECTO:",
+        data
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          data.mensaje ||
+            "No se pudieron obtener los materiales"
+        );
+      }
+
+      const listaMateriales =
+        data.materiales ??
+        data.data ??
+        data;
+
+      setMateriales(listaMateriales);
+
+    } catch (error) {
+      console.error(
+        "Error al obtener materiales:",
+        error
+      );
+
+      setMateriales([]);
+    } finally {
+      setCargandoMateriales(false);
+    }
+  };
+
+  // -----------------------------------------
+  // OBTENER COTIZACIÓN
+  // -----------------------------------------
+
   useEffect(() => {
-    obtenerCotizacion();
+   obtenerCotizacion();
   }, [idCotizacion]);
 
   const obtenerCotizacion = async () => {
@@ -120,7 +168,22 @@ export default function DetalleCotizacion() {
       const cotizacionRecibida: Cotizacion = data;
 
       setCotizacion(cotizacionRecibida);
-      cargarFormulario(cotizacionRecibida);
+      await obtenerMaterialesProyecto(
+        data.idProyecto
+      );
+
+      // Obtener el proyecto relacionado
+      const responseProyecto = await fetch(
+        `${API_URL}/api/proyectos/${cotizacionRecibida.idProyecto}`
+      );
+
+      if (responseProyecto.ok) {
+        const proyectoRecibido: ProyectoAPI =
+          await responseProyecto.json();
+
+        setProyecto(proyectoRecibido);
+      }
+
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -133,102 +196,9 @@ export default function DetalleCotizacion() {
     }
   };
 
-  const cargarFormulario = (
-    cotizacionActual: Cotizacion
-  ) => {
-    setFormulario({
-      estado: cotizacionActual.estado,
-      precioEstimado:
-        cotizacionActual.precioEstimado !== null
-          ? cotizacionActual.precioEstimado.toString()
-          : "",
-      observaciones:
-        cotizacionActual.observaciones ?? "",
-    });
-  };
-
-  const actualizarCampo = (
-    event: ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = event.target;
-
-    setFormulario((prev) =>
-      prev
-        ? {
-            ...prev,
-            [name]: value,
-          }
-        : prev
-    );
-  };
-
-  const cancelarEdicion = () => {
-    if (cotizacion) {
-      cargarFormulario(cotizacion);
-    }
-
-    setModoEdicion(false);
-    setError("");
-  };
-
-  const guardarCambios = async (
-    event: FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
-
-    if (!formulario || !idCotizacion) {
-      return;
-    }
-
-    try {
-      setGuardando(true);
-      setError("");
-
-      const precio =
-        formulario.precioEstimado.trim() === ""
-          ? null
-          : Number(formulario.precioEstimado);
-
-      const response = await fetch(
-        `${API_URL}/api/cotizaciones/${idCotizacion}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            estado: formulario.estado,
-            precioEstimado: precio,
-            observaciones:
-              formulario.observaciones.trim() || null,
-          }),
-        }
-      );
-
-      const data: RespuestaAPI = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.mensaje ||
-            "No se pudo actualizar la cotización"
-        );
-      }
-
-      await obtenerCotizacion();
-      setModoEdicion(false);
-    } catch (error) {
-      const mensaje =
-        error instanceof Error
-          ? error.message
-          : "Ocurrió un error al actualizar la cotización";
-
-      setError(mensaje);
-    } finally {
-      setGuardando(false);
-    }
-  };
+  // -----------------------------------------
+  // ELIMINAR COTIZACIÓN
+  // -----------------------------------------
 
   const eliminarCotizacion = async () => {
     if (!idCotizacion) {
@@ -246,7 +216,8 @@ export default function DetalleCotizacion() {
         }
       );
 
-      const data: RespuestaAPI = await response.json();
+      const data: RespuestaAPI =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -269,6 +240,10 @@ export default function DetalleCotizacion() {
     }
   };
 
+  // -----------------------------------------
+  // CARGANDO
+  // -----------------------------------------
+
   if (cargando) {
     return (
       <EstructuraDetalle
@@ -281,6 +256,10 @@ export default function DetalleCotizacion() {
       </EstructuraDetalle>
     );
   }
+
+  // -----------------------------------------
+  // ERROR
+  // -----------------------------------------
 
   if (error && !cotizacion) {
     return (
@@ -304,21 +283,30 @@ export default function DetalleCotizacion() {
     );
   }
 
-  if (!cotizacion || !formulario) {
+  if (!cotizacion) {
     return null;
   }
 
+  // -----------------------------------------
+  // VISTA PRINCIPAL
+  // -----------------------------------------
+
   return (
     <div className="cliente-panel">
+
       <SidebarCliente
         menuOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
       />
 
       <main className="cliente-main">
-    
+
+        {/* ---------------------------------- */}
+        {/* ENCABEZADO */}
+        {/* ---------------------------------- */}
 
         <section className="detalle-cotizacion-top">
+
           <button
             type="button"
             className="detalle-cotizacion-back"
@@ -331,54 +319,66 @@ export default function DetalleCotizacion() {
           </button>
 
           <div className="detalle-cotizacion-header">
-            <div>
-              <div className="detalle-cotizacion-title-row">
-                <h2>{cotizacion.codigo}</h2>
 
-                <EstadoBadge estado={cotizacion.estado} />
+            <div>
+
+              <div className="detalle-cotizacion-title-row">
+
+                <h2>
+                  {cotizacion.codigo}
+                </h2>
+
+                <EstadoBadge
+                  estado={cotizacion.estado}
+                />
+
               </div>
 
-              <p>{cotizacion.nombreProyecto}</p>
+              <p>
+                {cotizacion.nombreProyecto}
+              </p>
+
             </div>
 
-            {!modoEdicion && (
-              <div className="detalle-cotizacion-actions">
-                <button
-                  type="button"
-                  className="detalle-cotizacion-project-button"
-                  onClick={() =>
-                    navigate(
-                      `/panel-cliente/proyectos/${cotizacion.idProyecto}`
-                    )
-                  }
-                >
-                  <FolderOpen size={17} />
-                  Ver proyecto
-                </button>
+            <div className="detalle-cotizacion-actions">
 
-                <button
-                  type="button"
-                  className="detalle-cotizacion-edit-button"
-                  onClick={() => setModoEdicion(true)}
-                >
-                  <Pencil size={17} />
-                  Editar
-                </button>
+              {/* VER PROYECTO */}
 
-                <button
-                  type="button"
-                  className="detalle-cotizacion-delete-button"
-                  onClick={() =>
-                    setMostrarConfirmacion(true)
-                  }
-                >
-                  <Trash2 size={17} />
-                  Eliminar
-                </button>
-              </div>
-            )}
+              <button
+                type="button"
+                className="detalle-cotizacion-project-button"
+                onClick={() =>
+                  navigate(
+                    `/panel-cliente/proyectos/${cotizacion.idProyecto}`
+                  )
+                }
+              >
+                <FolderOpen size={17} />
+                Ver proyecto
+              </button>
+
+              {/* ELIMINAR */}
+
+              <button
+                type="button"
+                className="detalle-cotizacion-delete-button"
+                onClick={() =>
+                  setMostrarConfirmacion(true)
+                }
+              >
+                <Trash2 size={17} />
+                Eliminar
+              </button>
+
+            </div>
+
           </div>
+
         </section>
+
+        {/* ---------------------------------- */}
+        {/* ERROR */}
+        {/* ---------------------------------- */}
 
         {error && (
           <div className="detalle-cotizacion-error">
@@ -386,234 +386,233 @@ export default function DetalleCotizacion() {
           </div>
         )}
 
-        {!modoEdicion ? (
-          <section className="detalle-cotizacion-content">
-            <article className="detalle-cotizacion-card">
-              <CardTitle
-                icon={<FileText size={21} />}
-                title="Información de la cotización"
+        {/* ---------------------------------- */}
+        {/* INFORMACIÓN */}
+        {/* ---------------------------------- */}
+
+        <section className="detalle-cotizacion-content">
+
+          {/* -------------------------------- */}
+          {/* INFORMACIÓN DE COTIZACIÓN */}
+          {/* -------------------------------- */}
+
+          <article className="detalle-cotizacion-card">
+
+            <CardTitle
+              icon={<FileText size={21} />}
+              title="Información de la cotización"
+            />
+
+            <div className="detalle-cotizacion-info-grid">
+
+              <InfoItem
+                label="Código"
+                value={cotizacion.codigo}
               />
 
-              <div className="detalle-cotizacion-info-grid">
-                <InfoItem
-                  label="Código"
-                  value={cotizacion.codigo}
-                />
-
-                <InfoItem
-                  label="Estado"
-                  value={cotizacion.estado}
-                />
-
-                <InfoItem
-                  label="Fecha de creación"
-                  value={formatearFecha(
-                    cotizacion.fechaCreacion
-                  )}
-                  icon={<CalendarDays size={16} />}
-                />
-
-                <InfoItem
-                  label="Última actualización"
-                  value={
-                    cotizacion.fechaActualizacion
-                      ? formatearFecha(
-                          cotizacion.fechaActualizacion
-                        )
-                      : "Sin modificaciones"
-                  }
-                />
-
-                <InfoItem
-                  label="Precio estimado"
-                  value={formatearPrecio(
-                    cotizacion.precioEstimado
-                  )}
-                  icon={<CircleDollarSign size={16} />}
-                />
-
-                <div className="detalle-cotizacion-description">
-                  <span>Observaciones</span>
-
-                  <p>
-                    {cotizacion.observaciones ||
-                      "Sin observaciones"}
-                  </p>
-                </div>
-              </div>
-            </article>
-
-            <article className="detalle-cotizacion-card">
-              <CardTitle
-                icon={<FolderOpen size={21} />}
-                title="Proyecto relacionado"
+              <InfoItem
+                label="Estado"
+                value={cotizacion.estado}
               />
 
-              <div className="detalle-cotizacion-info-grid">
-                <InfoItem
-                  label="Proyecto"
-                  value={cotizacion.nombreProyecto}
-                />
-
-                <InfoItem
-                  label="Ubicación"
-                  value={
-                    cotizacion.ubicacion ||
-                    "No especificada"
-                  }
-                  icon={<MapPin size={16} />}
-                />
-
-                <InfoItem
-                  label="Tipo de obra"
-                  value={`Tipo #${cotizacion.idTipoObra}`}
-                />
-
-                <InfoItem
-                  label="Superficie"
-                  value={`${formatearNumero(
-                    cotizacion.superficie
-                  )} m²`}
-                  icon={<Ruler size={16} />}
-                />
-              </div>
-
-              <div className="detalle-cotizacion-measures">
-                <MeasureItem
-                  label="Alto"
-                  value={`${cotizacion.alto} m`}
-                />
-
-                <MeasureItem
-                  label="Ancho"
-                  value={`${cotizacion.ancho} m`}
-                />
-
-                <MeasureItem
-                  label="Largo"
-                  value={`${cotizacion.largo} m`}
-                />
-              </div>
-            </article>
-          </section>
-        ) : (
-          <form
-            className="detalle-cotizacion-edit-form"
-            onSubmit={guardarCambios}
-          >
-            <article className="detalle-cotizacion-card">
-              <CardTitle
-                icon={<Pencil size={21} />}
-                title="Editar cotización"
+              <InfoItem
+                label="Fecha de creación"
+                value={formatearFecha(
+                  cotizacion.fechaCreacion
+                )}
+                icon={<CalendarDays size={16} />}
               />
 
-              <div className="detalle-cotizacion-form-grid">
-                <label className="detalle-cotizacion-field">
-                  <span>Estado</span>
+              <InfoItem
+                label="Última actualización"
+                value={
+                  cotizacion.fechaActualizacion
+                    ? formatearFecha(
+                        cotizacion.fechaActualizacion
+                      )
+                    : "Sin modificaciones"
+                }
+              />
 
-                  <select
-                    name="estado"
-                    value={formulario.estado}
-                    onChange={actualizarCampo}
-                  >
-                    <option value="Borrador">
-                      Borrador
-                    </option>
+              <InfoItem
+                label="Precio estimado"
+                value={formatearPrecio(
+                  cotizacion.precioEstimado
+                )}
+                icon={
+                  <CircleDollarSign size={16} />
+                }
+              />
 
-                    <option value="Enviada">
-                      Enviada
-                    </option>
+              <div className="detalle-cotizacion-description">
 
-                    <option value="Revisada">
-                      Revisada
-                    </option>
+                <span>
+                  Observaciones
+                </span>
 
-                    <option value="Aceptada">
-                      Aceptada
-                    </option>
+                <p>
+                  {cotizacion.observaciones ||
+                    "Sin observaciones"}
+                </p>
 
-                    <option value="Rechazada">
-                      Rechazada
-                    </option>
-                  </select>
-                </label>
-
-                <label className="detalle-cotizacion-field">
-                  <span>Precio estimado</span>
-
-                  <input
-                    type="number"
-                    name="precioEstimado"
-                    min="0"
-                    step="0.01"
-                    value={formulario.precioEstimado}
-                    onChange={actualizarCampo}
-                    placeholder="Ej.: 850000"
-                  />
-                </label>
-
-                <label className="detalle-cotizacion-field detalle-cotizacion-field-full">
-                  <span>Observaciones</span>
-
-                  <textarea
-                    name="observaciones"
-                    value={formulario.observaciones}
-                    onChange={actualizarCampo}
-                    maxLength={1000}
-                    rows={6}
-                    placeholder="Agregá observaciones sobre la cotización..."
-                  />
-                </label>
               </div>
-            </article>
 
-            <div className="detalle-cotizacion-edit-actions">
-              <button
-                type="button"
-                className="detalle-cotizacion-cancel-button"
-                onClick={cancelarEdicion}
-                disabled={guardando}
-              >
-                <X size={17} />
-                Cancelar
-              </button>
-
-              <button
-                type="submit"
-                className="detalle-cotizacion-save-button"
-                disabled={guardando}
-              >
-                <Save size={17} />
-
-                {guardando
-                  ? "Guardando..."
-                  : "Guardar cambios"}
-              </button>
             </div>
-          </form>
-        )}
+
+          </article>
+
+          {/* -------------------------------- */}
+          {/* PROYECTO RELACIONADO */}
+          {/* -------------------------------- */}
+
+          <article className="detalle-cotizacion-card">
+
+            <CardTitle
+              icon={<FolderOpen size={21} />}
+              title="Proyecto relacionado"
+            />
+
+            <div className="detalle-cotizacion-info-grid">
+
+              <InfoItem
+                label="Proyecto"
+                value={cotizacion.nombreProyecto}
+              />
+
+              <InfoItem
+                label="Ubicación"
+                value={
+                  cotizacion.ubicacion ||
+                  "No especificada"
+                }
+                icon={<MapPin size={16} />}
+              />
+
+            <InfoItem
+              label="Tipo de obra"
+              value={proyecto?.tipoObra ?? "No especificado"}
+            />
+
+              <InfoItem
+                label="Superficie"
+                value={`${formatearNumero(
+                  cotizacion.superficie
+                )} m²`}
+                icon={<Ruler size={16} />}
+              />
+
+            </div>
+
+            <div className="detalle-cotizacion-measures">
+
+              <MeasureItem
+                label="Alto"
+                value={`${cotizacion.alto} m`}
+              />
+
+              <MeasureItem
+                label="Ancho"
+                value={`${cotizacion.ancho} m`}
+              />
+
+              <MeasureItem
+                label="Largo"
+                value={`${cotizacion.largo} m`}
+              />
+
+            </div>
+
+          </article>
+
+
+          <article className="detalle-cotizacion-card">
+            <CardTitle
+              icon={<Package size={21} />}
+              title="Materiales utilizados"
+            />
+
+            {cargandoMateriales ? (
+              <p>Cargando materiales...</p>
+            ) : materiales.length === 0 ? (
+              <p>
+                No hay materiales asociados a este proyecto.
+              </p>
+            ) : (
+              <div className="detalle-cotizacion-materiales-lista">
+                {materiales.map((material) => (
+                  <div
+                    key={material.idMaterial}
+                    className="detalle-cotizacion-material"
+                  >
+                    <div className="detalle-cotizacion-material-nombre">
+                      {material.nombre}
+                    </div>
+
+                    <div className="detalle-cotizacion-material-dato">
+                      <span>Cantidad</span>
+                      <strong>
+                        {material.cantidad ?? 1}
+                      </strong>
+                    </div>
+
+                    <div className="detalle-cotizacion-material-dato">
+                      <span>Precio unitario</span>
+                      <strong>
+                        {formatearPrecio(
+                          material.costoUnitario
+                        )}
+                      </strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </article>
+
+        </section>
+
       </main>
 
+      {/* ---------------------------------- */}
+      {/* MODAL ELIMINAR */}
+      {/* ---------------------------------- */}
+
       {mostrarConfirmacion && (
+
         <div className="detalle-cotizacion-modal-overlay">
+
           <div
             className="detalle-cotizacion-modal"
             role="dialog"
             aria-modal="true"
           >
+
             <div className="detalle-cotizacion-modal-icon">
+
               <Trash2 size={25} />
+
             </div>
 
-            <h3>Eliminar cotización</h3>
+            <h3>
+              Eliminar cotización
+            </h3>
 
             <p>
-              ¿Seguro que querés eliminar la cotización{" "}
-              <strong>{cotizacion.codigo}</strong>? Esta
-              acción no se puede deshacer.
+
+              ¿Seguro que querés eliminar la
+              cotización{" "}
+
+              <strong>
+                {cotizacion.codigo}
+              </strong>
+              ?
+
+              {" "}Esta acción no se puede deshacer.
+
             </p>
 
             <div className="detalle-cotizacion-modal-actions">
+
               <button
                 type="button"
                 className="detalle-cotizacion-cancel-button"
@@ -635,13 +634,22 @@ export default function DetalleCotizacion() {
                   ? "Eliminando..."
                   : "Eliminar cotización"}
               </button>
+
             </div>
+
           </div>
+
         </div>
+
       )}
+
     </div>
   );
 }
+
+/* ================================================= */
+/* ESTRUCTURA PARA ESTADOS DE CARGA / ERROR */
+/* ================================================= */
 
 interface EstructuraDetalleProps {
   menuOpen: boolean;
@@ -658,12 +666,14 @@ function EstructuraDetalle({
 }: EstructuraDetalleProps) {
   return (
     <div className="cliente-panel">
+
       <SidebarCliente
         menuOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
       />
 
       <main className="cliente-main">
+
         <HeaderCliente
           title="Detalle de cotización"
           subtitle="Información de la cotización."
@@ -674,37 +684,63 @@ function EstructuraDetalle({
         />
 
         {children}
+
       </main>
+
     </div>
   );
 }
+
+/* ================================================= */
+/* ESTADO */
+/* ================================================= */
 
 function EstadoBadge({
   estado,
 }: {
   estado: EstadoCotizacion;
 }) {
-  const clase = `detalle-cotizacion-status detalle-cotizacion-status-${estado.toLowerCase()}`;
+  const clase =
+    `detalle-cotizacion-status detalle-cotizacion-status-${estado.toLowerCase()}`;
 
-  return <span className={clase}>{estado}</span>;
+  return (
+    <span className={clase}>
+      {estado}
+    </span>
+  );
 }
+
+/* ================================================= */
+/* TÍTULO DE CARD */
+/* ================================================= */
 
 interface CardTitleProps {
   icon: ReactNode;
   title: string;
 }
 
-function CardTitle({ icon, title }: CardTitleProps) {
+function CardTitle({
+  icon,
+  title,
+}: CardTitleProps) {
   return (
     <div className="detalle-cotizacion-card-title">
+
       <div className="detalle-cotizacion-card-icon">
         {icon}
       </div>
 
-      <h3>{title}</h3>
+      <h3>
+        {title}
+      </h3>
+
     </div>
   );
 }
+
+/* ================================================= */
+/* ITEM DE INFORMACIÓN */
+/* ================================================= */
 
 interface InfoItemProps {
   label: string;
@@ -719,15 +755,23 @@ function InfoItem({
 }: InfoItemProps) {
   return (
     <div className="detalle-cotizacion-info-item">
-      <span>{label}</span>
+
+      <span>
+        {label}
+      </span>
 
       <strong>
         {icon}
         {value}
       </strong>
+
     </div>
   );
 }
+
+/* ================================================= */
+/* MEDIDAS */
+/* ================================================= */
 
 interface MeasureItemProps {
   label: string;
@@ -740,27 +784,52 @@ function MeasureItem({
 }: MeasureItemProps) {
   return (
     <div className="detalle-cotizacion-measure">
-      <span>{label}</span>
-      <strong>{value}</strong>
+
+      <span>
+        {label}
+      </span>
+
+      <strong>
+        {value}
+      </strong>
+
     </div>
   );
 }
 
-function formatearFecha(fecha: string): string {
-  const fechaCotizacion = new Date(fecha);
+/* ================================================= */
+/* FORMATEAR FECHA */
+/* ================================================= */
 
-  if (Number.isNaN(fechaCotizacion.getTime())) {
+function formatearFecha(
+  fecha: string
+): string {
+  const fechaCotizacion =
+    new Date(fecha);
+
+  if (
+    Number.isNaN(
+      fechaCotizacion.getTime()
+    )
+  ) {
     return "Fecha no disponible";
   }
 
-  return new Intl.DateTimeFormat("es-UY", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(fechaCotizacion);
+  return new Intl.DateTimeFormat(
+    "es-UY",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  ).format(fechaCotizacion);
 }
+
+/* ================================================= */
+/* FORMATEAR PRECIO */
+/* ================================================= */
 
 function formatearPrecio(
   precio: number | null
@@ -769,13 +838,24 @@ function formatearPrecio(
     return "Sin calcular";
   }
 
-  return new Intl.NumberFormat("es-UY", {
-    style: "currency",
-    currency: "UYU",
-    maximumFractionDigits: 0,
-  }).format(precio);
+  return new Intl.NumberFormat(
+    "es-UY",
+    {
+      style: "currency",
+      currency: "UYU",
+      maximumFractionDigits: 0,
+    }
+  ).format(precio);
 }
 
-function formatearNumero(numero: number): string {
-  return Number(numero).toFixed(2).replace(".00", "");
+/* ================================================= */
+/* FORMATEAR NÚMERO */
+/* ================================================= */
+
+function formatearNumero(
+  numero: number
+): string {
+  return Number(numero)
+    .toFixed(2)
+    .replace(".00", "");
 }

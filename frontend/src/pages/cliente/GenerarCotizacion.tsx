@@ -14,34 +14,45 @@ import "../../styles/GenerarCotizacion.css";
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-interface CotizacionAPI {
+const ID_CLIENTE_TEMPORAL = 1;
+
+interface Cotizacion {
   idCotizacion: number;
   idProyecto: number;
   codigo: string;
   fechaCreacion: string;
   fechaActualizacion: string | null;
   estado: string;
-  costoMateriales: number | null;
-  costoManoObra: number | null;
-  totalCotizacion: number | null;
   precioEstimado: number | null;
   observaciones: string | null;
+  idCliente: number;
+  idTipoObra: number;
+  nombreProyecto: string;
+  descripcionProyecto: string | null;
+  ubicacion: string | null;
+  alto: number;
+  ancho: number;
+  largo: number;
+  superficie: number;
+}
+
+interface CotizacionCreadaResponse {
+  idCotizacion: number;
+  mensaje: string;
 }
 
 export default function GenerarCotizacion() {
   const navigate = useNavigate();
-
   const { idProyecto } = useParams();
 
   const [cotizacion, setCotizacion] =
-    useState<CotizacionAPI | null>(null);
+    useState<Cotizacion | null>(null);
 
   const [cargando, setCargando] = useState(true);
-
   const [error, setError] = useState("");
 
-  // Evita ejecutar dos veces la creación
-  // durante el desarrollo con React StrictMode
+  // Evita que React cree la cotización dos veces
+  // cuando StrictMode ejecuta el useEffect nuevamente.
   const cotizacionCreada = useRef(false);
 
   useEffect(() => {
@@ -60,37 +71,34 @@ export default function GenerarCotizacion() {
       setError("");
 
       if (!idProyecto) {
-        throw new Error(
-          "No se encontró el proyecto seleccionado."
-        );
+        throw new Error("No se encontró el proyecto.");
       }
+
+      // -----------------------------------
+      // 1. CREAR COTIZACIÓN
+      // -----------------------------------
 
       const response = await fetch(
         `${API_URL}/api/cotizaciones`,
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify({
             idProyecto: Number(idProyecto),
-
             estado: "Borrador",
-
-            // POR AHORA valores de prueba
             costoMateriales: 500,
             costoManoObra: 300,
             totalCotizacion: 800,
             precioEstimado: 800,
-
             observaciones: "Cotización inicial",
           }),
         }
       );
 
-      const data = await response.json();
+      const data: CotizacionCreadaResponse =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -101,7 +109,43 @@ export default function GenerarCotizacion() {
 
       console.log("Cotización creada:", data);
 
-      setCotizacion(data);
+      // -----------------------------------
+      // 2. OBTENER LA COTIZACIÓN COMPLETA
+      // -----------------------------------
+
+      const cotizacionesResponse = await fetch(
+        `${API_URL}/api/cotizaciones/cliente/${ID_CLIENTE_TEMPORAL}`
+      );
+
+      const cotizaciones: Cotizacion[] =
+        await cotizacionesResponse.json();
+
+      if (!cotizacionesResponse.ok) {
+        throw new Error(
+          "La cotización fue creada, pero no se pudieron obtener sus datos."
+        );
+      }
+
+      // -----------------------------------
+      // 3. BUSCAR LA COTIZACIÓN RECIÉN CREADA
+      // -----------------------------------
+
+      const cotizacionCompleta = cotizaciones.find(
+        (item) =>
+          item.idCotizacion === data.idCotizacion
+      );
+
+      if (!cotizacionCompleta) {
+        throw new Error(
+          "La cotización fue creada, pero no se encontró su información."
+        );
+      }
+
+      // -----------------------------------
+      // 4. GUARDARLA EN EL ESTADO
+      // -----------------------------------
+
+      setCotizacion(cotizacionCompleta);
 
     } catch (error) {
       console.error(
@@ -114,7 +158,6 @@ export default function GenerarCotizacion() {
           ? error.message
           : "No se pudo generar la cotización"
       );
-
     } finally {
       setCargando(false);
     }
@@ -127,19 +170,13 @@ export default function GenerarCotizacion() {
   if (cargando) {
     return (
       <section className="generar-cotizacion">
-
         <article className="gc-card">
-
-          <h3>
-            Generando cotización...
-          </h3>
+          <h3>Generando cotización...</h3>
 
           <p>
             Estamos preparando la cotización de tu proyecto.
           </p>
-
         </article>
-
       </section>
     );
   }
@@ -151,16 +188,10 @@ export default function GenerarCotizacion() {
   if (error) {
     return (
       <section className="generar-cotizacion">
-
         <article className="gc-card">
+          <h3>No se pudo generar la cotización</h3>
 
-          <h3>
-            No se pudo generar la cotización
-          </h3>
-
-          <p>
-            {error}
-          </p>
+          <p>{error}</p>
 
           <button
             className="gc-button gc-secondary"
@@ -170,30 +201,24 @@ export default function GenerarCotizacion() {
           >
             Volver a proyectos
           </button>
-
         </article>
-
       </section>
     );
   }
 
   // -----------------------------------
-  // SIN COTIZACIÓN
+  // COTIZACIÓN GENERADA
   // -----------------------------------
 
   if (!cotizacion) {
     return (
       <section className="generar-cotizacion">
-
         <article className="gc-card">
-
-          <h3>
-            No se encontró la cotización
-          </h3>
+          <h3>No se encontró la cotización</h3>
 
           <p>
-            No fue posible obtener la información
-            de la cotización.
+            No fue posible cargar la información de la
+            cotización.
           </p>
 
           <button
@@ -204,16 +229,10 @@ export default function GenerarCotizacion() {
           >
             Volver a proyectos
           </button>
-
         </article>
-
       </section>
     );
   }
-
-  // -----------------------------------
-  // COTIZACIÓN CREADA
-  // -----------------------------------
 
   return (
     <section className="generar-cotizacion">
@@ -225,8 +244,8 @@ export default function GenerarCotizacion() {
         </h2>
 
         <p>
-          La cotización de tu proyecto fue
-          generada correctamente.
+          La cotización de tu proyecto fue generada
+          correctamente.
         </p>
 
       </header>
@@ -262,9 +281,7 @@ export default function GenerarCotizacion() {
           <strong>
             $
             {Number(
-              cotizacion.precioEstimado ??
-              cotizacion.totalCotizacion ??
-              0
+              cotizacion.precioEstimado ?? 0
             ).toLocaleString("es-UY")}
           </strong>
 
