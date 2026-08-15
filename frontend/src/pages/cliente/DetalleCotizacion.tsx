@@ -4,7 +4,10 @@ import {
   type ReactNode,
 } from "react";
 
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 import {
   ArrowLeft,
@@ -24,6 +27,11 @@ import type { Material } from "../../components/cliente/MaterialesProyectoDropLi
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
 
+import {
+  formatearPrecioUYU,
+  formatearPrecioUSD,
+} from "../../utilities/formatoMoneda";
+
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/DetalleCotizacion.css";
 
@@ -40,8 +48,20 @@ interface Cotizacion {
   codigo: string;
   fechaCreacion: string;
   fechaActualizacion: string | null;
+  version: number;
   estado: EstadoCotizacion;
+
+  // Precio original en USD
   precioEstimado: number | null;
+
+  // Precio convertido a UYU
+  precioEstimadoUYU: number | null;
+
+  // Tipo de cambio utilizado
+  tipoCambio: number;
+
+  moneda: string;
+
   observaciones: string | null;
 
   idCliente: number;
@@ -49,6 +69,7 @@ interface Cotizacion {
   nombreProyecto: string;
   descripcionProyecto: string | null;
   ubicacion: string | null;
+
   alto: number;
   ancho: number;
   largo: number;
@@ -60,34 +81,43 @@ interface RespuestaAPI {
 }
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000";
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:3000";
 
 export default function DetalleCotizacion() {
   const navigate = useNavigate();
+
   const { idCotizacion } = useParams();
 
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] =
+    useState(false);
 
   const [cotizacion, setCotizacion] =
     useState<Cotizacion | null>(null);
 
   const [proyecto, setProyecto] =
-  useState<ProyectoAPI | null>(null); 
-  
-  const [materiales, setMateriales] = useState<Material[]>([]);
-  const [cargandoMateriales, setCargandoMateriales] = useState(true);
+    useState<ProyectoAPI | null>(null);
 
-  const [cargando, setCargando] = useState(true);
+  const [materiales, setMateriales] =
+    useState<Material[]>([]);
 
-  const [eliminando, setEliminando] = useState(false);
+  const [cargandoMateriales, setCargandoMateriales] =
+    useState(true);
+
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [eliminando, setEliminando] =
+    useState(false);
 
   const [mostrarConfirmacion, setMostrarConfirmacion] =
     useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
   // -----------------------------------------
-  // OBTENER MATERIALES DE PROYECTOS
+  // OBTENER MATERIALES DEL PROYECTO
   // -----------------------------------------
 
   const obtenerMaterialesProyecto = async (
@@ -128,6 +158,7 @@ export default function DetalleCotizacion() {
       );
 
       setMateriales([]);
+
     } finally {
       setCargandoMateriales(false);
     }
@@ -138,7 +169,7 @@ export default function DetalleCotizacion() {
   // -----------------------------------------
 
   useEffect(() => {
-   obtenerCotizacion();
+    obtenerCotizacion();
   }, [idCotizacion]);
 
   const obtenerCotizacion = async () => {
@@ -165,17 +196,23 @@ export default function DetalleCotizacion() {
         );
       }
 
-      const cotizacionRecibida: Cotizacion = data;
+      const cotizacionRecibida: Cotizacion =
+        data;
 
       setCotizacion(cotizacionRecibida);
+
       await obtenerMaterialesProyecto(
-        data.idProyecto
+        cotizacionRecibida.idProyecto
       );
 
-      // Obtener el proyecto relacionado
-      const responseProyecto = await fetch(
-        `${API_URL}/api/proyectos/${cotizacionRecibida.idProyecto}`
-      );
+      // -----------------------------------------
+      // OBTENER PROYECTO RELACIONADO
+      // -----------------------------------------
+
+      const responseProyecto =
+        await fetch(
+          `${API_URL}/api/proyectos/${cotizacionRecibida.idProyecto}`
+        );
 
       if (responseProyecto.ok) {
         const proyectoRecibido: ProyectoAPI =
@@ -191,6 +228,7 @@ export default function DetalleCotizacion() {
           : "Ocurrió un error al cargar la cotización";
 
       setError(mensaje);
+
     } finally {
       setCargando(false);
     }
@@ -226,7 +264,10 @@ export default function DetalleCotizacion() {
         );
       }
 
-      navigate("/panel-cliente/cotizaciones");
+      navigate(
+        "/panel-cliente/cotizaciones"
+      );
+
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -235,6 +276,7 @@ export default function DetalleCotizacion() {
 
       setError(mensaje);
       setMostrarConfirmacion(false);
+
     } finally {
       setEliminando(false);
     }
@@ -268,16 +310,22 @@ export default function DetalleCotizacion() {
         setMenuOpen={setMenuOpen}
       >
         <div className="detalle-cotizacion-feedback">
-          <p>{error}</p>
+
+          <p>
+            {error}
+          </p>
 
           <button
             type="button"
             onClick={() =>
-              navigate("/panel-cliente/cotizaciones")
+              navigate(
+                "/panel-cliente/cotizaciones"
+              )
             }
           >
             Volver a Mis cotizaciones
           </button>
+
         </div>
       </EstructuraDetalle>
     );
@@ -296,7 +344,9 @@ export default function DetalleCotizacion() {
 
       <SidebarCliente
         menuOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
+        onClose={() =>
+          setMenuOpen(false)
+        }
       />
 
       <main className="cliente-main">
@@ -311,10 +361,13 @@ export default function DetalleCotizacion() {
             type="button"
             className="detalle-cotizacion-back"
             onClick={() =>
-              navigate("/panel-cliente/cotizaciones")
+              navigate(
+                "/panel-cliente/cotizaciones"
+              )
             }
           >
             <ArrowLeft size={18} />
+
             Volver a Mis cotizaciones
           </button>
 
@@ -342,8 +395,6 @@ export default function DetalleCotizacion() {
 
             <div className="detalle-cotizacion-actions">
 
-              {/* VER PROYECTO */}
-
               <button
                 type="button"
                 className="detalle-cotizacion-project-button"
@@ -354,10 +405,9 @@ export default function DetalleCotizacion() {
                 }
               >
                 <FolderOpen size={17} />
+
                 Ver proyecto
               </button>
-
-              {/* ELIMINAR */}
 
               <button
                 type="button"
@@ -367,6 +417,7 @@ export default function DetalleCotizacion() {
                 }
               >
                 <Trash2 size={17} />
+
                 Eliminar
               </button>
 
@@ -416,11 +467,18 @@ export default function DetalleCotizacion() {
               />
 
               <InfoItem
+                label="Versión"
+                value={`${cotizacion.version}`}
+              />
+
+              <InfoItem
                 label="Fecha de creación"
                 value={formatearFecha(
                   cotizacion.fechaCreacion
                 )}
-                icon={<CalendarDays size={16} />}
+                icon={
+                  <CalendarDays size={16} />
+                }
               />
 
               <InfoItem
@@ -434,15 +492,42 @@ export default function DetalleCotizacion() {
                 }
               />
 
-              <InfoItem
-                label="Precio estimado"
-                value={formatearPrecio(
-                  cotizacion.precioEstimado
-                )}
-                icon={
-                  <CircleDollarSign size={16} />
-                }
-              />
+              {/* -------------------------------- */}
+              {/* PRECIO */}
+              {/* -------------------------------- */}
+
+              <div className="detalle-cotizacion-info-item">
+
+                <span>
+                  Precio estimado
+                </span>
+
+                <strong className="detalle-cotizacion-precio">
+
+                  
+
+                  <div className="precio-doble">
+
+                    <span>
+                      {formatearPrecioUYU(
+                        cotizacion.precioEstimadoUYU
+                      )}{" "}
+                      UYU
+                    </span>
+
+                    <small>
+                      (
+                      {formatearPrecioUSD(
+                        cotizacion.precioEstimado
+                      )}{" "}
+                      USD)
+                    </small>
+
+                  </div>
+
+                </strong>
+
+              </div>
 
               <div className="detalle-cotizacion-description">
 
@@ -476,7 +561,9 @@ export default function DetalleCotizacion() {
 
               <InfoItem
                 label="Proyecto"
-                value={cotizacion.nombreProyecto}
+                value={
+                  cotizacion.nombreProyecto
+                }
               />
 
               <InfoItem
@@ -485,20 +572,27 @@ export default function DetalleCotizacion() {
                   cotizacion.ubicacion ||
                   "No especificada"
                 }
-                icon={<MapPin size={16} />}
+                icon={
+                  <MapPin size={16} />
+                }
               />
 
-            <InfoItem
-              label="Tipo de obra"
-              value={proyecto?.tipoObra ?? "No especificado"}
-            />
+              <InfoItem
+                label="Tipo de obra"
+                value={
+                  proyecto?.tipoObra ??
+                  "No especificado"
+                }
+              />
 
               <InfoItem
                 label="Superficie"
                 value={`${formatearNumero(
                   cotizacion.superficie
                 )} m²`}
-                icon={<Ruler size={16} />}
+                icon={
+                  <Ruler size={16} />
+                }
               />
 
             </div>
@@ -524,49 +618,116 @@ export default function DetalleCotizacion() {
 
           </article>
 
+          {/* -------------------------------- */}
+          {/* MATERIALES */}
+          {/* -------------------------------- */}
 
           <article className="detalle-cotizacion-card">
+
             <CardTitle
               icon={<Package size={21} />}
               title="Materiales utilizados"
             />
 
             {cargandoMateriales ? (
-              <p>Cargando materiales...</p>
-            ) : materiales.length === 0 ? (
+
               <p>
-                No hay materiales asociados a este proyecto.
+                Cargando materiales...
               </p>
+
+            ) : materiales.length === 0 ? (
+
+              <p>
+                No hay materiales asociados a
+                este proyecto.
+              </p>
+
             ) : (
+
               <div className="detalle-cotizacion-materiales-lista">
-                {materiales.map((material) => (
-                  <div
-                    key={material.idMaterial}
-                    className="detalle-cotizacion-material"
-                  >
-                    <div className="detalle-cotizacion-material-nombre">
-                      {material.nombre}
-                    </div>
 
-                    <div className="detalle-cotizacion-material-dato">
-                      <span>Cantidad</span>
-                      <strong>
-                        {material.cantidad ?? 1}
-                      </strong>
-                    </div>
+                {materiales.map(
+                  (material) => {
 
-                    <div className="detalle-cotizacion-material-dato">
-                      <span>Precio unitario</span>
-                      <strong>
-                        {formatearPrecio(
-                          material.costoUnitario
-                        )}
-                      </strong>
-                    </div>
-                  </div>
-                ))}
+                    const precioUSD =
+                      Number(
+                        material.costoUnitario
+                      );
+
+                    const precioUYU =
+                      precioUSD *
+                      Number(
+                        cotizacion.tipoCambio
+                      );
+
+                    return (
+
+                      <div
+                        key={
+                          material.idMaterial
+                        }
+                        className="detalle-cotizacion-material"
+                      >
+
+                        <div className="detalle-cotizacion-material-nombre">
+
+                          {material.nombre}
+
+                        </div>
+
+                        <div className="detalle-cotizacion-material-dato">
+
+                          <span>
+                            Cantidad
+                          </span>
+
+                          <strong>
+                            {material.cantidad ?? 1}
+                          </strong>
+
+                        </div>
+
+                        <div className="detalle-cotizacion-material-dato">
+
+                          <span>
+                            Precio unitario
+                          </span>
+
+                          <strong>
+
+                            <div className="precio-doble">
+
+                              <span>
+                                {formatearPrecioUYU(
+                                  precioUYU
+                                )}{" "}
+                                UYU
+                              </span>
+
+                              <small>
+                                (
+                                {formatearPrecioUSD(
+                                  precioUSD
+                                )}{" "}
+                                USD)
+                              </small>
+
+                            </div>
+
+                          </strong>
+
+                        </div>
+
+                      </div>
+
+                    );
+                  }
+                )}
+
               </div>
+
             )}
+
           </article>
 
         </section>
@@ -607,7 +768,8 @@ export default function DetalleCotizacion() {
               </strong>
               ?
 
-              {" "}Esta acción no se puede deshacer.
+              {" "}
+              Esta acción no se puede deshacer.
 
             </p>
 
@@ -648,7 +810,7 @@ export default function DetalleCotizacion() {
 }
 
 /* ================================================= */
-/* ESTRUCTURA PARA ESTADOS DE CARGA / ERROR */
+/* ESTRUCTURA PARA CARGA / ERROR */
 /* ================================================= */
 
 interface EstructuraDetalleProps {
@@ -669,7 +831,9 @@ function EstructuraDetalle({
 
       <SidebarCliente
         menuOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
+        onClose={() =>
+          setMenuOpen(false)
+        }
       />
 
       <main className="cliente-main">
@@ -679,7 +843,9 @@ function EstructuraDetalle({
           subtitle="Información de la cotización."
           menuOpen={menuOpen}
           onToggleMenu={() =>
-            setMenuOpen((prev) => !prev)
+            setMenuOpen(
+              (prev) => !prev
+            )
           }
         />
 
@@ -825,27 +991,6 @@ function formatearFecha(
       minute: "2-digit",
     }
   ).format(fechaCotizacion);
-}
-
-/* ================================================= */
-/* FORMATEAR PRECIO */
-/* ================================================= */
-
-function formatearPrecio(
-  precio: number | null
-): string {
-  if (precio === null) {
-    return "Sin calcular";
-  }
-
-  return new Intl.NumberFormat(
-    "es-UY",
-    {
-      style: "currency",
-      currency: "UYU",
-      maximumFractionDigits: 0,
-    }
-  ).format(precio);
 }
 
 /* ================================================= */

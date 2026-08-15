@@ -24,30 +24,40 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-import { type ProyectoAPI } from "../cliente/MisProyectos";
+import ActualizarCotizacion from "../../components/cliente/ActualizarCotizacion";
 
+import {
+  formatearPrecioUYU,
+  formatearPrecioUSD,
+} from "../../utilities/formatoMoneda";
+import { type ProyectoAPI } from "../cliente/MisProyectos";
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/MisCotizaciones.css";
 
 type EstadoCotizacion =
   | "Borrador"
-  | "Pendiente"
   | "Enviada"
   | "Revisada"
   | "Aceptada"
-  | "Aprobada"
   | "Rechazada";
 
 interface CotizacionAPI {
   idCotizacion: number;
   idProyecto: number;
   codigo: string;
+  version: number;
   fechaCreacion: string;
   fechaActualizacion: string | null;
   estado: EstadoCotizacion;
+
   precioEstimado: number | null;
+  precioEstimadoUYU: number | null;
+  tipoCambio: number;
+  moneda: string;
+
   observaciones: string | null;
+
   idCliente: number;
   idTipoObra: number;
   nombreProyecto: string;
@@ -75,9 +85,9 @@ export default function MisCotizaciones() {
 
   const [imagenesProyectos, setImagenesProyectos] =
     useState<Record<number, string | null>>({});
- 
+
   const [tiposObraProyectos, setTiposObraProyectos] =
-  useState<Record<number, string>>({});
+    useState<Record<number, string>>({});
 
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
@@ -130,7 +140,7 @@ export default function MisCotizaciones() {
       const resultados: {
         idProyecto: number;
         imagenUrl: string | null;
-        tipoObra: string,
+        tipoObra: string;
       }[] = await Promise.all(
         proyectosUnicos.map(
           async (idProyecto: number) => {
@@ -156,7 +166,8 @@ export default function MisCotizaciones() {
                   proyecto.idProyecto,
                 imagenUrl:
                   proyecto.imagenUrl,
-                tipoObra: proyecto.tipoObra, 
+                tipoObra:
+                  proyecto.tipoObra,
               };
             } catch {
               return {
@@ -170,15 +181,21 @@ export default function MisCotizaciones() {
       );
 
       // -----------------------------------------
-      // 4. GUARDAR LAS IMÁGENES POR PROYECTO
+      // 4. GUARDAR TIPOS DE OBRA
       // -----------------------------------------
+
       const tipos: Record<number, string> = {};
 
       resultados.forEach((resultado) => {
-      tipos[resultado.idProyecto] = resultado.tipoObra;
+        tipos[resultado.idProyecto] =
+          resultado.tipoObra;
       });
 
       setTiposObraProyectos(tipos);
+
+      // -----------------------------------------
+      // 5. GUARDAR IMÁGENES
+      // -----------------------------------------
 
       const imagenes: Record<
         number,
@@ -237,10 +254,9 @@ export default function MisCotizaciones() {
   // ESTADÍSTICAS
   // -----------------------------------------
 
-  const totalPendientes =
+    const totalBorradores =
     cotizaciones.filter(
       (cotizacion) =>
-        cotizacion.estado === "Pendiente" ||
         cotizacion.estado === "Borrador"
     ).length;
 
@@ -256,10 +272,9 @@ export default function MisCotizaciones() {
         cotizacion.estado === "Revisada"
     ).length;
 
-  const totalAprobadas =
+  const totalAceptadas =
     cotizaciones.filter(
       (cotizacion) =>
-        cotizacion.estado === "Aprobada" ||
         cotizacion.estado === "Aceptada"
     ).length;
 
@@ -315,8 +330,8 @@ export default function MisCotizaciones() {
 
           <StatCard
             icon={<Clock3 size={24} />}
-            value={totalPendientes.toString()}
-            label="Pendientes"
+            value={totalBorradores.toString()}
+            label="Borradores"
             variant="orange"
           />
 
@@ -336,8 +351,8 @@ export default function MisCotizaciones() {
 
           <StatCard
             icon={<CircleCheck size={24} />}
-            value={totalAprobadas.toString()}
-            label="Aprobadas"
+            value={totalAceptadas.toString()}
+            label="Aceptadas"
             variant="green"
           />
 
@@ -403,11 +418,9 @@ export default function MisCotizaciones() {
 
         {cargando && (
           <section className="cotizaciones-feedback">
-
             <p>
               Cargando cotizaciones...
             </p>
-
           </section>
         )}
 
@@ -450,33 +463,21 @@ export default function MisCotizaciones() {
 
                     <tr>
 
-                      <th>
-                        Cotización
-                      </th>
+                      <th>Cotización</th>
 
-                      <th>
-                        Fecha
-                      </th>
+                      <th>Versión</th>
 
-                      <th>
-                        Tipo de obra
-                      </th>
+                      <th>Fecha</th>
 
-                      <th>
-                        Superficie
-                      </th>
+                      <th>Tipo de obra</th>
 
-                      <th>
-                        Estado
-                      </th>
+                      <th>Superficie</th>
 
-                      <th>
-                        Precio estimado
-                      </th>
+                      <th>Estado</th>
 
-                      <th>
-                        Acciones
-                      </th>
+                      <th>Precio estimado</th>
+
+                      <th>Acciones</th>
 
                     </tr>
 
@@ -531,6 +532,12 @@ export default function MisCotizaciones() {
 
                           </td>
 
+                          <td>
+                            <span className="cotizacion-version">
+                              {cotizacion.version}
+                            </span>
+                          </td>
+
                           {/* FECHA */}
 
                           <td>
@@ -556,8 +563,12 @@ export default function MisCotizaciones() {
                           {/* TIPO DE OBRA */}
 
                           <td>
-                            {tiposObraProyectos[cotizacion.idProyecto] ??
-                            "No especificado"}
+                            {
+                              tiposObraProyectos[
+                                cotizacion.idProyecto
+                              ] ??
+                              "No especificado"
+                            }
                           </td>
 
                           {/* SUPERFICIE */}
@@ -584,9 +595,25 @@ export default function MisCotizaciones() {
 
                           <td className="cotizacion-precio">
 
-                            {formatearPrecio(
-                              cotizacion.precioEstimado
-                            )}
+                            <div className="precio-doble">
+
+                              <strong>
+                                UYU
+                                {formatearPrecioUYU(
+                                  cotizacion.precioEstimadoUYU
+                                )}
+                              </strong>
+
+                              <span>
+                                USD
+                                (
+                                {formatearPrecioUSD(
+                                  cotizacion.precioEstimado
+                                )}
+                                )
+                              </span>
+
+                            </div>
 
                           </td>
 
@@ -652,6 +679,11 @@ export default function MisCotizaciones() {
 
                               </button>
 
+                              <ActualizarCotizacion
+                                idCotizacion={cotizacion.idCotizacion}
+                                onActualizada={obtenerCotizaciones}
+                              />
+
                             </div>
 
                           </td>
@@ -667,9 +699,7 @@ export default function MisCotizaciones() {
 
               </div>
 
-              {/* ---------------------------------- */}
               {/* PAGINACIÓN */}
-              {/* ---------------------------------- */}
 
               <footer className="cotizaciones-pagination">
 
@@ -718,9 +748,7 @@ export default function MisCotizaciones() {
           <div className="tip-content">
 
             <div className="tip-icon">
-
               <Lightbulb size={25} />
-
             </div>
 
             <div>
@@ -770,7 +798,6 @@ function StatCard({
 }: StatCardProps) {
 
   return (
-
     <article className="cotizacion-stat-card">
 
       <div
@@ -886,24 +913,3 @@ function formatearSuperficie(
   return `${Number(superficie).toFixed(2)} m²`;
 }
 
-/* ================================================= */
-/* FORMATEAR PRECIO */
-/* ================================================= */
-
-function formatearPrecio(
-  precio: number | null
-): string {
-
-  if (precio === null) {
-    return "Sin calcular";
-  }
-
-  return new Intl.NumberFormat(
-    "es-UY",
-    {
-      style: "currency",
-      currency: "UYU",
-      maximumFractionDigits: 0,
-    }
-  ).format(precio);
-}

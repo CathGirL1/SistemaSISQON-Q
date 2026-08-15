@@ -21,6 +21,10 @@ import HeaderCliente from "../../components/cliente/HeaderCliente";
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/DetalleCotizacion.css";
 
+/* ================================================= */
+/* TIPOS */
+/* ================================================= */
+
 type EstadoCotizacion =
   | "Borrador"
   | "Enviada"
@@ -35,7 +39,10 @@ interface Cotizacion {
   fechaCreacion: string;
   fechaActualizacion: string | null;
   estado: EstadoCotizacion;
+
   precioEstimado: number | null;
+  precioEstimadoUYU: number | null;
+
   observaciones: string | null;
 
   idCliente: number;
@@ -43,6 +50,7 @@ interface Cotizacion {
   nombreProyecto: string;
   descripcionProyecto: string | null;
   ubicacion: string | null;
+
   alto: number;
   ancho: number;
   largo: number;
@@ -51,7 +59,6 @@ interface Cotizacion {
 
 interface FormularioCotizacion {
   estado: EstadoCotizacion;
-  precioEstimado: string;
   observaciones: string;
 }
 
@@ -61,6 +68,10 @@ interface RespuestaAPI {
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+/* ================================================= */
+/* COMPONENTE PRINCIPAL */
+/* ================================================= */
 
 export default function EditarCotizacion() {
   const navigate = useNavigate();
@@ -75,6 +86,10 @@ export default function EditarCotizacion() {
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+
+  /* ================================================= */
+  /* OBTENER COTIZACIÓN */
+  /* ================================================= */
 
   useEffect(() => {
     obtenerCotizacion();
@@ -110,14 +125,9 @@ export default function EditarCotizacion() {
 
       setFormulario({
         estado: cotizacionRecibida.estado,
-        precioEstimado:
-          cotizacionRecibida.precioEstimado !== null
-            ? cotizacionRecibida.precioEstimado.toString()
-            : "",
         observaciones:
           cotizacionRecibida.observaciones ?? "",
       });
-
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -129,6 +139,10 @@ export default function EditarCotizacion() {
       setCargando(false);
     }
   };
+
+  /* ================================================= */
+  /* ACTUALIZAR CAMPOS */
+  /* ================================================= */
 
   const actualizarCampo = (
     event: ChangeEvent<
@@ -149,11 +163,19 @@ export default function EditarCotizacion() {
     );
   };
 
+  /* ================================================= */
+  /* CANCELAR EDICIÓN */
+  /* ================================================= */
+
   const cancelarEdicion = () => {
     navigate(
       `/panel-cliente/cotizaciones/${idCotizacion}`
     );
   };
+
+  /* ================================================= */
+  /* GUARDAR CAMBIOS */
+  /* ================================================= */
 
   const guardarCambios = async (
     event: FormEvent<HTMLFormElement>
@@ -168,11 +190,6 @@ export default function EditarCotizacion() {
       setGuardando(true);
       setError("");
 
-      const precio =
-        formulario.precioEstimado.trim() === ""
-          ? null
-          : Number(formulario.precioEstimado);
-
       const response = await fetch(
         `${API_URL}/api/cotizaciones/${idCotizacion}`,
         {
@@ -182,7 +199,6 @@ export default function EditarCotizacion() {
           },
           body: JSON.stringify({
             estado: formulario.estado,
-            precioEstimado: precio,
             observaciones:
               formulario.observaciones.trim() || null,
           }),
@@ -199,11 +215,9 @@ export default function EditarCotizacion() {
         );
       }
 
-      // Después de guardar volvemos al detalle
       navigate(
         `/panel-cliente/cotizaciones/${idCotizacion}`
       );
-
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -216,11 +230,13 @@ export default function EditarCotizacion() {
     }
   };
 
+  /* ================================================= */
+  /* CARGANDO */
+  /* ================================================= */
+
   if (cargando) {
     return (
-      <EstructuraEditar
-        menuOpen={false}
-      >
+      <EstructuraEditar>
         <div className="detalle-cotizacion-feedback">
           Cargando cotización...
         </div>
@@ -228,11 +244,13 @@ export default function EditarCotizacion() {
     );
   }
 
+  /* ================================================= */
+  /* ERROR */
+  /* ================================================= */
+
   if (error && !cotizacion) {
     return (
-      <EstructuraEditar
-        menuOpen={false}
-      >
+      <EstructuraEditar>
         <div className="detalle-cotizacion-feedback">
           <p>{error}</p>
 
@@ -255,6 +273,10 @@ export default function EditarCotizacion() {
     return null;
   }
 
+  /* ================================================= */
+  /* VISTA PRINCIPAL */
+  /* ================================================= */
+
   return (
     <div className="cliente-panel">
 
@@ -265,16 +287,16 @@ export default function EditarCotizacion() {
 
       <main className="cliente-main">
 
+        {/* ----------------------------------------- */}
+        {/* ENCABEZADO */}
+        {/* ----------------------------------------- */}
+
         <section className="detalle-cotizacion-top">
 
           <button
             type="button"
             className="detalle-cotizacion-back"
-            onClick={() =>
-              navigate(
-                `/panel-cliente/cotizaciones/${idCotizacion}`
-              )
-            }
+            onClick={cancelarEdicion}
           >
             <ArrowLeft size={18} />
             Volver al detalle
@@ -302,11 +324,19 @@ export default function EditarCotizacion() {
 
         </section>
 
+        {/* ----------------------------------------- */}
+        {/* ERROR */}
+        {/* ----------------------------------------- */}
+
         {error && (
           <div className="detalle-cotizacion-error">
             {error}
           </div>
         )}
+
+        {/* ----------------------------------------- */}
+        {/* FORMULARIO */}
+        {/* ----------------------------------------- */}
 
         <form
           className="detalle-cotizacion-edit-form"
@@ -321,6 +351,8 @@ export default function EditarCotizacion() {
             />
 
             <div className="detalle-cotizacion-form-grid">
+
+              {/* ESTADO */}
 
               <label className="detalle-cotizacion-field">
 
@@ -358,23 +390,7 @@ export default function EditarCotizacion() {
 
               </label>
 
-              <label className="detalle-cotizacion-field">
-
-                <span>
-                  Precio estimado
-                </span>
-
-                <input
-                  type="number"
-                  name="precioEstimado"
-                  min="0"
-                  step="0.01"
-                  value={formulario.precioEstimado}
-                  onChange={actualizarCampo}
-                  placeholder="Ej.: 850000"
-                />
-
-              </label>
+              {/* OBSERVACIONES */}
 
               <label className="detalle-cotizacion-field detalle-cotizacion-field-full">
 
@@ -396,6 +412,10 @@ export default function EditarCotizacion() {
             </div>
 
           </article>
+
+          {/* ----------------------------------------- */}
+          {/* ACCIONES */}
+          {/* ----------------------------------------- */}
 
           <div className="detalle-cotizacion-edit-actions">
 
@@ -437,20 +457,17 @@ export default function EditarCotizacion() {
 /* ================================================= */
 
 interface EstructuraEditarProps {
-  menuOpen: boolean;
   children: ReactNode;
 }
 
 function EstructuraEditar({
-  menuOpen,
   children,
 }: EstructuraEditarProps) {
-
   return (
     <div className="cliente-panel">
 
       <SidebarCliente
-        menuOpen={menuOpen}
+        menuOpen={false}
         onClose={() => {}}
       />
 
@@ -459,7 +476,7 @@ function EstructuraEditar({
         <HeaderCliente
           title="Editar cotización"
           subtitle="Modificá la información de la cotización."
-          menuOpen={menuOpen}
+          menuOpen={false}
           onToggleMenu={() => {}}
         />
 
@@ -484,7 +501,6 @@ function CardTitle({
   icon,
   title,
 }: CardTitleProps) {
-
   return (
     <div className="detalle-cotizacion-card-title">
 
