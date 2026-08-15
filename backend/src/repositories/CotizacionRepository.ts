@@ -101,6 +101,8 @@ export class CotizacionRepository {
         data.observaciones ?? null
       )
 
+      .input( "version", sql.Int, data.version )
+
       .query(`
         INSERT INTO Cotizacion
         (
@@ -113,7 +115,8 @@ export class CotizacionRepository {
           precioEstimado,
           observaciones,
           fechaCreacion,
-          fechaActualizacion
+          fechaActualizacion, 
+          version
         )
 
         OUTPUT INSERTED.id_Cotizacion
@@ -129,11 +132,41 @@ export class CotizacionRepository {
           @precioEstimado,
           @observaciones,
           GETDATE(),
-          GETDATE()
+          GETDATE(), 
+          @version
         )
       `);
 
     return result.recordset[0].id_Cotizacion;
+  }
+
+  // ====================================================
+  // OBTENER PRÓXIMA VERSIÓN DE COTIZACIÓN
+  // ====================================================
+
+  public async obtenerProximaVersion(
+    idProyecto: number
+  ): Promise<number> {
+
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+      .input(
+        "idProyecto",
+        sql.Int,
+        idProyecto
+      )
+      .query(`
+        SELECT
+          ISNULL(MAX(version), 0) + 1 AS proximaVersion
+
+        FROM Cotizacion
+
+        WHERE id_Proyecto = @idProyecto
+      `);
+
+    return result.recordset[0].proximaVersion;
   }
 
   // ====================================================
@@ -202,8 +235,8 @@ export class CotizacionRepository {
       .query(`
         SELECT
 
-          mp.id_MaterialProyecto
-            AS idMaterialProyecto,
+          mp.idMaterialProyecto
+          AS idMaterialProyecto,
 
           mp.id_Proyecto
             AS idProyecto,
@@ -234,7 +267,7 @@ export class CotizacionRepository {
   }
 
   // ====================================================
-  // OBTENER COTIZACIONES POR CLIENTE
+  // OBTENER ÚLTIMA COTIZACIÓN POR CLIENTE
   // ====================================================
 
   public async obtenerCotizacionesPorCliente(
@@ -253,63 +286,108 @@ export class CotizacionRepository {
       )
 
       .query(`
+        WITH CotizacionesVersionadas AS (
+          SELECT
+
+            c.id_Cotizacion AS idCotizacion,
+            c.id_Proyecto AS idProyecto,
+
+            CONCAT(
+              'COT-',
+              YEAR(c.fechaCreacion),
+              '-',
+              RIGHT(
+                '0000' +
+                CAST(
+                  c.id_Cotizacion AS VARCHAR(10)
+                ),
+                4
+              )
+            ) AS codigo,
+
+            c.fechaRealizada,
+            c.fechaCreacion,
+            c.fechaActualizacion,
+            c.version,
+
+            c.costoMateriales,
+            c.costoManoObra,
+            c.totalCotizacion,
+
+            c.estado,
+            c.precioEstimado,
+            c.observaciones,
+
+            p.id_Cliente AS idCliente,
+            p.id_TipoObra AS idTipoObra,
+
+            p.nombre AS nombreProyecto,
+            p.descripcion AS descripcionProyecto,
+
+            p.ubicacion,
+
+            p.alto,
+            p.ancho,
+            p.largo,
+
+            CAST(
+              p.ancho * p.largo
+              AS DECIMAL(18, 2)
+            ) AS superficie,
+
+            ROW_NUMBER() OVER (
+              PARTITION BY c.id_Proyecto
+              ORDER BY
+                c.version DESC,
+                c.fechaCreacion DESC,
+                c.id_Cotizacion DESC
+            ) AS numeroFila
+
+          FROM Cotizacion c
+
+          INNER JOIN Proyecto p
+            ON p.id_Proyecto = c.id_Proyecto
+
+          WHERE p.id_Cliente = @idCliente
+        )
+
         SELECT
+          idCotizacion,
+          idProyecto,
+          codigo,
+          fechaRealizada,
+          fechaCreacion,
+          fechaActualizacion,
+          version,
 
-          c.id_Cotizacion AS idCotizacion,
-          c.id_Proyecto AS idProyecto,
+          costoMateriales,
+          costoManoObra,
+          totalCotizacion,
 
-          CONCAT(
-            'COT-',
-            YEAR(c.fechaCreacion),
-            '-',
-            RIGHT(
-              '0000' +
-              CAST(
-                c.id_Cotizacion AS VARCHAR(10)
-              ),
-              4
-            )
-          ) AS codigo,
+          estado,
+          precioEstimado,
+          observaciones,
 
-          c.fechaRealizada,
-          c.fechaCreacion,
-          c.fechaActualizacion,
+          idCliente,
+          idTipoObra,
 
-          c.costoMateriales,
-          c.costoManoObra,
-          c.totalCotizacion,
+          nombreProyecto,
+          descripcionProyecto,
 
-          c.estado,
-          c.precioEstimado,
-          c.observaciones,
+          ubicacion,
 
-          p.id_Cliente AS idCliente,
-          p.id_TipoObra AS idTipoObra,
+          alto,
+          ancho,
+          largo,
+          superficie
 
-          p.nombre AS nombreProyecto,
-          p.descripcion AS descripcionProyecto,
+        FROM CotizacionesVersionadas
 
-          p.ubicacion,
-
-          p.alto,
-          p.ancho,
-          p.largo,
-
-          CAST(
-            p.ancho * p.largo
-            AS DECIMAL(18, 2)
-          ) AS superficie
-
-        FROM Cotizacion c
-
-        INNER JOIN Proyecto p
-          ON p.id_Proyecto = c.id_Proyecto
-
-        WHERE p.id_Cliente = @idCliente
+        WHERE numeroFila = 1
 
         ORDER BY
-          c.fechaCreacion DESC,
-          c.id_Cotizacion DESC
+          fechaCreacion DESC,
+          idCotizacion DESC
       `);
 
     return result.recordset;
@@ -438,6 +516,7 @@ export class CotizacionRepository {
           c.fechaRealizada,
           c.fechaCreacion,
           c.fechaActualizacion,
+          c.version,
 
           c.costoMateriales,
           c.costoManoObra,

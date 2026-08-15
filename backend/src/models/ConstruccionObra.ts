@@ -1,42 +1,70 @@
 import { Proyecto } from "./Proyecto";
-import { ITipoObraStrategy } from "../interfaces/ITipoObraStrategy";
+import {
+    ITipoObraStrategy,
+    MaterialParaCotizacion
+} from "../interfaces/ITipoObraStrategy";
+import { ResultadoCotizacion } from "../interfaces/ResultadoCotizacion";
 
-export class ConstruccionObra
-  implements ITipoObraStrategy {
+export class ConstruccionObra implements ITipoObraStrategy {
 
-  public calcularManoDeObra(
-    proyecto: Proyecto
-  ): number {
+    private readonly COSTO_CONSTRUCCION_M2_USD = 800;
 
-    const alto = proyecto.alto;
-    const ancho = proyecto.ancho;
-    const largo = proyecto.largo;
+    private readonly COSTO_BASE_MANO_OBRA_USD = 300;
 
-    // Superficie de construcción
-    const metrosConstruccion =
-      ancho * largo;
+    private readonly COSTO_MANO_OBRA_M2_USD = 0.20;
 
-    // Costo mínimo de construcción
-    const costoPorMetro = 800;
+    public calcularCosto(
+        proyecto: Proyecto,
+        materiales: MaterialParaCotizacion[]
+    ): ResultadoCotizacion {
 
-    // Costo mínimo de construcción según
-    // los metros cuadrados del proyecto
-    const costoConstruccion =
-      metrosConstruccion * costoPorMetro;
+       const superficiePiso =
+            proyecto.ancho *
+            proyecto.largo;
 
-    // La altura forma parte de las dimensiones
-    // disponibles del proyecto y podrá utilizarse
-    // para ajustar el cálculo de mano de obra.
-    const costoManoDeObra = 300;
+        const superficieParedes =
+            2 * (
+                proyecto.ancho *
+                proyecto.alto
+            ) +
+            2 * (
+                proyecto.largo *
+                proyecto.alto
+            );
 
-    console.log("Alto:", alto);
-    console.log("Ancho:", ancho);
-    console.log("Largo:", largo);
-    console.log(
-      "Metros de construcción:",
-      metrosConstruccion
-    );
+        const superficieTrabajo =
+            superficiePiso +
+            superficieParedes;
 
-    return costoManoDeObra;
-  }
+        const costoConstruccion =
+            superficiePiso *
+            this.COSTO_CONSTRUCCION_M2_USD;
+
+        const manoDeObra = Math.max(
+            this.COSTO_BASE_MANO_OBRA_USD,
+            superficieTrabajo *
+            this.COSTO_MANO_OBRA_M2_USD
+        );
+
+        const totalMateriales =
+            materiales.reduce(
+                (total, material) =>
+                    total +
+                    material.cantidad *
+                    material.costoUnitario,
+                0
+            );
+
+        const totalGeneral =
+            totalMateriales +
+            manoDeObra +
+            costoConstruccion;
+
+        return {
+            totalMateriales,
+            manoDeObra,
+            costoConstruccion,
+            totalGeneral
+        };
+    }
 }

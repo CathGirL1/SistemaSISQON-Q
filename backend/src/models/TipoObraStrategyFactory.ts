@@ -8,10 +8,16 @@ import { ConstruccionObra } from "./ConstruccionObra";
 export class TipoObraStrategyFactory {
 
     public static obtenerStrategy(
-        codigoTipoObra: string
+        tipoObra: string
     ): ITipoObraStrategy {
 
-        switch (codigoTipoObra.toUpperCase()) {
+        const tipoNormalizado = tipoObra
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase()
+            .trim();
+
+        switch (tipoNormalizado) {
 
             case "QUINCHO":
                 return new Quincho();
@@ -27,7 +33,7 @@ export class TipoObraStrategyFactory {
 
             default:
                 throw new Error(
-                    `No existe una estrategia para el tipo de obra: ${codigoTipoObra}`
+                    `No existe una estrategia para el tipo de obra: ${tipoObra}`
                 );
         }
     }

@@ -1,6 +1,7 @@
 import { CotizacionRepository } from "../repositories/CotizacionRepository";
 import { ProyectoRepository } from "../repositories/ProyectoRepository";
 import { TipoObraStrategyFactory } from "../models/TipoObraStrategyFactory";
+import { MonedaService } from "./MonedaService";
 
 import type {
     CrearCotizacionDTO,
@@ -18,6 +19,9 @@ const ESTADOS_VALIDOS = [
 export class CotizacionService {
 
     private repository = new CotizacionRepository();
+
+    private readonly monedaService =
+        new MonedaService();
 
     private proyectoRepository =
         new ProyectoRepository();
@@ -78,6 +82,15 @@ export class CotizacionService {
             );
         }
 
+        // =========================================
+        // Obtener próxima versión
+        // =========================================
+
+        const version =
+            await this.repository.obtenerProximaVersion(
+                data.idProyecto
+            );
+
         return this.repository.crearCotizacion({
 
             idProyecto:
@@ -103,6 +116,8 @@ export class CotizacionService {
                 data.observaciones !== undefined
                     ? data.observaciones?.trim() || null
                     : null,
+
+            version,
         });
     }
 
@@ -120,8 +135,9 @@ export class CotizacionService {
             "El id del proyecto no es válido"
         );
 
-
+        // =========================================
         // 1. Obtener proyecto
+        // =========================================
 
         const proyecto =
             await this.proyectoRepository
@@ -135,8 +151,9 @@ export class CotizacionService {
             );
         }
 
-
-        // 2. Obtener información del tipo de obra
+        // =========================================
+        // 2. Obtener información del proyecto
+        // =========================================
 
         const proyectoCotizacion =
             await this.repository
@@ -150,39 +167,27 @@ export class CotizacionService {
             );
         }
 
+        const tipoObra =
+            proyectoCotizacion.tipoObra;
 
-        const codigoTipoObra =
-            proyectoCotizacion.codigoTipoObra;
-
-        if (!codigoTipoObra) {
+        if (!tipoObra) {
             throw new Error(
-                "El proyecto no tiene un código de tipo de obra válido"
+                "El proyecto no tiene un tipo de obra válido"
             );
         }
 
-
+        // =========================================
         // 3. Obtener Strategy
+        // =========================================
 
         const strategy =
             TipoObraStrategyFactory.obtenerStrategy(
-                codigoTipoObra
+                tipoObra
             );
 
-
-        // 4. Calcular mano de obra
-
-        const costoManoObra =
-            strategy.calcularManoDeObra(
-                proyecto
-            );
-
-        this.validarCosto(
-            costoManoObra,
-            "El costo de mano de obra"
-        );
-
-
-        // 5. Obtener materiales
+        // =========================================
+        // 4. Obtener materiales actuales
+        // =========================================
 
         const materiales =
             await this.repository
@@ -190,64 +195,89 @@ export class CotizacionService {
                     idProyecto
                 );
 
+        // =========================================
+        // 5. Preparar materiales
+        // =========================================
 
-        // 6. Calcular materiales
+        const materialesParaCotizacion =
+            materiales.map(material => {
 
-        const costoMateriales =
-            materiales.reduce(
-                (total, material) => {
+                const cantidad =
+                    Number(material.cantidad);
 
-                    const cantidad =
-                        Number(material.cantidad);
+                const costoUnitario =
+                    Number(material.costoUnitario);
 
-                    const costoUnitario =
-                        Number(material.costoUnitario);
-
-
-                    if (
-                        !Number.isFinite(cantidad) ||
-                        cantidad < 0
-                    ) {
-                        throw new Error(
-                            `Cantidad inválida para el material "${material.nombre}"`
-                        );
-                    }
-
-
-                    if (
-                        !Number.isFinite(costoUnitario) ||
-                        costoUnitario < 0
-                    ) {
-                        throw new Error(
-                            `Costo inválido para el material "${material.nombre}"`
-                        );
-                    }
-
-
-                    return (
-                        total +
-                        cantidad * costoUnitario
+                if (
+                    !Number.isFinite(cantidad) ||
+                    cantidad < 0
+                ) {
+                    throw new Error(
+                        `Cantidad inválida para el material "${material.nombre}"`
                     );
+                }
 
-                },
-                0
+                if (
+                    !Number.isFinite(costoUnitario) ||
+                    costoUnitario < 0
+                ) {
+                    throw new Error(
+                        `Costo inválido para el material "${material.nombre}"`
+                    );
+                }
+
+                return {
+                    cantidad,
+                    costoUnitario
+                };
+            });
+
+        // =========================================
+        // 6. Calcular cotización
+        // =========================================
+
+        const resultado =
+            strategy.calcularCosto(
+                proyecto,
+                materialesParaCotizacion
             );
 
-
-        // 7. Calcular total
-
-        const totalCotizacion =
-            costoMateriales +
-            costoManoObra;
-
+        // =========================================
+        // 7. Validar resultado
+        // =========================================
 
         this.validarCosto(
-            totalCotizacion,
+            resultado.totalMateriales,
+            "El costo de materiales"
+        );
+
+        this.validarCosto(
+            resultado.manoDeObra,
+            "El costo de mano de obra"
+        );
+
+        this.validarCosto(
+            resultado.costoConstruccion,
+            "El costo de construcción"
+        );
+
+        this.validarCosto(
+            resultado.totalGeneral,
             "El total de la cotización"
         );
 
+        // =========================================
+        // 8. Obtener próxima versión
+        // =========================================
 
-        // 8. Guardar
+        const version =
+            await this.repository.obtenerProximaVersion(
+                idProyecto
+            );
+
+        // =========================================
+        // 9. Crear nueva cotización
+        // =========================================
 
         return this.repository.crearCotizacion({
 
@@ -255,17 +285,255 @@ export class CotizacionService {
 
             estado: "Borrador",
 
-            costoMateriales,
+            costoMateriales:
+                resultado.totalMateriales,
 
-            costoManoObra,
+            costoManoObra:
+                resultado.manoDeObra,
 
-            totalCotizacion,
+            totalCotizacion:
+                resultado.totalGeneral,
 
             precioEstimado:
-                totalCotizacion,
+                resultado.totalGeneral,
 
             observaciones:
                 null,
+
+            version,
+        });
+    }
+
+
+    // =========================================================
+    // ACTUALIZAR / GENERAR NUEVA VERSIÓN
+    // =========================================================
+
+    public async actualizarCotizacion(
+        idCotizacion: number,
+        data: ActualizarCotizacionDTO
+    ): Promise<number> {
+
+        this.validarId(
+            idCotizacion,
+            "El id de la cotización no es válido"
+        );
+
+        // =========================================
+        // 1. Obtener cotización anterior
+        // =========================================
+
+        const cotizacion =
+            await this.repository
+                .obtenerCotizacionPorId(
+                    idCotizacion
+                );
+
+        if (!cotizacion) {
+            throw new Error(
+                "Cotización no encontrada"
+            );
+        }
+
+        // =========================================
+        // 2. Obtener proyecto asociado
+        // =========================================
+
+        const idProyecto =
+            Number(cotizacion.idProyecto);
+
+        this.validarId(
+            idProyecto,
+            "El id del proyecto no es válido"
+        );
+
+        // =========================================
+        // 3. Verificar que el proyecto exista
+        // =========================================
+
+        const proyectoExiste =
+            await this.repository.existeProyecto(
+                idProyecto
+            );
+
+        if (!proyectoExiste) {
+            throw new Error(
+                "Proyecto asociado a la cotización no encontrado"
+            );
+        }
+
+        // =========================================
+        // 4. Obtener datos ACTUALES del proyecto
+        // =========================================
+
+        const proyecto =
+            await this.proyectoRepository
+                .obtenerProyectoPorId(
+                    idProyecto
+                );
+
+        if (!proyecto) {
+            throw new Error(
+                "Proyecto no encontrado"
+            );
+        }
+
+        // =========================================
+        // 5. Obtener tipo de obra actual
+        // =========================================
+
+        const proyectoCotizacion =
+            await this.repository
+                .obtenerProyectoParaCotizacion(
+                    idProyecto
+                );
+
+        if (!proyectoCotizacion) {
+            throw new Error(
+                "No se pudo obtener la información del proyecto"
+            );
+        }
+
+        const tipoObra =
+            proyectoCotizacion.tipoObra;
+
+        if (!tipoObra) {
+            throw new Error(
+                "El proyecto no tiene un tipo de obra válido"
+            );
+        }
+
+        // =========================================
+        // 6. Obtener Strategy actual
+        // =========================================
+
+        const strategy =
+            TipoObraStrategyFactory.obtenerStrategy(
+                tipoObra
+            );
+
+        // =========================================
+        // 7. Obtener materiales ACTUALES
+        // =========================================
+
+        const materiales =
+            await this.repository
+                .obtenerMaterialesDelProyecto(
+                    idProyecto
+                );
+
+        // =========================================
+        // 8. Preparar materiales
+        // =========================================
+
+        const materialesParaCotizacion =
+            materiales.map(material => {
+
+                const cantidad =
+                    Number(material.cantidad);
+
+                const costoUnitario =
+                    Number(material.costoUnitario);
+
+                if (
+                    !Number.isFinite(cantidad) ||
+                    cantidad < 0
+                ) {
+                    throw new Error(
+                        `Cantidad inválida para el material "${material.nombre}"`
+                    );
+                }
+
+                if (
+                    !Number.isFinite(costoUnitario) ||
+                    costoUnitario < 0
+                ) {
+                    throw new Error(
+                        `Costo inválido para el material "${material.nombre}"`
+                    );
+                }
+
+                return {
+                    cantidad,
+                    costoUnitario
+                };
+            });
+
+        // =========================================
+        // 9. Recalcular
+        // =========================================
+
+        const resultado =
+            strategy.calcularCosto(
+                proyecto,
+                materialesParaCotizacion
+            );
+
+        // =========================================
+        // 10. Validar resultado
+        // =========================================
+
+        this.validarCosto(
+            resultado.totalMateriales,
+            "El costo de materiales"
+        );
+
+        this.validarCosto(
+            resultado.manoDeObra,
+            "El costo de mano de obra"
+        );
+
+        this.validarCosto(
+            resultado.costoConstruccion,
+            "El costo de construcción"
+        );
+
+        this.validarCosto(
+            resultado.totalGeneral,
+            "El total de la cotización"
+        );
+
+        // =========================================
+        // 11. Obtener próxima versión
+        // =========================================
+
+        const version =
+            await this.repository.obtenerProximaVersion(
+                idProyecto
+            );
+
+        // =========================================
+        // 12. Crear NUEVA cotización
+        //
+        // La anterior NO se modifica.
+        // =========================================
+
+        return this.repository.crearCotizacion({
+
+            idProyecto,
+
+            estado:
+                data.estado?.trim() ||
+                "Borrador",
+
+            costoMateriales:
+                resultado.totalMateriales,
+
+            costoManoObra:
+                resultado.manoDeObra,
+
+            totalCotizacion:
+                resultado.totalGeneral,
+
+            precioEstimado:
+                resultado.totalGeneral,
+
+            observaciones:
+                data.observaciones !== undefined
+                    ? data.observaciones?.trim() || null
+                    : null,
+
+            version,
         });
     }
 
@@ -283,10 +551,34 @@ export class CotizacionService {
             "El id del cliente no es válido"
         );
 
-        return this.repository
-            .obtenerCotizacionesPorCliente(
-                idCliente
-            );
+        const cotizaciones =
+            await this.repository
+                .obtenerCotizacionesPorCliente(
+                    idCliente
+                );
+
+        const tipoCambio =
+            await this.monedaService
+                .obtenerDolarAPesoUruguayo();
+
+        return cotizaciones.map((cotizacion) => {
+
+            const precioEstimadoUYU =
+                cotizacion.precioEstimado !== null
+                    ? Number(cotizacion.precioEstimado) *
+                      tipoCambio
+                    : null;
+
+            return {
+                ...cotizacion,
+
+                moneda: "USD",
+
+                tipoCambio,
+
+                precioEstimadoUYU,
+            };
+        });
     }
 
 
@@ -315,10 +607,34 @@ export class CotizacionService {
             );
         }
 
-        return this.repository
-            .obtenerCotizacionesPorProyecto(
-                idProyecto
-            );
+        const cotizaciones =
+            await this.repository
+                .obtenerCotizacionesPorProyecto(
+                    idProyecto
+                );
+
+        const tipoCambio =
+            await this.monedaService
+                .obtenerDolarAPesoUruguayo();
+
+        return cotizaciones.map((cotizacion) => {
+
+            const precioEstimadoUYU =
+                cotizacion.precioEstimado !== null
+                    ? Number(cotizacion.precioEstimado) *
+                      tipoCambio
+                    : null;
+
+            return {
+                ...cotizacion,
+
+                moneda: "USD",
+
+                tipoCambio,
+
+                precioEstimadoUYU,
+            };
+        });
     }
 
 
@@ -347,79 +663,64 @@ export class CotizacionService {
             );
         }
 
-        return cotizacion;
+        const resultado =
+            await this.agregarConversionMonetaria(
+                [cotizacion]
+            );
+
+        return resultado[0];
     }
 
 
     // =========================================================
-    // ACTUALIZAR
+    // AGREGAR CONVERSIÓN USD → UYU
     // =========================================================
 
-    public async actualizarCotizacion(
-        idCotizacion: number,
-        data: ActualizarCotizacionDTO
-    ): Promise<void> {
+    private async agregarConversionMonetaria(
+        cotizaciones: any[]
+    ) {
 
-        this.validarId(
-            idCotizacion,
-            "El id de la cotización no es válido"
+        if (cotizaciones.length === 0) {
+            return [];
+        }
+
+        const tipoCambio =
+            await this.monedaService
+                .obtenerDolarAPesoUruguayo();
+
+        return cotizaciones.map(
+            cotizacion => ({
+
+                ...cotizacion,
+
+                moneda: "USD",
+
+                tipoCambio,
+
+                costoMaterialesUYU:
+                    Number(cotizacion.costoMateriales) *
+                    tipoCambio,
+
+                costoManoObraUYU:
+                    Number(cotizacion.costoManoObra) *
+                    tipoCambio,
+
+                totalCotizacionUYU:
+                    Number(cotizacion.totalCotizacion) *
+                    tipoCambio,
+
+                precioEstimadoUYU:
+                    cotizacion.precioEstimado !== null
+                        ? Number(cotizacion.precioEstimado) *
+                          tipoCambio
+                        : null
+            })
         );
-
-
-        const cotizacion =
-            await this.repository
-                .obtenerCotizacionPorId(
-                    idCotizacion
-                );
-
-        if (!cotizacion) {
-            throw new Error(
-                "Cotización no encontrada"
-            );
-        }
-
-
-        this.validarActualizacion(data);
-
-
-        const actualizado =
-            await this.repository
-                .actualizarCotizacion(
-                    idCotizacion,
-                    {
-                        estado:
-                            data.estado?.trim(),
-
-                        costoMateriales:
-                            data.costoMateriales,
-
-                        costoManoObra:
-                            data.costoManoObra,
-
-                        totalCotizacion:
-                            data.totalCotizacion,
-
-                        precioEstimado:
-                            data.precioEstimado,
-
-                        observaciones:
-                            data.observaciones !== undefined
-                                ? data.observaciones?.trim() || null
-                                : undefined,
-                    }
-                );
-
-
-        if (!actualizado) {
-            throw new Error(
-                "No se pudo actualizar la cotización"
-            );
-        }
     }
 
 
     // =========================================================
-    // ELIMINAR
+    // ELIMINAR COTIZACIÓN
     // =========================================================
 
     public async eliminarCotizacion(
@@ -431,7 +732,6 @@ export class CotizacionService {
             "El id de la cotización no es válido"
         );
 
-
         const cotizacion =
             await this.repository
                 .obtenerCotizacionPorId(
@@ -444,78 +744,15 @@ export class CotizacionService {
             );
         }
 
-
         const eliminado =
             await this.repository
                 .eliminarCotizacion(
                     idCotizacion
                 );
 
-
         if (!eliminado) {
             throw new Error(
                 "No se pudo eliminar la cotización"
-            );
-        }
-    }
-
-
-    // =========================================================
-    // VALIDAR ACTUALIZACIÓN
-    // =========================================================
-
-    private validarActualizacion(
-        data: ActualizarCotizacionDTO
-    ): void {
-
-        if (Object.keys(data).length === 0) {
-            throw new Error(
-                "Debe enviar al menos un campo para actualizar"
-            );
-        }
-
-
-        if (data.estado !== undefined) {
-            this.validarEstado(
-                data.estado
-            );
-        }
-
-
-        if (data.costoMateriales !== undefined) {
-            this.validarCosto(
-                data.costoMateriales,
-                "El costo de materiales"
-            );
-        }
-
-
-        if (data.costoManoObra !== undefined) {
-            this.validarCosto(
-                data.costoManoObra,
-                "El costo de mano de obra"
-            );
-        }
-
-
-        if (data.totalCotizacion !== undefined) {
-            this.validarCosto(
-                data.totalCotizacion,
-                "El total de la cotización"
-            );
-        }
-
-
-        if (data.precioEstimado !== undefined) {
-            this.validarPrecio(
-                data.precioEstimado
-            );
-        }
-
-
-        if (data.observaciones !== undefined) {
-            this.validarObservaciones(
-                data.observaciones
             );
         }
     }
@@ -532,20 +769,17 @@ export class CotizacionService {
         const estadoNormalizado =
             estado.trim();
 
-
         if (!estadoNormalizado) {
             throw new Error(
                 "El estado de la cotización no puede estar vacío"
             );
         }
 
-
         const esValido =
             ESTADOS_VALIDOS.includes(
                 estadoNormalizado as
                     (typeof ESTADOS_VALIDOS)[number]
             );
-
 
         if (!esValido) {
             throw new Error(
@@ -588,7 +822,6 @@ export class CotizacionService {
             return;
         }
 
-
         if (
             typeof precio !== "number" ||
             !Number.isFinite(precio) ||
@@ -612,7 +845,6 @@ export class CotizacionService {
         if (observaciones === null) {
             return;
         }
-
 
         if (
             observaciones.trim().length > 1000

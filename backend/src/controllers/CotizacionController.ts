@@ -122,24 +122,62 @@ export class CotizacionController {
     req: Request,
     res: Response
   ): Promise<void> => {
+
     try {
+
       const idCotizacion = Number(
         req.params.idCotizacion
       );
 
-      await this.service.actualizarCotizacion(
-        idCotizacion,
-        req.body
-      );
+      const nuevoIdCotizacion =
+        await this.service.actualizarCotizacion(
+          idCotizacion,
+          req.body
+        );
 
       res.status(200).json({
-        mensaje: "Cotización actualizada correctamente",
+        mensaje:
+          "Cotización actualizada correctamente",
+
+        idCotizacion:
+          nuevoIdCotizacion,
+      });
+
+    } catch (error: unknown) {
+
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al actualizar la cotización";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
+
+  // POST /api/cotizaciones/generar/:idProyecto
+  public generarCotizacion = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idProyecto = Number(req.params.idProyecto);
+
+      const idCotizacion =
+        await this.service.generarCotizacion(idProyecto);
+
+      res.status(201).json({
+        mensaje: "Cotización generada correctamente",
+        idCotizacion,
       });
     } catch (error: unknown) {
       const mensaje =
         error instanceof Error
           ? error.message
-          : "Ocurrió un error al actualizar la cotización";
+          : "Ocurrió un error al generar la cotización";
 
       console.error(error);
 

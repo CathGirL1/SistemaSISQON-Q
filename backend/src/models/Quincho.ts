@@ -1,12 +1,23 @@
 import { Proyecto } from "./Proyecto";
-import { ITipoObraStrategy } from "../interfaces/ITipoObraStrategy";
+import {
+    ITipoObraStrategy,
+    MaterialParaCotizacion
+} from "../interfaces/ITipoObraStrategy";
+import { ResultadoCotizacion } from "../interfaces/ResultadoCotizacion";
 
 export class Quincho implements ITipoObraStrategy {
 
-    public calcularManoDeObra( proyecto: Proyecto): number {
+    public calcularCosto(
+        proyecto: Proyecto,
+        materiales: MaterialParaCotizacion[]
+    ): ResultadoCotizacion {
 
-        return 0;
 
+        return {
+            totalMateriales : 0,
+            manoDeObra : 0,
+            costoConstruccion : 0,
+            totalGeneral : 0
+        };
     }
-
 }

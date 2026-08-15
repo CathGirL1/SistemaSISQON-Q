@@ -40,4 +40,9 @@ router.delete(
     controller.eliminarCotizacion
 );
 
+router.post(
+  "/generar/:idProyecto",
+  controller.generarCotizacion
+);
+
 export default router;

@@ -10,7 +10,8 @@ export class Cotizacion {
     private _fechaActualizacion: Date | null,
     private _estado: string,
     private _precioEstimado: number | null,
-    private _observaciones: string | null
+    private _observaciones: string | null,
+    private _version: number = 1
   ) {}
 
   public get idCotizacion(): number | null {
@@ -100,6 +101,14 @@ export class Cotizacion {
   public set observaciones(value: string | null) {
     this._observaciones = value;
   }
+
+  public get version(): number {
+    return this._version;
+  }
+
+  public set version(value: number) {
+    this._version = value;
+  }
 }
 
 
@@ -115,6 +124,7 @@ export interface CrearCotizacionDTO {
   totalCotizacion: number;
   precioEstimado: number | null;
   observaciones: string | null;
+  version: number;
 }
 
 
