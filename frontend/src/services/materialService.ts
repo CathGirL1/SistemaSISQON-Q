@@ -12,6 +12,7 @@ export type MaterialApi = {
   descripcion: string | null;
   stock: number;
   costoUnitario: number;
+  costoUnitarioUYU: number;
   categoria: string | null;
   unidad: string | null;
   ultimaActualizacion: string;
@@ -79,14 +80,21 @@ const transformarMaterial = (
     unidad,
 
     costoUnitario: Number(material.costoUnitario),
+
+    costoUnitarioUYU: Number(
+      material.costoUnitarioUYU
+    ),
+
     stockCantidad: Number(material.stock),
 
     imagenUrl: material.imagenUrl ?? "",
 
     precioActual: formatearPrecio(
-      Number(material.costoUnitario)
+      Number(material.costoUnitarioUYU)
     ),
+
     precioDetalle: `por ${unidad.toLowerCase()}`,
+
     ultimaActualizacion: formatearFecha(
       material.ultimaActualizacion
     ),

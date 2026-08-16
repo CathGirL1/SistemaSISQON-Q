@@ -20,6 +20,7 @@ interface Material {
   imagen: string;
 
   precio: number;
+  precioUYU: number;
   unidad: string;
 
   disponibilidad: string;
@@ -86,6 +87,8 @@ export default function CatalogoMateriales() {
           imagen: material.imagenUrl,
 
           precio: material.costoUnitario,
+          precioUYU: material.costoUnitarioUYU,
+          
           unidad: material.unidad,
 
           disponibilidad: material.disponibilidad,
@@ -338,11 +341,16 @@ export default function CatalogoMateriales() {
 
                     <div className="material-price">
                       <strong>
-                        $
-                        {material.precio.toLocaleString(
-                          "es-UY"
-                        )}
+                        {material.precioUYU.toLocaleString("es-UY")} UYU
                       </strong>
+
+                      <span>
+                        (
+                        {material.precio.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })} USD)
+                      </span>
 
                       <span>
                         por {material.unidad}

@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import ActualizarCotizacion from "../../components/cliente/ActualizarCotizacion";
+import EnviarCotizacion from "../../components/cliente/EnviarCotizacion";
 
 import {
   formatearPrecioUYU,
@@ -651,16 +652,11 @@ export default function MisCotizaciones() {
 
                               </button>
 
-                              <button
-                                type="button"
-                                disabled
-                              >
-
-                                <Send size={16} />
-
-                                Enviar
-
-                              </button>
+                              <EnviarCotizacion
+                                idCotizacion={cotizacion.idCotizacion}
+                                estado={cotizacion.estado}
+                                onEnviada={obtenerCotizaciones}
+                              />
 
                               <button
                                 type="button"
