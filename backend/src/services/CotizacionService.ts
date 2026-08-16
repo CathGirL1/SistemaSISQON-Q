@@ -671,6 +671,69 @@ export class CotizacionService {
         return resultado[0];
     }
 
+    public async enviarCotizacion(
+        idCotizacion: number,
+        idEmpresa: number
+        ): Promise<void> {
+        const enviada =
+            await this.repository.enviarCotizacion(
+            idCotizacion,
+            idEmpresa
+            );
+
+        if (!enviada) {
+            throw new Error(
+            "No se pudo enviar la cotización"
+            );
+        }
+    }
+
+    // =========================================================
+    // OBTENER COTIZACIONES POR EMPRESA
+    // =========================================================
+
+    public async obtenerCotizacionesPorEmpresa(
+        idEmpresa: number
+    ) {
+
+        this.validarId(
+            idEmpresa,
+            "El id de la empresa no es válido"
+        );
+
+        const cotizaciones =
+            await this.repository
+                .obtenerCotizacionesPorEmpresa(
+                    idEmpresa
+                );
+
+        const tipoCambio =
+            await this.monedaService
+                .obtenerDolarAPesoUruguayo();
+
+        return cotizaciones.map((cotizacion) => {
+
+            const precioEstimadoUYU =
+                cotizacion.precioEstimado !== null
+                    ? Number(cotizacion.precioEstimado) *
+                    tipoCambio
+                    : null;
+
+            return {
+
+                ...cotizacion,
+
+                moneda: "USD",
+
+                tipoCambio,
+
+                precioEstimadoUYU,
+
+            };
+
+        });
+    }
+
 
     // =========================================================
     // AGREGAR CONVERSIÓN USD → UYU

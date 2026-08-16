@@ -22,6 +22,10 @@ router.get(
     controller.obtenerCotizacionesPorProyecto
 );
 
+router.get(
+  "/empresa/:idEmpresa",
+  controller.obtenerCotizacionesPorEmpresa
+);
 
 router.get(
     "/:idCotizacion",
@@ -43,6 +47,11 @@ router.delete(
 router.post(
   "/generar/:idProyecto",
   controller.generarCotizacion
+);
+
+router.put(
+  "/:idCotizacion/enviar",
+  controller.enviarCotizacion
 );
 
 export default router;

@@ -217,4 +217,70 @@ export class CotizacionController {
       });
     }
   };
+
+  // GET /api/cotizaciones/empresa/:idEmpresa
+  public obtenerCotizacionesPorEmpresa = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idEmpresa = Number(
+        req.params.idEmpresa
+      );
+
+      const cotizaciones =
+        await this.service.obtenerCotizacionesPorEmpresa(
+          idEmpresa
+        );
+
+      res.status(200).json(cotizaciones);
+
+    } catch (error: unknown) {
+
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al obtener las cotizaciones de la empresa";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
+
+
+  public enviarCotizacion = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idCotizacion = Number(
+        req.params.idCotizacion
+      );
+
+      const { idEmpresa } = req.body;
+
+      await this.service.enviarCotizacion(
+        idCotizacion,
+        Number(idEmpresa)
+      );
+
+      res.status(200).json({
+        mensaje: "Cotización enviada correctamente",
+      });
+    } catch (error: unknown) {
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al enviar la cotización";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
 }

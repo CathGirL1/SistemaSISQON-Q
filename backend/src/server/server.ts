@@ -9,6 +9,7 @@ import loginRoutes from "../routes/loginUsuario";
 import recuperacionAcceso from "../routes/RecuperacionAcceso";
 import materialRoutes from "../routes/materialRoutes";
 import clienteRoutes from "../routes/clienteRoutes";
+import empresaRoutes from "../routes/empresaRoutes";
 import tipoObraRoutes from "../routes/tipoObraRoutes";
 import manoObraRoutes from "../routes/ManoObraRoutes";
 
@@ -16,7 +17,7 @@ import manoObraRoutes from "../routes/ManoObraRoutes";
 import proyectoRoutes from "../routes/proyectoRoutes";
 import cotizacionRoutes from "../routes/CotizacionRoutes";
 import materialProyectoRoutes from "../routes/MaterialProyectoRoutes";
-import monedaRoutes from "../routes/MonedaRoutes";
+import monedaRoutes from "../routes/monedaRoutes";
 
 
 import { connectDB } from "./database";
@@ -42,6 +43,7 @@ servidor.use("/api/login", loginRoutes);
 servidor.use("/api/recuperacionAcceso", recuperacionAcceso);
 servidor.use("/api/materiales", materialRoutes);
 servidor.use("/api/clientes", clienteRoutes);
+servidor.use("/api/empresas", empresaRoutes);
 servidor.use("/api/tipos-obra",tipoObraRoutes);
 servidor.use("/api/mano-obra", manoObraRoutes);
 

@@ -2,6 +2,7 @@ export class Cotizacion {
   constructor(
     private _idCotizacion: number | null,
     private _idProyecto: number,
+    private _idEmpresa: number | null,
     private _fechaRealizada: Date | null,
     private _costoMateriales: number,
     private _costoManoObra: number,
@@ -118,6 +119,7 @@ export class Cotizacion {
 
 export interface CrearCotizacionDTO {
   idProyecto: number;
+  idEmpresa?: number | null;
   estado: string;
   costoMateriales: number;
   costoManoObra: number;
@@ -133,6 +135,7 @@ export interface CrearCotizacionDTO {
 // ======================================================
 
 export interface ActualizarCotizacionDTO {
+  idEmpresa?: number | null;
   estado?: string;
   costoMateriales?: number;
   costoManoObra?: number;
