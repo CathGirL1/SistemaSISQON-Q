@@ -18,7 +18,8 @@ import {
   actualizarCliente,
   crearCliente,
   eliminarCliente,
-  obtenerClientes,
+  obtenerClientesPorEmpresa,
+  obtenerHistorialCotizacionesCliente,
 } from "../../../services/clienteService";
 
 import type {
@@ -40,6 +41,9 @@ export default function ClientesEmpresaContenido() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
+  const [busqueda, setBusqueda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("");
+  const [filtroCiudad, setFiltroCiudad] = useState("");
   const [modalCrear, setModalCrear] = useState(false);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalNota, setModalNota] = useState(false);
@@ -48,49 +52,147 @@ export default function ClientesEmpresaContenido() {
 
   const cargarClientes = useCallback(async () => {
     try {
-      setCargando(true);
-      setError("");
+    setCargando(true);
+    setError("");
 
-      const clientesObtenidos = await obtenerClientes();
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario") || "{}"
+    );
 
-      setClientes(clientesObtenidos);
+    const idEmpresa = usuario.idEmpresa;
 
-      setClienteSeleccionado((seleccionActual) => {
-        if (clientesObtenidos.length === 0) {
-          return null;
-        }
+    if (!idEmpresa) {
+      throw new Error(
+        "No se pudo identificar la empresa autenticada."
+      );
+    }
 
-        if (seleccionActual) {
-          const clienteActualizado = clientesObtenidos.find(
-            (cliente) => cliente.id === seleccionActual.id
+    const clientesObtenidos =
+      await obtenerClientesPorEmpresa(idEmpresa);
+
+    const clientesConHistorial =
+      await Promise.all(
+        clientesObtenidos.map(async (cliente) => {
+          try {
+            const historial =
+              await obtenerHistorialCotizacionesCliente(
+                cliente.id,
+                idEmpresa
+              );
+
+            return {
+              ...cliente,
+
+              historialCotizaciones: historial,
+
+              historial:
+                historial.length === 0
+                  ? "Sin cotizaciones"
+                  : historial.length === 1
+                    ? "1 cotización"
+                    : `${historial.length} cotizaciones`,
+
+              ultimaCotizacion:
+                historial.length > 0
+                  ? historial[0].fecha
+                  : "Sin registros",
+            };
+          } catch (error) {
+            console.error(
+              `Error al cargar historial del cliente ${cliente.id}:`,
+              error
+            );
+
+            return cliente;
+          }
+        })
+      );
+
+    setClientes(clientesConHistorial);
+
+    setClienteSeleccionado((seleccionActual) => {
+      if (clientesConHistorial.length === 0) {
+        return null;
+      }
+
+      if (seleccionActual) {
+        const clienteActualizado =
+          clientesConHistorial.find(
+            (cliente) =>
+              cliente.id === seleccionActual.id
           );
 
-          if (clienteActualizado) {
-            return clienteActualizado;
-          }
+        if (clienteActualizado) {
+          return clienteActualizado;
         }
+      }
 
-        return clientesObtenidos[0];
-      });
+      return clientesConHistorial[0];
+    });
     } catch (errorDesconocido) {
-      console.error(
-        "Error al cargar clientes:",
-        errorDesconocido
-      );
+    console.error(
+      "Error al cargar clientes:",
+      errorDesconocido
+    );
 
-      setError(
-        errorDesconocido instanceof Error
-          ? errorDesconocido.message
-          : "Ocurrió un error al cargar los clientes."
-      );
+    setError(
+      errorDesconocido instanceof Error
+        ? errorDesconocido.message
+        : "Ocurrió un error al cargar los clientes."
+    );
     } finally {
-      setCargando(false);
+    setCargando(false);
     }
   }, []);
 
   useEffect(() => {
     cargarClientes();
   }, [cargarClientes]);
+
+  const ciudades = Array.from(
+  new Set(
+    clientes
+      .map((cliente) => cliente.ciudad)
+      .filter(
+        (ciudad) =>
+          ciudad &&
+          ciudad.trim().length > 0
+      )
+    )
+  ).sort();
+
+  const clientesFiltrados = clientes.filter(
+  (cliente) => {
+    const textoBusqueda =
+      `${cliente.nombre} ${cliente.email} ${cliente.telefono}`
+        .toLowerCase();
+
+    const coincideBusqueda =
+      textoBusqueda.includes(
+        busqueda.toLowerCase().trim()
+      );
+
+    const coincideEstado =
+      !filtroEstado ||
+      cliente.estado === filtroEstado;
+
+    const coincideCiudad =
+      !filtroCiudad ||
+      cliente.ciudad === filtroCiudad;
+
+    return (
+      coincideBusqueda &&
+      coincideEstado &&
+      coincideCiudad
+    );
+    }
+  );
+
+  const limpiarFiltros = () => {
+  setBusqueda("");
+  setFiltroEstado("");
+  setFiltroCiudad("");
+  };
 
   const abrirEditar = (cliente: ClienteEmpresa) => {
     setClienteAccion(cliente);
@@ -102,9 +204,66 @@ export default function ClientesEmpresaContenido() {
     setModalNota(true);
   };
 
-  const abrirHistorial = (cliente: ClienteEmpresa) => {
-    setClienteAccion(cliente);
+  const abrirHistorial = async (
+  cliente: ClienteEmpresa
+  ) => {
+  try {
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario") || "{}"
+    );
+
+    const idEmpresa = usuario.idEmpresa;
+
+    if (!idEmpresa) {
+      throw new Error(
+        "No se pudo identificar la empresa autenticada."
+      );
+    }
+
+    const historial =
+      await obtenerHistorialCotizacionesCliente(
+        cliente.id,
+        idEmpresa
+      );
+
+    const clienteConHistorial: ClienteEmpresa = {
+      ...cliente,
+      historialCotizaciones: historial,
+      historial:
+        historial.length === 0
+          ? "Sin cotizaciones"
+          : historial.length === 1
+            ? "1 cotización"
+            : `${historial.length} cotizaciones`,
+      ultimaCotizacion:
+        historial.length > 0
+          ? historial[0].fecha
+          : "Sin registros",
+    };
+
+    setClienteAccion(clienteConHistorial);
+
+    setClientes((listaActual) =>
+      listaActual.map((item) =>
+        item.id === cliente.id
+          ? clienteConHistorial
+          : item
+      )
+    );
+
+    if (clienteSeleccionado?.id === cliente.id) {
+      setClienteSeleccionado(
+        clienteConHistorial
+      );
+    }
+
     setModalHistorial(true);
+    } catch (errorDesconocido) {
+    console.error(
+      "Error al obtener historial:",
+      errorDesconocido
+    );
+    }
   };
 
   const abrirEliminar = (cliente: ClienteEmpresa) => {
@@ -248,27 +407,93 @@ export default function ClientesEmpresaContenido() {
 
     cerrarModales();
   };
+   const seleccionarCliente = async (
+    cliente: ClienteEmpresa
+    ) => {
+    try {
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario") || "{}"
+    );
+
+    const idEmpresa = usuario.idEmpresa;
+
+    if (!idEmpresa) {
+      throw new Error(
+        "No se pudo identificar la empresa autenticada."
+      );
+    }
+
+    const historial =
+      await obtenerHistorialCotizacionesCliente(
+        cliente.id,
+        idEmpresa
+      );
+
+    const clienteConHistorial: ClienteEmpresa = {
+      ...cliente,
+      historialCotizaciones: historial,
+      historial:
+        historial.length === 0
+          ? "Sin cotizaciones"
+          : historial.length === 1
+            ? "1 cotización"
+            : `${historial.length} cotizaciones`,
+      ultimaCotizacion:
+        historial.length > 0
+          ? historial[0].fecha
+          : "Sin registros",
+    };
+
+    setClientes((listaActual) =>
+      listaActual.map((item) =>
+        item.id === cliente.id
+          ? clienteConHistorial
+          : item
+      )
+    );
+
+    setClienteSeleccionado(
+      clienteConHistorial
+    );
+    } catch (errorDesconocido) {
+    console.error(
+      "Error al cargar historial:",
+      errorDesconocido
+    );
+
+    setClienteSeleccionado(cliente);
+    }
+   };
 
   return (
     <section className="clientes-page">
       <PageHeader
         title="Gestión de clientes"
         subtitle="Administra la información de tus clientes y su historial de cotizaciones."
-        buttonText="Agregar cliente"
-        onButtonClick={() => setModalCrear(true)}
       />
 
-      <ClientesKPIs />
+  <ClientesKPIs
+    clientes={clientes}
+  />
 
-      <ClientesFiltros />
+  <ClientesFiltros
+    busqueda={busqueda}
+    estado={filtroEstado}
+    ciudad={filtroCiudad}
+    ciudades={ciudades}
+    onBusquedaChange={setBusqueda}
+    onEstadoChange={setFiltroEstado}
+    onCiudadChange={setFiltroCiudad}
+    onLimpiarFiltros={limpiarFiltros}
+  />
 
       <div className="clientes-main-grid">
         <TablaClientes
-          clientes={clientes}
+          clientes={clientesFiltrados}
           clienteSeleccionado={clienteSeleccionado}
           cargando={cargando}
           error={error}
-          onSeleccionarCliente={setClienteSeleccionado}
+          onSeleccionarCliente={seleccionarCliente}
           onWhatsapp={abrirWhatsapp}
           onEditar={abrirEditar}
           onAgregarNota={abrirNota}
@@ -280,6 +505,10 @@ export default function ClientesEmpresaContenido() {
         {clienteSeleccionado ? (
           <ClienteDetallePanel
             cliente={clienteSeleccionado}
+            onCerrar={() =>
+              setClienteSeleccionado(null)
+            }
+            onVerHistorial={abrirHistorial}
           />
         ) : (
           <aside className="cliente-detalle-vacio">
@@ -341,4 +570,6 @@ export default function ClientesEmpresaContenido() {
       />
     </section>
   );
+
+ 
 }
