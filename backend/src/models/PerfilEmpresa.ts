@@ -16,6 +16,22 @@ export interface PerfilEmpresa {
   descripcion: string;
   logo: string;
 
+  zonasTrabajo: string;
+
+  condicionesComerciales: string;
+
+  textoLegal: string;
+
+  impuestos: string;
+  validezCotizacion: number;
+
+  diasLaborables: string;
+
+  horarioInicio: string;
+  horarioFin: string;
+
+  idiomaDocumentos: string;
+
   fechaRegistro: Date | null;
 }
 
@@ -32,5 +48,22 @@ export interface ActualizarPerfilEmpresaDTO {
 
   paginaWeb: string;
   descripcion: string;
+
+  zonasTrabajo: string;
+
+  condicionesComerciales: string;
+
+  textoLegal: string;
+
+  impuestos: string;
+  validezCotizacion: number;
+
+  diasLaborables: string;
+
+  horarioInicio: string;
+  horarioFin: string;
+
+  idiomaDocumentos: string;
+
   logo?: string;
 }

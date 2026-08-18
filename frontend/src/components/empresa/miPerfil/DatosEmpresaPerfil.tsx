@@ -7,7 +7,9 @@ interface Props {
   empresa: Empresa;
 
   handleChange: (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
+    >
   ) => void;
 
   handleCancelar: () => void;
@@ -29,8 +31,8 @@ export default function DatosEmpresaPerfil({
         <h2>Datos de la empresa</h2>
 
         <p>
-          Administrá la información principal de tu empresa utilizada dentro del
-          sistema.
+          Administrá la información principal de tu empresa
+          utilizada dentro del sistema.
         </p>
       </div>
 
@@ -143,6 +145,130 @@ export default function DatosEmpresaPerfil({
             onChange={handleChange}
             rows={4}
             placeholder="Descripción de la empresa"
+          />
+        </div>
+
+        <div className="perfil-seccion">
+          <h3>Zonas de trabajo</h3>
+        </div>
+
+        <div className="form-group full">
+          <label>Zonas de trabajo</label>
+
+          <textarea
+            name="zonasTrabajo"
+            value={empresa.zonasTrabajo}
+            onChange={handleChange}
+            rows={3}
+            placeholder="Ej.: Maldonado, Punta del Este, San Carlos"
+          />
+        </div>
+
+        <div className="perfil-seccion">
+          <h3>Condiciones comerciales</h3>
+        </div>
+
+        <div className="form-group full">
+          <label>Condiciones comerciales</label>
+
+          <textarea
+            name="condicionesComerciales"
+            value={empresa.condicionesComerciales}
+            onChange={handleChange}
+            rows={4}
+            placeholder="Condiciones comerciales de la empresa"
+          />
+        </div>
+
+        <div className="perfil-seccion">
+          <h3>
+            Texto legal o aclaraciones del presupuesto
+          </h3>
+        </div>
+
+        <div className="form-group full">
+          <label>Texto legal</label>
+
+          <textarea
+            name="textoLegal"
+            value={empresa.textoLegal}
+            onChange={handleChange}
+            rows={4}
+            placeholder="Aclaraciones legales del presupuesto"
+          />
+        </div>
+
+        <div className="perfil-seccion">
+          <h3>Configuración adicional</h3>
+        </div>
+
+        <div className="form-group">
+          <label>Impuestos</label>
+
+          <input
+            type="text"
+            name="impuestos"
+            value={empresa.impuestos}
+            onChange={handleChange}
+            placeholder="IVA incluido"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Validez de la cotización (días)</label>
+
+          <input
+            type="number"
+            name="validezCotizacion"
+            value={empresa.validezCotizacion}
+            onChange={handleChange}
+            placeholder="30"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Días laborables</label>
+
+          <input
+            type="text"
+            name="diasLaborables"
+            value={empresa.diasLaborables}
+            onChange={handleChange}
+            placeholder="Lunes a viernes"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Horario de inicio</label>
+
+          <input
+            type="time"
+            name="horarioInicio"
+            value={empresa.horarioInicio}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Horario de finalización</label>
+
+          <input
+            type="time"
+            name="horarioFin"
+            value={empresa.horarioFin}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Idioma</label>
+
+          <input
+            type="text"
+            name="idiomaDocumentos"
+            value={empresa.idiomaDocumentos}
+            onChange={handleChange}
+            placeholder="Español"
           />
         </div>
 

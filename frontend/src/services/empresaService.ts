@@ -21,6 +21,24 @@ interface EmpresaApi {
 
   logo: string | null;
 
+  zonasTrabajo: string;
+
+  condicionesComerciales: string;
+
+  textoLegal: string;
+
+  impuestos: string;
+
+  validezCotizacion: number;
+
+  diasLaborables: string;
+
+  horarioInicio: string;
+
+  horarioFin: string;
+
+  idiomaDocumentos: string;
+
   fechaRegistro: string | null;
 }
 
@@ -100,6 +118,32 @@ function convertirEmpresa(api: EmpresaApi): Empresa {
     fechaRegistro: formatearFecha(
       api.fechaRegistro
     ),
+
+    zonasTrabajo: api.zonasTrabajo ?? "",
+
+    condicionesComerciales:
+      api.condicionesComerciales ?? "",
+
+    textoLegal:
+      api.textoLegal ?? "",
+
+    impuestos:
+      api.impuestos ?? "",
+
+    validezCotizacion:
+      api.validezCotizacion ?? 30,
+
+    diasLaborables:
+      api.diasLaborables ?? "",
+
+    horarioInicio:
+      api.horarioInicio ?? "",
+
+    horarioFin:
+      api.horarioFin ?? "",
+
+    idiomaDocumentos:
+      api.idiomaDocumentos ?? "",
   };
 }
 
@@ -156,6 +200,32 @@ export async function actualizarEmpresa(
         descripcion: empresa.descripcion,
 
         logo: empresa.logo,
+
+        zonasTrabajo: empresa.zonasTrabajo,
+
+        condicionesComerciales:
+          empresa.condicionesComerciales,
+
+        textoLegal:
+          empresa.textoLegal,
+
+        impuestos:
+          empresa.impuestos,
+
+        validezCotizacion:
+          empresa.validezCotizacion,
+
+        diasLaborables:
+          empresa.diasLaborables,
+
+        horarioInicio:
+          empresa.horarioInicio,
+
+        horarioFin:
+          empresa.horarioFin,
+
+        idiomaDocumentos:
+          empresa.idiomaDocumentos,
       }),
     }
   );

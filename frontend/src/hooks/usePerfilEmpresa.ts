@@ -30,6 +30,24 @@ const empresaVacia: Empresa = {
   logo: "",
 
   fechaRegistro: "",
+
+  zonasTrabajo: "",
+
+  condicionesComerciales: "",
+
+  textoLegal: "",
+
+  impuestos: "",
+
+  validezCotizacion: 30,
+
+  diasLaborables: "",
+
+  horarioInicio: "",
+
+  horarioFin: "",
+
+  idiomaDocumentos: "",
 };
 
 export default function usePerfilEmpresa() {

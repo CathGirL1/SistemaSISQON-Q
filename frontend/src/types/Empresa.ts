@@ -18,4 +18,22 @@ export interface Empresa {
   logo?: string;
 
   fechaRegistro?: string;
+
+  zonasTrabajo: string;
+
+  condicionesComerciales: string;
+
+  textoLegal: string;
+
+  impuestos: string;
+
+  validezCotizacion: number;
+
+  diasLaborables: string;
+
+  horarioInicio: string;
+
+  horarioFin: string;
+
+  idiomaDocumentos: string;
 }
