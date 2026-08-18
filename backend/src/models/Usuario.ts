@@ -9,7 +9,7 @@ export class Usuario implements IAutenticacion{
         private nombreUsuario : string, 
         private rol : string,
         private gmail : string, 
-        private telefono : number, 
+        private telefono : string, 
         private contrasenia : string,
         private direccion : string
 

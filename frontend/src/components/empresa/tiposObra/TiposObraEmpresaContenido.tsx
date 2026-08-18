@@ -17,6 +17,14 @@ import useTiposObra from "../../../hooks/useTiposObra";
 export default function TiposObraEmpresaContenido() {
   const {
     tiposObra,
+    tiposObraFiltrados,
+
+    busqueda,
+    estadoFiltro,
+
+    setBusqueda,
+    setEstadoFiltro,
+
     tipoSeleccionado,
     tipoAccion,
 
@@ -35,7 +43,7 @@ export default function TiposObraEmpresaContenido() {
     toastTipo,
 
     seleccionarTipoObra,
-
+    limpiarSeleccion,
     abrirCrear,
     abrirEditar,
     abrirObservaciones,
@@ -59,9 +67,14 @@ export default function TiposObraEmpresaContenido() {
         onButtonClick={abrirCrear}
       />
 
-      <TiposObraKPIs />
+    <TiposObraKPIs tiposObra={tiposObra} />
 
-      <TiposObraFiltros />
+      <TiposObraFiltros
+        busqueda={busqueda}
+        estado={estadoFiltro}
+        onBusquedaChange={setBusqueda}
+        onEstadoChange={setEstadoFiltro}
+      />
 
       {cargando && (
         <div className="tipos-obra-vacio">
@@ -78,7 +91,7 @@ export default function TiposObraEmpresaContenido() {
       {!cargando && !error && (
         <div className="tipos-obra-main-grid">
           <TablaTiposObra
-            tiposObra={tiposObra}
+            tiposObra={tiposObraFiltrados}
             tipoSeleccionado={tipoSeleccionado}
             onSeleccionarTipo={seleccionarTipoObra}
             onEditar={abrirEditar}
@@ -88,13 +101,18 @@ export default function TiposObraEmpresaContenido() {
             onEliminar={abrirEliminar}
           />
 
-          {tipoSeleccionado ? (
+          {tipoSeleccionado &&
+          tiposObraFiltrados.some(
+            (tipo) => tipo.id === tipoSeleccionado.id
+          ) ? (
             <TipoObraDetallePanel
               tipoObra={tipoSeleccionado}
+              onCerrar={limpiarSeleccion}
             />
           ) : (
-            <div className="tipos-obra-vacio">
-              No hay tipos de obra registrados.
+            <div className="tipo-obra-detalle-vacio">
+              <h3>Seleccioná un tipo de obra</h3>
+              <p>Elegí un registro de la tabla para visualizar su información.</p>
             </div>
           )}
         </div>

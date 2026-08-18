@@ -19,7 +19,18 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
+import useEmpresa from "../hooks/useEmpresa";
+
 export default function SidebarEmpresa() {
+  const { empresa } = useEmpresa();
+
+  const nombreEmpresa =
+    empresa?.nombreComercial ||
+    empresa?.razonSocial ||
+    "Empresa";
+
+  const inicial = nombreEmpresa.charAt(0).toUpperCase();
+
   return (
     <aside className="sidebar-empresa">
       <div className="sidebar-logo">
@@ -108,10 +119,20 @@ export default function SidebarEmpresa() {
       </div>
 
       <div className="sidebar-user">
-        <div className="sidebar-avatar">E</div>
+        <div className="sidebar-avatar">
+          {empresa?.logo ? (
+            <img
+              src={empresa.logo}
+              alt={nombreEmpresa}
+              className="sidebar-avatar-img"
+            />
+          ) : (
+            inicial
+          )}
+        </div>
 
         <div className="sidebar-user-info">
-          <h4>Empresa Demo</h4>
+          <h4>{nombreEmpresa}</h4>
           <p>Administrador</p>
         </div>
 
@@ -122,3 +143,4 @@ export default function SidebarEmpresa() {
     </aside>
   );
 }
+

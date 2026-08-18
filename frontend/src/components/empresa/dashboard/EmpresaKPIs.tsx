@@ -3,10 +3,27 @@ import {
   FaUsers,
   FaFolderOpen,
   FaDollarSign,
-  FaArrowUp,
 } from "react-icons/fa";
 
-export default function EmpresaKPIs() {
+import type {
+  KPIsDashboard,
+} from "../../../interfaces/Dashboard";
+
+type Props = {
+  kpis: KPIsDashboard;
+};
+
+function formatearMoneda(valor: number): string {
+  return new Intl.NumberFormat("es-UY", {
+    style: "currency",
+    currency: "UYU",
+    maximumFractionDigits: 0,
+  }).format(valor);
+}
+
+export default function EmpresaKPIs({
+  kpis,
+}: Props) {
   return (
     <div className="dashboard-kpis">
       <div className="kpi-card">
@@ -16,8 +33,8 @@ export default function EmpresaKPIs() {
 
         <div>
           <p>Cotizaciones</p>
-          <h3>128</h3>
-          <span><FaArrowUp /> 12% este mes</span>
+          <h3>{kpis.cotizaciones}</h3>
+          <span>Total registrado</span>
         </div>
       </div>
 
@@ -28,8 +45,8 @@ export default function EmpresaKPIs() {
 
         <div>
           <p>Clientes</p>
-          <h3>64</h3>
-          <span><FaArrowUp /> 8% este mes</span>
+          <h3>{kpis.clientes}</h3>
+          <span>Clientes registrados</span>
         </div>
       </div>
 
@@ -40,8 +57,8 @@ export default function EmpresaKPIs() {
 
         <div>
           <p>Proyectos activos</p>
-          <h3>21</h3>
-          <span><FaArrowUp /> 5 nuevos</span>
+          <h3>{kpis.proyectosActivos}</h3>
+          <span>En curso actualmente</span>
         </div>
       </div>
 
@@ -52,8 +69,14 @@ export default function EmpresaKPIs() {
 
         <div>
           <p>Ingresos estimados</p>
-          <h3>$ 842.500</h3>
-          <span><FaArrowUp /> 18% este mes</span>
+
+          <h3>
+            {formatearMoneda(
+              kpis.ingresosEstimados
+            )}
+          </h3>
+
+          <span>Total cotizado</span>
         </div>
       </div>
     </div>
