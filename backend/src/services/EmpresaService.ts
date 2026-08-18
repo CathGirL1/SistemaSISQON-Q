@@ -59,21 +59,50 @@ export class EmpresaService {
 
     this.validarEmpresa(empresa);
 
-    const empresaNormalizada: ActualizarPerfilEmpresaDTO = {
-      razonSocial: empresa.razonSocial.trim(),
-      nombreComercial: empresa.nombreComercial.trim(),
+  const empresaNormalizada: ActualizarPerfilEmpresaDTO = {
+    razonSocial: empresa.razonSocial.trim(),
+    nombreComercial: empresa.nombreComercial.trim(),
 
-      rut: empresa.rut.trim(),
-      rubro: empresa.rubro?.trim() || "",
+    rut: empresa.rut.trim(),
+    rubro: empresa.rubro?.trim() || "",
 
-      email: empresa.email?.trim().toLowerCase() || "",
-      telefono: empresa.telefono?.trim() || "",
-      direccion: empresa.direccion?.trim() || "",
+    email: empresa.email?.trim().toLowerCase() || "",
+    telefono: empresa.telefono?.trim() || "",
+    direccion: empresa.direccion?.trim() || "",
 
-      paginaWeb: empresa.paginaWeb?.trim() || "",
-      descripcion: empresa.descripcion?.trim() || "",
-      logo: empresa.logo?.trim() || "",
-    };
+    paginaWeb: empresa.paginaWeb?.trim() || "",
+    descripcion: empresa.descripcion?.trim() || "",
+
+    zonasTrabajo:
+      empresa.zonasTrabajo?.trim() || "",
+
+    condicionesComerciales:
+      empresa.condicionesComerciales?.trim() || "",
+
+    textoLegal:
+      empresa.textoLegal?.trim() || "",
+
+    impuestos:
+      empresa.impuestos?.trim() || "",
+
+    validezCotizacion:
+      empresa.validezCotizacion,
+
+    diasLaborables:
+      empresa.diasLaborables?.trim() || "",
+
+    horarioInicio:
+      empresa.horarioInicio?.trim() || "",
+
+    horarioFin:
+      empresa.horarioFin?.trim() || "",
+
+    idiomaDocumentos:
+      empresa.idiomaDocumentos?.trim() || "",
+
+    logo:
+      empresa.logo?.trim() || "",
+  };
 
     try {
       const empresaActualizada =

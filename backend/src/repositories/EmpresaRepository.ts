@@ -8,7 +8,7 @@ import type {
 } from "../models/PerfilEmpresa";
 
 interface PerfilEmpresaDB {
-  idEmpresa: number;
+idEmpresa: number;
   idUsuario: number;
 
   razonSocial: string;
@@ -23,7 +23,26 @@ interface PerfilEmpresaDB {
 
   paginaWeb: string;
   descripcion: string;
+
   logo: string;
+
+  zonasTrabajo: string;
+
+  condicionesComerciales: string;
+
+  textoLegal: string;
+
+  impuestos: string;
+
+  validezCotizacion: number;
+
+  diasLaborables: string;
+
+  horarioInicio: string;
+
+  horarioFin: string;
+
+  idiomaDocumentos: string;
 
   fechaRegistro: Date | null;
 }
@@ -55,6 +74,50 @@ export class EmpresaRepository {
           ISNULL(e.paginaWeb, '') AS paginaWeb,
           ISNULL(e.descripcion, '') AS descripcion,
           ISNULL(e.logo, '') AS logo,
+
+          ISNULL(e.zonasTrabajo, '') AS zonasTrabajo,
+
+          ISNULL(
+            e.condicionesComerciales,
+            ''
+          ) AS condicionesComerciales,
+
+          ISNULL(
+            e.textoLegal,
+            ''
+          ) AS textoLegal,
+
+          ISNULL(
+            e.impuestos,
+            ''
+          ) AS impuestos,
+
+          ISNULL(
+            e.validezCotizacion,
+            30
+          ) AS validezCotizacion,
+
+          ISNULL(
+            e.diasLaborables,
+            ''
+          ) AS diasLaborables,
+
+          ISNULL(
+            CONVERT(VARCHAR(5), e.horarioInicio, 108),
+            ''
+          ) AS horarioInicio,
+
+          ISNULL(
+            CONVERT(VARCHAR(5), e.horarioFin, 108),
+            ''
+          ) AS horarioFin,
+
+          ISNULL(
+            e.idiomaDocumentos,
+            ''
+          ) AS idiomaDocumentos,
+
+
 
           e.fechaRegistro
         FROM Empresa e
