@@ -62,10 +62,7 @@ export default function SidebarEmpresa() {
           <span>Clientes</span>
         </NavLink>
 
-        <NavLink to="/empresa/proyectos" className="sidebar-link">
-          <FaFolderOpen />
-          <span>Proyectos</span>
-        </NavLink>
+
 
         <p className="sidebar-section-title">Gestión</p>
 
@@ -89,16 +86,6 @@ export default function SidebarEmpresa() {
         <NavLink to="/empresa/reportes" className="sidebar-link">
           <FaChartBar />
           <span>Reportes</span>
-        </NavLink>
-
-        <NavLink to="/empresa/usuarios" className="sidebar-link">
-          <FaUserShield />
-          <span>Usuarios</span>
-        </NavLink>
-
-        <NavLink to="/empresa/configuracion" className="sidebar-link">
-          <FaCog />
-          <span>Configuración</span>
         </NavLink>
 
         <NavLink to="/empresa/perfil" className="sidebar-link">
