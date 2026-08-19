@@ -185,14 +185,89 @@ export default function DetalleCotizacionModal({
 
           <h3>Materiales</h3>
 
-          <div className="materiales-resumen">
+          {cotizacion.materiales &&
+          cotizacion.materiales.length > 0 ? (
 
-            <p>
-              {cotizacion.resumenMateriales ||
-                "Sin materiales agregados"}
-            </p>
+            <div className="materiales-tabla-container">
 
-          </div>
+              <table className="materiales-tabla">
+
+                <thead>
+                  <tr>
+                    <th>Material</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Subtotal</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {cotizacion.materiales.map(
+                    (material) => (
+
+                      <tr
+                        key={
+                          material.idMaterialProyecto
+                        }
+                      >
+
+                        <td>
+                          {material.nombre}
+                        </td>
+
+                        <td>
+                          {material.cantidad}{" "}
+                          {material.unidad}
+                        </td>
+
+                        <td>
+                          ${" "}
+                          {material.costoUnitario.toLocaleString(
+                            "es-UY",
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }
+                          )}
+                        </td>
+
+                        <td>
+                          <strong>
+                            ${" "}
+                            {material.subtotal.toLocaleString(
+                              "es-UY",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
+                          </strong>
+                        </td>
+
+                      </tr>
+
+                    )
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          ) : (
+
+            <div className="materiales-resumen">
+
+              <p>
+                {cotizacion.resumenMateriales ||
+                  "Sin materiales agregados"}
+              </p>
+
+            </div>
+
+          )}
 
         </section>
 

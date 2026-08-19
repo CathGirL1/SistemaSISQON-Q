@@ -64,6 +64,16 @@ export interface Cotizacion {
   // ==========================================
 
   resumenMateriales: string;
+  materiales: {
+    idMaterialProyecto: number;
+    idProyecto: number;
+    idMaterial: number;
+    cantidad: number;
+    nombre: string;
+    costoUnitario: number;
+    unidad: string | null;
+    subtotal: number;
+  }[];
 
   // ==========================================
   // EMPRESA

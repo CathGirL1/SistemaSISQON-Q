@@ -1,3 +1,4 @@
+
 import { CheckCircle } from "lucide-react";
 import {
   useEffect,
@@ -9,15 +10,26 @@ import {
   useParams,
 } from "react-router-dom";
 
+import {
+  formatearPrecioUSD,
+  formatearPrecioUYU,
+} from "../../utilities/formatoMoneda";
+
 import "../../styles/GenerarCotizacion.css";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000";
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:3000";
+
+// ======================================================
+// INTERFACES
+// ======================================================
 
 interface Cotizacion {
   idCotizacion: number;
   idProyecto: number;
   codigo: string;
+
   fechaCreacion: string;
   fechaActualizacion: string | null;
   fechaRealizada?: string | null;
@@ -28,6 +40,7 @@ interface Cotizacion {
   costoManoObra: number;
   totalCotizacion: number;
 
+  // Precio estimado original en USD
   precioEstimado: number | null;
 
   observaciones: string | null;
@@ -45,11 +58,15 @@ interface Cotizacion {
   superficie: number;
 
   moneda?: string;
+
+  // Puede venir desde el backend
   tipoCambio?: number;
 
   costoMaterialesUYU?: number;
   costoManoObraUYU?: number;
   totalCotizacionUYU?: number;
+
+  // Puede venir calculado desde el backend
   precioEstimadoUYU?: number | null;
 }
 
@@ -58,6 +75,10 @@ interface CotizacionCreadaResponse {
   mensaje: string;
 }
 
+// ======================================================
+// COMPONENTE
+// ======================================================
+
 export default function GenerarCotizacion() {
   const navigate = useNavigate();
   const { idProyecto } = useParams();
@@ -65,11 +86,73 @@ export default function GenerarCotizacion() {
   const [cotizacion, setCotizacion] =
     useState<Cotizacion | null>(null);
 
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState("");
+  const [tipoCambio, setTipoCambio] =
+    useState<number | null>(null);
+
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
   // Evita doble ejecución en React StrictMode
-  const cotizacionCreada = useRef(false);
+  const cotizacionCreada =
+    useRef(false);
+
+  // ====================================================
+  // OBTENER TIPO DE CAMBIO
+  // ====================================================
+
+  const obtenerTipoCambio = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/moneda/usd-uyu`
+      );
+
+      const data = await response.json();
+
+      console.log(
+        "RESPUESTA MONEDA:",
+        data
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          data.mensaje ||
+            "No se pudo obtener el tipo de cambio."
+        );
+      }
+
+      const cambio =
+        Number(data.valor);
+
+      if (
+        !Number.isFinite(cambio) ||
+        cambio <= 0
+      ) {
+        throw new Error(
+          "El tipo de cambio recibido no es válido."
+        );
+      }
+
+      setTipoCambio(cambio);
+
+      return cambio;
+
+    } catch (error) {
+
+      console.error(
+        "Error al obtener el tipo de cambio:",
+        error
+      );
+
+      throw error;
+    }
+  };
+
+  // ====================================================
+  // CREAR COTIZACIÓN
+  // ====================================================
 
   useEffect(() => {
     if (cotizacionCreada.current) {
@@ -79,10 +162,13 @@ export default function GenerarCotizacion() {
     cotizacionCreada.current = true;
 
     crearCotizacion();
+
   }, [idProyecto]);
 
   const crearCotizacion = async () => {
+
     try {
+
       setCargando(true);
       setError("");
 
@@ -92,9 +178,13 @@ export default function GenerarCotizacion() {
         );
       }
 
-      const proyectoId = Number(idProyecto);
+      const proyectoId =
+        Number(idProyecto);
 
-      if (!Number.isInteger(proyectoId) || proyectoId <= 0) {
+      if (
+        !Number.isInteger(proyectoId) ||
+        proyectoId <= 0
+      ) {
         throw new Error(
           "El ID del proyecto no es válido."
         );
@@ -105,19 +195,21 @@ export default function GenerarCotizacion() {
         proyectoId
       );
 
-      // =====================================================
+      // =================================================
       // 1. GENERAR COTIZACIÓN
-      // =====================================================
+      // =================================================
 
-      const response = await fetch(
-        `${API_URL}/api/cotizaciones/generar/${proyectoId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response =
+        await fetch(
+          `${API_URL}/api/cotizaciones/generar/${proyectoId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+          }
+        );
 
       const data: CotizacionCreadaResponse =
         await response.json();
@@ -134,14 +226,9 @@ export default function GenerarCotizacion() {
         );
       }
 
-      console.log(
-        "Cotización creada:",
-        data
-      );
-
-      // =====================================================
+      // =================================================
       // 2. OBTENER COTIZACIONES DEL PROYECTO
-      // =====================================================
+      // =================================================
 
       const cotizacionesResponse =
         await fetch(
@@ -149,6 +236,7 @@ export default function GenerarCotizacion() {
         );
 
       if (!cotizacionesResponse.ok) {
+
         const textoError =
           await cotizacionesResponse.text();
 
@@ -162,7 +250,8 @@ export default function GenerarCotizacion() {
         );
       }
 
-      const cotizaciones: Cotizacion[] =
+      const cotizaciones:
+        Cotizacion[] =
         await cotizacionesResponse.json();
 
       console.log(
@@ -170,9 +259,9 @@ export default function GenerarCotizacion() {
         cotizaciones
       );
 
-      // =====================================================
-      // 3. BUSCAR LA COTIZACIÓN RECIÉN CREADA
-      // =====================================================
+      // =================================================
+      // 3. BUSCAR LA COTIZACIÓN CREADA
+      // =================================================
 
       const cotizacionCompleta =
         cotizaciones.find(
@@ -192,15 +281,43 @@ export default function GenerarCotizacion() {
         cotizacionCompleta
       );
 
-      // =====================================================
-      // 4. GUARDAR COTIZACIÓN
-      // =====================================================
+      // =================================================
+      // 4. OBTENER TIPO DE CAMBIO
+      // =================================================
+
+      let cambio =
+        cotizacionCompleta.tipoCambio;
+
+      if (
+        !cambio ||
+        !Number.isFinite(
+          Number(cambio)
+        ) ||
+        Number(cambio) <= 0
+      ) {
+        cambio =
+          await obtenerTipoCambio();
+      } else {
+        cambio = Number(cambio);
+
+        setTipoCambio(cambio);
+      }
+
+      console.log(
+        "TIPO DE CAMBIO UTILIZADO:",
+        cambio
+      );
+
+      // =================================================
+      // 5. GUARDAR COTIZACIÓN
+      // =================================================
 
       setCotizacion(
         cotizacionCompleta
       );
 
     } catch (error) {
+
       console.error(
         "Error al crear cotización:",
         error
@@ -211,42 +328,96 @@ export default function GenerarCotizacion() {
           ? error.message
           : "No se pudo generar la cotización."
       );
+
     } finally {
+
       setCargando(false);
+
     }
   };
 
-  // =========================================================
+  // ====================================================
+  // PRECIO ESTIMADO USD
+  // ====================================================
+
+  const precioEstimadoUSD =
+    cotizacion?.precioEstimado !== null &&
+    cotizacion?.precioEstimado !== undefined
+      ? Number(
+          cotizacion.precioEstimado
+        )
+      : null;
+
+  // ====================================================
+  // PRECIO ESTIMADO UYU
+  // ====================================================
+
+  let precioEstimadoUYU:
+    number | null = null;
+
+  if (
+    cotizacion?.precioEstimadoUYU !==
+      null &&
+    cotizacion?.precioEstimadoUYU !==
+      undefined
+  ) {
+
+    precioEstimadoUYU =
+      Number(
+        cotizacion.precioEstimadoUYU
+      );
+
+  } else if (
+    precioEstimadoUSD !== null &&
+    tipoCambio !== null
+  ) {
+
+    precioEstimadoUYU =
+      precioEstimadoUSD *
+      tipoCambio;
+
+  }
+
+  // ====================================================
   // CARGANDO
-  // =========================================================
+  // ====================================================
 
   if (cargando) {
+
     return (
       <section className="generar-cotizacion">
+
         <article className="gc-card">
+
           <h3>
             Generando cotización...
           </h3>
 
           <p>
-            Estamos preparando la cotización de tu proyecto.
+            Estamos preparando la
+            cotización de tu proyecto.
           </p>
+
         </article>
+
       </section>
     );
   }
 
-  // =========================================================
+  // ====================================================
   // ERROR
-  // =========================================================
+  // ====================================================
 
   if (error) {
+
     return (
       <section className="generar-cotizacion">
+
         <article className="gc-card">
 
           <h3>
-            No se pudo generar la cotización
+            No se pudo generar la
+            cotización
           </h3>
 
           <p>
@@ -265,17 +436,20 @@ export default function GenerarCotizacion() {
           </button>
 
         </article>
+
       </section>
     );
   }
 
-  // =========================================================
+  // ====================================================
   // SIN COTIZACIÓN
-  // =========================================================
+  // ====================================================
 
   if (!cotizacion) {
+
     return (
       <section className="generar-cotizacion">
+
         <article className="gc-card">
 
           <h3>
@@ -283,8 +457,8 @@ export default function GenerarCotizacion() {
           </h3>
 
           <p>
-            No fue posible cargar la información
-            de la cotización.
+            No fue posible cargar la
+            información de la cotización.
           </p>
 
           <button
@@ -299,13 +473,14 @@ export default function GenerarCotizacion() {
           </button>
 
         </article>
+
       </section>
     );
   }
 
-  // =========================================================
+  // ====================================================
   // COTIZACIÓN GENERADA
-  // =========================================================
+  // ====================================================
 
   return (
     <section className="generar-cotizacion">
@@ -317,20 +492,31 @@ export default function GenerarCotizacion() {
         </h2>
 
         <p>
-          La cotización de tu proyecto fue
-          generada correctamente.
+          La cotización de tu proyecto
+          fue generada correctamente.
         </p>
 
       </header>
 
       <article className="gc-card gc-success-card">
 
+        {/* ==============================================
+            ICONO
+        ============================================== */}
+
         <div className="gc-success-icon">
+
           <CheckCircle size={55} />
+
         </div>
 
+        {/* ==============================================
+            TITULO
+        ============================================== */}
+
         <h3>
-          Cotización generada correctamente
+          Cotización generada
+          correctamente
         </h3>
 
         <p className="gc-message">
@@ -345,20 +531,70 @@ export default function GenerarCotizacion() {
 
         </p>
 
+        {/* ==============================================
+            TOTAL ESTIMADO
+        ============================================== */}
+
         <div className="gc-total">
 
           <span>
             Total estimado
           </span>
 
+          {/* PESOS URUGUAYOS */}
+
           <strong>
-            $
-            {Number(
-              cotizacion.precioEstimado ?? 0
-            ).toLocaleString("es-UY")}
+
+            {precioEstimadoUYU !== null
+              ? formatearPrecioUYU(
+                  precioEstimadoUYU
+                )
+              : "Sin calcular"}
+
+            {" "}UYU
+
           </strong>
 
+          {/* DÓLARES */}
+
+          <small>
+
+            (
+            {precioEstimadoUSD !== null
+              ? formatearPrecioUSD(
+                  precioEstimadoUSD
+                )
+              : "Sin calcular"}
+
+            {" "}USD)
+
+          </small>
+
         </div>
+
+        {/* ==============================================
+            TIPO DE CAMBIO
+        ============================================== */}
+
+        {tipoCambio !== null && (
+          <p className="gc-tipo-cambio">
+
+            Tipo de cambio utilizado:{" "}
+
+            <strong>
+              1 USD ={" "}
+              {formatearPrecioUYU(
+                tipoCambio
+              )}{" "}
+              UYU
+            </strong>
+
+          </p>
+        )}
+
+        {/* ==============================================
+            ACCIONES
+        ============================================== */}
 
         <div className="gc-actions">
 
@@ -380,3 +616,6 @@ export default function GenerarCotizacion() {
     </section>
   );
 }
+
+
+

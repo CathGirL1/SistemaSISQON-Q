@@ -216,8 +216,7 @@ export default function EditarCotizacion() {
       }
 
       navigate(
-        `/panel-cliente/cotizaciones/${idCotizacion}`
-      );
+        "/panel-cliente/cotizaciones");
     } catch (error) {
       const mensaje =
         error instanceof Error

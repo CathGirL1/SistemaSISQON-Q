@@ -37,6 +37,9 @@ export interface Material {
 
   // Cantidad necesaria para el proyecto
   cantidad?: number;
+  idMaterialProyecto?: number;
+  idProyecto?: number;
+  subtotal?: number;
 }
 
 // ======================================================

@@ -51,6 +51,16 @@ interface CotizacionBackend {
 
   // MATERIALES
   resumenMateriales: string;
+    materiales: {
+    idMaterialProyecto: number;
+    idProyecto: number;
+    idMaterial: number;
+    cantidad: number;
+    nombre: string;
+    costoUnitario: number;
+    unidad: string;
+    subtotal: number;
+  }[];
 
   // EMPRESA
   nombreEmpresa: string;
@@ -230,6 +240,13 @@ export async function obtenerCotizacionesEmpresa(
 
             resumenMateriales:
             cotizacion.resumenMateriales,
+            materiales:
+            (cotizacion.materiales ?? []).map((material) => ({
+              ...material,
+              cantidad: Number(material.cantidad),
+              costoUnitario: Number(material.costoUnitario),
+              subtotal: Number(material.subtotal),
+            })),
 
             // ==========================================
             // EMPRESA

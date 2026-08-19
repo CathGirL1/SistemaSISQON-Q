@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { Package } from "lucide-react";
 
 import "../../styles/MaterialesProyectoDetalle.css";
+import {
+  formatearPrecioUSD,
+  formatearPrecioUYU
+} from "../../utilities/formatoMoneda";
 
 
 
@@ -55,6 +59,8 @@ export default function MaterialesProyectoDetalle({
 
   const [materiales, setMateriales] =
     useState<MaterialProyecto[]>([]);
+    
+  const [tipoCambio, setTipoCambio] = useState<number | null>(null);
 
   const [cargando, setCargando] =
     useState(true);
@@ -69,63 +75,117 @@ export default function MaterialesProyectoDetalle({
 
   useEffect(() => {
 
-    const obtenerMateriales = async () => {
+  const obtenerDatos = async () => {
 
-      try {
+    try {
 
-        setCargando(true);
-        setError("");
+      setCargando(true);
+      setError("");
 
-        const response = await fetch(
-          `${API_URL}/api/materiales-proyecto/proyecto/${idProyecto}`
-        );
+      // ================================
+      // OBTENER MATERIALES
+      // ================================
 
-        const data = await response.json();
+      const response = await fetch(
+        `${API_URL}/api/materiales-proyecto/proyecto/${idProyecto}`
+      );
 
-        if (!response.ok) {
-          throw new Error(
-            data.mensaje ||
+      const data = await response.json();
+
+     
+
+      if (!response.ok) {
+        throw new Error(
+          data.mensaje ||
             "No se pudieron obtener los materiales."
-          );
-        }
-
-        /*
-         * El endpoint actualmente devuelve directamente
-         * un array de materiales.
-         */
-        const listaMateriales =
-          Array.isArray(data)
-            ? data
-            : data.materiales ??
-              data.data ??
-              [];
-
-        setMateriales(listaMateriales);
-
-      } catch (error) {
-
-        console.error(
-          "Error al obtener materiales del proyecto:",
-          error
         );
-
-        setError(
-          error instanceof Error
-            ? error.message
-            : "No se pudieron cargar los materiales."
-        );
-
-      } finally {
-
-        setCargando(false);
-
       }
 
-    };
+      const listaMateriales =
+        Array.isArray(data)
+          ? data
+          : data.materiales ??
+            data.data ??
+            [];
 
-    obtenerMateriales();
+      setMateriales(listaMateriales);
 
-  }, [idProyecto]);
+      // ================================
+      // OBTENER TIPO DE CAMBIO
+      // ================================
+
+      await obtenerTipoCambio();
+
+    } catch (error) {
+
+      console.error(
+        "Error al obtener materiales del proyecto:",
+        error
+      );
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "No se pudieron cargar los materiales."
+      );
+
+    } finally {
+
+      setCargando(false);
+
+    }
+
+  };
+
+  obtenerDatos();
+
+}, [idProyecto]);
+
+  const obtenerTipoCambio = async () => {
+  try {
+    const response = await fetch(
+      `${API_URL}/api/moneda/usd-uyu`
+    );
+
+    const data = await response.json();
+
+    console.log("RESPUESTA MONEDA:", data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.mensaje ||
+          "No se pudo obtener el tipo de cambio."
+      );
+    }
+
+    // El backend devuelve el valor en la propiedad "valor"
+    const cambio = Number(data.valor);
+
+      if (
+        !Number.isFinite(cambio) ||
+        cambio <= 0
+      ) {
+        throw new Error(
+          "El tipo de cambio recibido no es válido."
+        );
+      }
+
+      setTipoCambio(cambio);
+
+    } catch (error) {
+
+      console.error(
+        "Error al obtener el tipo de cambio:",
+        error
+      );
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo obtener el tipo de cambio."
+      );
+    }
+  };
 
 
   // ====================================================
@@ -233,6 +293,8 @@ export default function MaterialesProyectoDetalle({
   // RENDER
   // ====================================================
 
+
+
   return (
     <article className="materiales-detalle-card">
 
@@ -270,11 +332,30 @@ export default function MaterialesProyectoDetalle({
       {/* ================================================
           LISTA
       ================================================= */}
-
+      
       <div className="materiales-detalle-lista">
+
+        
 
         {materiales.map((material) => {
 
+          // ==============================================
+          // PRECIO ORIGINAL USD
+          // ==============================================
+
+          const precioUSD =
+            Number(
+              material.costoUnitario
+            );
+
+          // ==============================================
+          // CONVERSIÓN A UYU
+          // ==============================================
+
+          const precioUYU =
+            tipoCambio !== null
+              ? precioUSD * tipoCambio
+              : null;
 
           return (
 
@@ -330,11 +411,29 @@ export default function MaterialesProyectoDetalle({
                 <p>
                   Precio unitario:{" "}
                   <strong>
-                    $
-                    {Number(
-                      material.costoUnitario
-                    ).toLocaleString("es-UY")}
+
+                    {precioUYU !== null
+                      ? formatearPrecioUYU(
+                          precioUYU
+                        )
+                      : "Sin calcular"}
+
+                    {" "}UYU
+
                   </strong>
+
+                  {/* USD */}
+
+                  <small>
+
+                    (
+                    {formatearPrecioUSD(
+                      precioUSD
+                    )}{" "}
+                    USD
+                    )
+
+                  </small>
 
                   {" / "}
 

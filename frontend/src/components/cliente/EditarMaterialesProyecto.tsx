@@ -10,6 +10,10 @@ import {
 } from "lucide-react";
 
 import ModalDatosMaterial from "./ModalDatosMaterial";
+import {
+  formatearPrecioUSD,
+  formatearPrecioUYU
+} from "../../utilities/formatoMoneda";
 
 import "../../styles/EditarMaterialesProyecto.css";
 
@@ -82,6 +86,8 @@ export default function EditarMaterialesProyecto({
     useState("");
 
   const [cantidad, setCantidad] = useState(1);
+  const [tipoCambio, setTipoCambio] =
+  useState<number | null>(null);
 
   const [busqueda, setBusqueda] = useState("");
 
@@ -96,6 +102,51 @@ export default function EditarMaterialesProyecto({
 
   const [modalMaterialAbierto, setModalMaterialAbierto] =
     useState(false);
+
+  const obtenerTipoCambio = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/moneda/usd-uyu`
+      );
+
+      const data = await response.json();
+
+      console.log("RESPUESTA MONEDA:", data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.mensaje ||
+            "No se pudo obtener el tipo de cambio."
+        );
+      }
+
+      const cambio = Number(data.valor);
+
+      if (
+        !Number.isFinite(cambio) ||
+        cambio <= 0
+      ) {
+        throw new Error(
+          "El tipo de cambio recibido no es válido."
+        );
+      }
+
+      setTipoCambio(cambio);
+
+    } catch (error) {
+      console.error(
+        "Error al obtener el tipo de cambio:",
+        error
+      );
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo obtener el tipo de cambio."
+      );
+    }
+  };
+
 
   // ====================================================
   // OBTENER DATOS
@@ -220,6 +271,8 @@ export default function EditarMaterialesProyecto({
       setMaterialesCatalogo(
         materialesCatalogoNormalizados
       );
+
+      await obtenerTipoCambio();
     } catch (error) {
       console.error(error);
 
@@ -743,14 +796,25 @@ export default function EditarMaterialesProyecto({
                       </strong>
                     </p>
 
+                    <small>
+                      {tipoCambio !== null
+                      ? formatearPrecioUYU(
+                              material.costoUnitario * tipoCambio
+                            )
+                          : "Sin calcular"}{" "}
+                        UYU
+                    </small>
                     <p>
-                      $
-                      {material.costoUnitario.toLocaleString(
-                        "es-UY"
+                      {" "}
+                      (
+                      {formatearPrecioUSD(
+                        material.costoUnitario
                       )}{" "}
-                      /{" "}
-                      {material.unidad ??
-                        "unidad"}
+                      USD)
+                    </p>
+
+                    <p>
+                      {material.unidad ?? "unidad"}
                     </p>
 
                     <p>
