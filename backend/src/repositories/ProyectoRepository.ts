@@ -186,16 +186,80 @@ export class ProyectoRepository {
   public async eliminarProyecto(
     idProyecto: number
   ): Promise<boolean> {
+
     const pool = await connectDB();
 
-    const result = await pool
-      .request()
-      .input("idProyecto", sql.Int, idProyecto)
-      .query(`
-        DELETE FROM Proyecto
-        WHERE id_Proyecto = @idProyecto
-      `);
+    const transaction = pool.transaction();
 
-    return result.rowsAffected[0] > 0;
+    try {
+
+      await transaction.begin();
+
+      // ==========================================
+      // ELIMINAR COTIZACIONES DEL PROYECTO
+      // ==========================================
+
+      await transaction
+        .request()
+        .input(
+          "idProyecto",
+          sql.Int,
+          idProyecto
+        )
+        .query(`
+          DELETE FROM Cotizacion
+          WHERE id_Proyecto = @idProyecto
+        `);
+
+
+      // ==========================================
+      // ELIMINAR MATERIALES DEL PROYECTO
+      // ==========================================
+
+      await transaction
+        .request()
+        .input(
+          "idProyecto",
+          sql.Int,
+          idProyecto
+        )
+        .query(`
+          DELETE FROM MaterialProyecto
+          WHERE id_Proyecto = @idProyecto
+        `);
+
+
+      // ==========================================
+      // ELIMINAR PROYECTO
+      // ==========================================
+
+      const result = await transaction
+        .request()
+        .input(
+          "idProyecto",
+          sql.Int,
+          idProyecto
+        )
+        .query(`
+          DELETE FROM Proyecto
+          WHERE id_Proyecto = @idProyecto
+        `);
+
+
+      await transaction.commit();
+
+      return result.rowsAffected[0] > 0;
+
+    } catch (error) {
+
+      await transaction.rollback();
+
+      console.error(
+        "Error al eliminar proyecto:",
+        error
+      );
+
+      throw error;
+    }
   }
 }

@@ -38,7 +38,9 @@ export interface MaterialCotizacionData {
   nombre: string;
   costoUnitario: number;
   unidad: string | null;
+  subtotal: number;
 }
+
 
 // ======================================================
 // REPOSITORY
@@ -434,7 +436,12 @@ export class CotizacionRepository {
           m.nombre ASC
       `);
 
-    return result.recordset;
+    return result.recordset.map((material) => ({
+      ...material,
+      subtotal:
+          Number(material.cantidad) *
+          Number(material.costoUnitario),
+    }));
   }
 
   // ====================================================
@@ -735,7 +742,21 @@ export class CotizacionRepository {
         WHERE c.id_Cotizacion = @idCotizacion
       `);
 
-    return result.recordset[0] ?? null;
+    const cotizacion = result.recordset[0];
+
+    if (!cotizacion) {
+      return null;
+    }
+
+    const materiales =
+      await this.obtenerMaterialesDelProyecto(
+        cotizacion.idProyecto
+      );
+
+    return {
+      ...cotizacion,
+      materiales,
+    };
   }
 
   // ====================================================
