@@ -242,6 +242,19 @@ export class CotizacionService {
                 materialesParaCotizacion
             );
 
+        let totalGeneralUSD =
+            resultado.totalGeneral;
+
+        if (resultado.moneda === "UYU") {
+
+            const tipoCambio =
+                await this.monedaService
+                    .obtenerDolarAPesoUruguayo();
+
+            totalGeneralUSD =
+                resultado.totalGeneral /
+                tipoCambio;
+        }
         // =========================================
         // 7. Validar resultado
         // =========================================
@@ -266,6 +279,26 @@ export class CotizacionService {
             "El total de la cotización"
         );
 
+        const detalleCalculoReforma =
+            resultado.horasEstimadas !== undefined
+                ? {
+                    horasEstimadas:
+                        resultado.horasEstimadas,
+
+                    jornalesEstimados:
+                        resultado.jornalesEstimados,
+
+                    superficiePiso:
+                        resultado.superficiePiso,
+
+                    superficieParedes:
+                        resultado.superficieParedes,
+
+                    superficieTrabajo:
+                        resultado.superficieTrabajo,
+                }
+        : undefined;
+
         // =========================================
         // 8. Obtener próxima versión
         // =========================================
@@ -285,17 +318,21 @@ export class CotizacionService {
 
             estado: "Borrador",
 
-            costoMateriales:
-                resultado.totalMateriales,
+             costoMateriales:
+                resultado.moneda === "UYU"
+                    ? 0
+                    : resultado.totalMateriales,
 
             costoManoObra:
-                resultado.manoDeObra,
+                resultado.moneda === "UYU"
+                    ? 0
+                    : resultado.manoDeObra,
 
             totalCotizacion:
-                resultado.totalGeneral,
+                totalGeneralUSD,
 
             precioEstimado:
-                resultado.totalGeneral,
+                totalGeneralUSD,
 
             observaciones:
                 null,
@@ -668,24 +705,91 @@ export class CotizacionService {
                 [cotizacion]
             );
 
-        return resultado[0];
-    }
+        const cotizacionFinal =
+            resultado[0];
 
-    public async enviarCotizacion(
-        idCotizacion: number,
-        idEmpresa: number
-        ): Promise<void> {
-        const enviada =
-            await this.repository.enviarCotizacion(
-            idCotizacion,
-            idEmpresa
-            );
+        // =====================================================
+        // DETALLE ESPECÍFICO DE REFORMA
+        // =====================================================
 
-        if (!enviada) {
+        const proyecto =
+            await this.proyectoRepository
+                .obtenerProyectoPorId(
+                    cotizacion.idProyecto
+                );
+
+        if (!proyecto) {
             throw new Error(
-            "No se pudo enviar la cotización"
+                "Proyecto no encontrado"
             );
         }
+
+        const proyectoCotizacion =
+            await this.repository
+                .obtenerProyectoParaCotizacion(
+                    cotizacion.idProyecto
+                );
+
+        if (!proyectoCotizacion) {
+            throw new Error(
+                "No se pudo obtener el tipo de obra"
+            );
+        }
+
+        const strategy =
+            TipoObraStrategyFactory.obtenerStrategy(
+                proyectoCotizacion.tipoObra
+            );
+
+        const materiales =
+            await this.repository
+                .obtenerMaterialesDelProyecto(
+                    cotizacion.idProyecto
+                );
+
+        const materialesParaCotizacion =
+            materiales.map(material => ({
+                cantidad:
+                    Number(material.cantidad),
+
+                costoUnitario:
+                    Number(material.costoUnitario)
+            }));
+
+        const calculo =
+            strategy.calcularCosto(
+                proyecto,
+                materialesParaCotizacion
+            );
+
+        // =====================================================
+        // RESULTADO
+        // =====================================================
+
+        return {
+            ...cotizacionFinal,
+
+            ...(proyectoCotizacion.codigoTipoObra === "OBR-000003"
+                ? {
+                    detalleCalculoReforma: {
+                        horasEstimadas:
+                            calculo.horasEstimadas,
+
+                        jornalesEstimados:
+                            calculo.jornalesEstimados,
+
+                        superficiePiso:
+                            calculo.superficiePiso,
+
+                        superficieParedes:
+                            calculo.superficieParedes,
+
+                        superficieTrabajo:
+                            calculo.superficieTrabajo
+                    }
+                }
+                : {})
+        };
     }
 
     // =========================================================
@@ -816,6 +920,47 @@ export class CotizacionService {
         if (!eliminado) {
             throw new Error(
                 "No se pudo eliminar la cotización"
+            );
+        }
+    }
+
+    public async enviarCotizacion(
+        idCotizacion: number,
+        idEmpresa: number
+    ): Promise<void> {
+
+        this.validarId(
+            idCotizacion,
+            "El id de la cotización no es válido"
+        );
+
+        this.validarId(
+            idEmpresa,
+            "El id de la empresa no es válido"
+        );
+
+        const cotizacion =
+            await this.repository
+                .obtenerCotizacionPorId(
+                    idCotizacion
+                );
+
+        if (!cotizacion) {
+            throw new Error(
+                "Cotización no encontrada"
+            );
+        }
+
+        const enviada =
+            await this.repository
+                .enviarCotizacion(
+                    idCotizacion,
+                    idEmpresa
+                );
+
+        if (!enviada) {
+            throw new Error(
+                "No se pudo enviar la cotización"
             );
         }
     }
