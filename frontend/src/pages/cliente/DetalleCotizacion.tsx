@@ -669,6 +669,8 @@ export default function DetalleCotizacion() {
                 {cotizacion.materiales?.map(
                   (material) => {
 
+                    
+
                     // -----------------------------------------
                     // PRECIO UNITARIO USD
                     // -----------------------------------------

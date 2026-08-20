@@ -31,7 +31,7 @@ interface MaterialProyecto {
   imagenUrl?: string | null;
 
   idEmpresa?: number | null;
-  empresa?: string | null;
+  nombreEmpresa?: string | null;
 }
 
 // ======================================================
@@ -403,7 +403,7 @@ export default function MaterialesProyectoDetalle({
                 <p>
                   Empresa:{" "}
                   <strong>
-                    {material.empresa ??
+                    {material.nombreEmpresa ??
                       "Sin empresa"}
                   </strong>
                 </p>
