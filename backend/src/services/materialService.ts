@@ -12,6 +12,27 @@ export class MaterialService {
   private repository = new MaterialRepository();
   private readonly monedaService = new MonedaService();
 
+  private async agregarConversionMonetaria(
+      material: Material
+  ) {
+
+      const tipoCambio =
+          await this.monedaService
+              .obtenerDolarAPesoUruguayo();
+
+      return {
+          ...material,
+
+          moneda: "USD" as const,
+
+          tipoCambio,
+
+          costoUnitarioUYU:
+              Number(material.costoUnitario) *
+              tipoCambio,
+      };
+  }
+
 
   public async obtenerMateriales() {
     const materiales =
@@ -64,7 +85,14 @@ export class MaterialService {
       estado: material.estado ?? "Activo",
     };
 
-    return this.repository.crearMaterial(materialNormalizado);
+    const materialCreado =
+    await this.repository.crearMaterial(
+        materialNormalizado
+    );
+
+    return this.agregarConversionMonetaria(
+        materialCreado
+    );
   }
 
   public async actualizarMaterial(
@@ -96,7 +124,9 @@ export class MaterialService {
       throw new Error("Material no encontrado");
     }
 
-    return materialActualizado;
+    return this.agregarConversionMonetaria(
+      materialActualizado
+    );
   }
 
   public async eliminarMaterial(
