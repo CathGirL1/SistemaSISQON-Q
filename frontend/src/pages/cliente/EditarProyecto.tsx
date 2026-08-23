@@ -19,6 +19,8 @@ import type {
   RespuestaError,
 } from "../../pages/cliente/DetalleProyecto";
 
+import EditarMaterialesProyecto from "../../components/cliente/EditarMaterialesProyecto"
+
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/EditarProyecto.css";
 
@@ -610,6 +612,10 @@ export default function EditarProyecto() {
         </div>
 
       </article>
+
+      <EditarMaterialesProyecto
+        idProyecto={Number(idProyecto)}
+      />
 
       {/* ===================================================
           BOTONES

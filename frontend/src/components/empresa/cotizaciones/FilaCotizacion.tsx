@@ -21,52 +21,91 @@ export default function FilaCotizacion({
 }: FilaCotizacionProps) {
   return (
     <tr className={seleccionada ? "fila-seleccionada" : ""}>
+      {/* SELECCIÓN */}
       <td>
         <input
           type="checkbox"
           checked={seleccionada}
-          onChange={() => onSeleccionar(cotizacion.id)}
+          onChange={() =>
+            onSeleccionar(cotizacion.id)
+          }
         />
       </td>
 
+      {/* ID */}
       <td>
-        <span className="cotizacion-id">{cotizacion.id}</span>
+        <span className="cotizacion-id">
+          {cotizacion.id}
+        </span>
       </td>
 
+      {/* CLIENTE */}
       <td>
         <div className="cliente-cell">
           <div className="cliente-avatar-tabla">
             {cotizacion.cliente
               .split(" ")
+              .filter(Boolean)
               .map((nombre) => nombre[0])
               .join("")
-              .slice(0, 2)}
+              .slice(0, 2)
+              .toUpperCase()}
           </div>
 
           <div>
             <h4>{cotizacion.cliente}</h4>
-            <p>{cotizacion.email}</p>
+
+            <p>
+              {cotizacion.email}
+            </p>
           </div>
         </div>
       </td>
 
-      <td>{cotizacion.tipoObra}</td>
-
-      <td>{cotizacion.fecha}</td>
-
+      {/* TIPO DE OBRA */}
       <td>
-        <strong>{cotizacion.total}</strong>
+        <div className="tipo-obra-cell">
+          <strong>
+            {cotizacion.tipoObra}
+          </strong>
+
+          <span>
+            {cotizacion.nombreProyecto}
+          </span>
+        </div>
       </td>
 
+      {/* FECHA */}
       <td>
-        <EstadoBadge estado={cotizacion.estado} />
+        {cotizacion.fecha}
       </td>
 
+      {/* TOTAL */}
+      <td>
+        <strong className="cotizacion-total">
+          {cotizacion.total}
+        </strong>
+      </td>
+
+      {/* ESTADO */}
+      <td>
+        <EstadoBadge
+          estado={cotizacion.estado}
+        />
+      </td>
+
+      {/* ACCIONES */}
       <td>
         <MenuAccionesCotizacion
-          onVer={() => onVerDetalle(cotizacion)}
-          onEditar={() => onEditarEstado(cotizacion)}
-          onEliminar={() => onEliminar(cotizacion)}
+          onVer={() =>
+            onVerDetalle(cotizacion)
+          }
+          onEditar={() =>
+            onEditarEstado(cotizacion)
+          }
+          onEliminar={() =>
+            onEliminar(cotizacion)
+          }
         />
       </td>
     </tr>

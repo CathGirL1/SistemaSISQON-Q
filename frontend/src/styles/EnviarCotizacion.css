@@ -1,0 +1,466 @@
+/* =====================================================
+   BOTÓN ENVIAR
+   ===================================================== */
+
+.cotizacion-actions .enviar-cotizacion-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+
+/* =====================================================
+   OVERLAY
+   ===================================================== */
+
+.enviar-cotizacion-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(3px);
+
+  animation: enviarOverlayEntrada 0.2s ease;
+}
+
+
+/* =====================================================
+   MODAL
+   ===================================================== */
+
+.enviar-cotizacion-modal {
+  width: min(100%, 500px);
+  max-height: calc(100vh - 40px);
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+
+  box-shadow:
+    0 20px 50px rgba(15, 23, 42, 0.18),
+    0 4px 12px rgba(15, 23, 42, 0.08);
+
+  overflow: hidden;
+
+  animation: enviarModalEntrada 0.25s ease;
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.enviar-cotizacion-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 22px 24px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.enviar-cotizacion-header > div {
+  min-width: 0;
+}
+
+.enviar-cotizacion-header h3 {
+  margin: 0 0 6px;
+
+  color: #0f172a;
+
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.enviar-cotizacion-header p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =====================================================
+   BOTÓN CERRAR
+   ===================================================== */
+
+.enviar-cotizacion-header > button {
+  flex-shrink: 0;
+
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #64748b;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.enviar-cotizacion-header > button:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.enviar-cotizacion-header > button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* =====================================================
+   BODY
+   ===================================================== */
+
+.enviar-cotizacion-body {
+  padding: 24px;
+}
+
+.enviar-cotizacion-body label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #334155;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   SELECT
+   ===================================================== */
+
+.empresa-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.empresa-select-wrapper select {
+  width: 100%;
+  min-height: 44px;
+
+  appearance: none;
+
+  padding: 0 42px 0 13px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #1e293b;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.empresa-select-wrapper select:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.empresa-select-wrapper select:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.empresa-select-wrapper svg {
+  position: absolute;
+
+  top: 50%;
+  right: 13px;
+
+  transform: translateY(-50%);
+
+  color: #64748b;
+
+  pointer-events: none;
+}
+
+
+/* =====================================================
+   MENSAJES
+   ===================================================== */
+
+.enviar-cotizacion-error,
+.enviar-cotizacion-success {
+  margin: 12px 0 0;
+
+  padding: 10px 12px;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.enviar-cotizacion-error {
+  border: 1px solid #fecaca;
+
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.enviar-cotizacion-success {
+  border: 1px solid #bbf7d0;
+
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+.enviar-cotizacion-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding: 18px 24px;
+
+  border-top: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+
+/* =====================================================
+   BOTONES DEL FOOTER
+   ===================================================== */
+
+.enviar-cotizacion-footer button {
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 0 16px;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.enviar-cotizacion-footer button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.enviar-cotizacion-footer button:first-child {
+  border: 1px solid #cbd5e1;
+
+  background: #ffffff;
+  color: #475569;
+}
+
+.enviar-cotizacion-footer button:first-child:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.enviar-cotizacion-footer button:last-child {
+  border: 1px solid #2563eb;
+
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.enviar-cotizacion-footer button:last-child:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.enviar-cotizacion-footer button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* =====================================================
+   ANIMACIONES
+   ===================================================== */
+
+@keyframes enviarOverlayEntrada {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes enviarModalEntrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+  .enviar-cotizacion-overlay {
+    padding: 16px;
+  }
+
+  .enviar-cotizacion-modal {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .enviar-cotizacion-header {
+    padding: 20px;
+  }
+
+  .enviar-cotizacion-body {
+    padding: 20px;
+  }
+
+  .enviar-cotizacion-footer {
+    padding: 16px 20px;
+  }
+}
+
+
+/* =====================================================
+   MÓVIL
+   ===================================================== */
+
+@media (max-width: 480px) {
+
+  .enviar-cotizacion-overlay {
+    align-items: flex-end;
+
+    padding: 10px;
+  }
+
+  .enviar-cotizacion-modal {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+
+    border-radius: 14px 14px 10px 10px;
+  }
+
+  .enviar-cotizacion-header {
+    padding: 18px 16px;
+  }
+
+  .enviar-cotizacion-header h3 {
+    font-size: 17px;
+  }
+
+  .enviar-cotizacion-header p {
+    font-size: 13px;
+  }
+
+  .enviar-cotizacion-body {
+    padding: 18px 16px;
+  }
+
+  .enviar-cotizacion-footer {
+    flex-direction: column-reverse;
+
+    padding: 14px 16px;
+  }
+
+  .enviar-cotizacion-footer button {
+    width: 100%;
+  }
+}
+
+
+/* =====================================================
+   MÓVILES MUY PEQUEÑOS
+   ===================================================== */
+
+@media (max-width: 360px) {
+
+  .enviar-cotizacion-overlay {
+    padding: 6px;
+  }
+
+  .enviar-cotizacion-modal {
+    max-height: calc(100vh - 12px);
+  }
+
+  .enviar-cotizacion-header {
+    padding: 16px 14px;
+  }
+
+  .enviar-cotizacion-body {
+    padding: 16px 14px;
+  }
+
+  .enviar-cotizacion-footer {
+    padding: 12px 14px;
+  }
+
+  .enviar-cotizacion-header h3 {
+    font-size: 16px;
+  }
+}

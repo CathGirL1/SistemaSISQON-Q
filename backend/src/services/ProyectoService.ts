@@ -1,18 +1,20 @@
 import {
-  ProyectoRepository,
-  type CrearProyectoData,
-} from "../repositories/ProyectoRepository";
+  type CrearProyectoDTO,
+} from "../models/Proyecto";
+
+import {ProyectoRepository} from "../repositories/ProyectoRepository"
 
 export class ProyectoService {
   private repository = new ProyectoRepository();
 
-  public async crearProyecto(data: CrearProyectoData): Promise<number> {
+  public async crearProyecto(data: CrearProyectoDTO): Promise<number> {
     this.validarProyecto(data);
 
     return this.repository.crearProyecto({
       ...data,
       nombre: data.nombre.trim(),
       descripcion: data.descripcion?.trim() || null,
+      imagenUrl: data.imagenUrl?.trim() || null,
       ubicacion: data.ubicacion?.trim() || null,
       estado: data.estado?.trim() || "Borrador",
       idEmpresa: data.idEmpresa ?? null,
@@ -40,7 +42,7 @@ export class ProyectoService {
 
   public async actualizarProyecto(
     idProyecto: number,
-    data: Partial<CrearProyectoData>
+    data: Partial<CrearProyectoDTO>
   ): Promise<void> {
     this.validarId(idProyecto, "El id del proyecto no es válido");
 
@@ -60,6 +62,10 @@ export class ProyectoService {
         descripcion:
           data.descripcion !== undefined
             ? data.descripcion?.trim() || null
+            : undefined,
+        imagenUrl:
+          data.imagenUrl !== undefined
+            ? data.imagenUrl?.trim() || null
             : undefined,
         ubicacion:
           data.ubicacion !== undefined
@@ -91,7 +97,7 @@ export class ProyectoService {
     }
   }
 
-  private validarProyecto(data: CrearProyectoData): void {
+  private validarProyecto(data: CrearProyectoDTO): void {
     this.validarId(
       data.idCliente,
       "El id del cliente no es válido"
@@ -140,13 +146,22 @@ export class ProyectoService {
       );
     }
 
+    if (
+      data.imagenUrl &&
+      data.imagenUrl.trim().length > 500
+    ) {
+      throw new Error(
+        "La URL de la imagen no puede superar los 500 caracteres"
+      );
+    }
+
     this.validarMedida(data.alto, "alto");
     this.validarMedida(data.ancho, "ancho");
     this.validarMedida(data.largo, "largo");
   }
 
   private validarActualizacion(
-    data: Partial<CrearProyectoData>
+    data: Partial<CrearProyectoDTO>
   ): void {
     if (Object.keys(data).length === 0) {
       throw new Error(
@@ -204,6 +219,17 @@ export class ProyectoService {
       throw new Error(
         "La descripción no puede superar los 500 caracteres"
       );
+    }
+
+    if (data.imagenUrl !== undefined) {
+      if (
+        data.imagenUrl !== null &&
+        data.imagenUrl.trim().length > 500
+      ) {
+        throw new Error(
+          "La URL de la imagen no puede superar los 500 caracteres"
+        );
+      }
     }
 
     if (

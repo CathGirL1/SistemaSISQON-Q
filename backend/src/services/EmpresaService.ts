@@ -1,12 +1,18 @@
-import { EmpresaRepository } from "../repositories/EmpresaRepository";
+
+import {
+  EmpresaRepository,
+  type Empresa,
+} from "../repositories/EmpresaRepository";
 
 import type {
   ActualizarPerfilEmpresaDTO,
   PerfilEmpresa,
 } from "../models/PerfilEmpresa";
 
+
 export class EmpresaService {
   private repository = new EmpresaRepository();
+
 
   public async obtenerEmpresaPorId(
     idEmpresa: number
@@ -265,4 +271,9 @@ export class EmpresaService {
 
   return empresa;
 }
+
+  public async obtenerEmpresas(): Promise<Empresa[]> {
+    return this.repository.obtenerEmpresas();
+  }
+
 }

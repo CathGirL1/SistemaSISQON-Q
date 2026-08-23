@@ -4,6 +4,7 @@ import { CotizacionService } from "../services/CotizacionService";
 export class CotizacionController {
   private service = new CotizacionService();
 
+  // POST /api/cotizaciones
   public crearCotizacion = async (
     req: Request,
     res: Response
@@ -30,6 +31,7 @@ export class CotizacionController {
     }
   };
 
+  // GET /api/cotizaciones/cliente/:idCliente
   public obtenerCotizacionesPorCliente = async (
     req: Request,
     res: Response
@@ -57,6 +59,7 @@ export class CotizacionController {
     }
   };
 
+  // GET /api/cotizaciones/proyecto/:idProyecto
   public obtenerCotizacionesPorProyecto = async (
     req: Request,
     res: Response
@@ -84,6 +87,7 @@ export class CotizacionController {
     }
   };
 
+  // GET /api/cotizaciones/:idCotizacion
   public obtenerCotizacionPorId = async (
     req: Request,
     res: Response
@@ -113,24 +117,34 @@ export class CotizacionController {
     }
   };
 
+  // PUT /api/cotizaciones/:idCotizacion
   public actualizarCotizacion = async (
     req: Request,
     res: Response
   ): Promise<void> => {
+
     try {
+
       const idCotizacion = Number(
         req.params.idCotizacion
       );
 
-      await this.service.actualizarCotizacion(
-        idCotizacion,
-        req.body
-      );
+      const nuevoIdCotizacion =
+        await this.service.actualizarCotizacion(
+          idCotizacion,
+          req.body
+        );
 
       res.status(200).json({
-        mensaje: "Cotización actualizada correctamente",
+        mensaje:
+          "Cotización actualizada correctamente",
+
+        idCotizacion:
+          nuevoIdCotizacion,
       });
+
     } catch (error: unknown) {
+
       const mensaje =
         error instanceof Error
           ? error.message
@@ -144,6 +158,36 @@ export class CotizacionController {
     }
   };
 
+  // POST /api/cotizaciones/generar/:idProyecto
+  public generarCotizacion = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idProyecto = Number(req.params.idProyecto);
+
+      const idCotizacion =
+        await this.service.generarCotizacion(idProyecto);
+
+      res.status(201).json({
+        mensaje: "Cotización generada correctamente",
+        idCotizacion,
+      });
+    } catch (error: unknown) {
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al generar la cotización";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
+
+  // DELETE /api/cotizaciones/:idCotizacion
   public eliminarCotizacion = async (
     req: Request,
     res: Response
@@ -165,6 +209,72 @@ export class CotizacionController {
         error instanceof Error
           ? error.message
           : "Ocurrió un error al eliminar la cotización";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
+
+  // GET /api/cotizaciones/empresa/:idEmpresa
+  public obtenerCotizacionesPorEmpresa = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idEmpresa = Number(
+        req.params.idEmpresa
+      );
+
+      const cotizaciones =
+        await this.service.obtenerCotizacionesPorEmpresa(
+          idEmpresa
+        );
+
+      res.status(200).json(cotizaciones);
+
+    } catch (error: unknown) {
+
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al obtener las cotizaciones de la empresa";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
+
+
+  public enviarCotizacion = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idCotizacion = Number(
+        req.params.idCotizacion
+      );
+
+      const { idEmpresa } = req.body;
+
+      await this.service.enviarCotizacion(
+        idCotizacion,
+        Number(idEmpresa)
+      );
+
+      res.status(200).json({
+        mensaje: "Cotización enviada correctamente",
+      });
+    } catch (error: unknown) {
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al enviar la cotización";
 
       console.error(error);
 

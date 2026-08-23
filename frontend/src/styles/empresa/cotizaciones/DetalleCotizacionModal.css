@@ -1,0 +1,395 @@
+/* =========================================================
+   DETALLE DE COTIZACIÓN
+   ========================================================= */
+
+.detalle-cotizacion {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+
+  padding: 4px 2px 10px;
+
+  color: #334155;
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   SECCIONES
+   ========================================================= */
+
+.detalle-seccion {
+  padding-bottom: 22px;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.detalle-seccion:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.detalle-seccion h3 {
+  margin: 0 0 16px;
+
+  color: #0f3460;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   GRID GENERAL
+   ========================================================= */
+
+.detalle-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  column-gap: 35px;
+  row-gap: 18px;
+}
+
+
+/* =========================================================
+   ITEMS
+   ========================================================= */
+
+.detalle-item {
+  min-width: 0;
+}
+
+.detalle-item strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #0f3460;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detalle-item p {
+  margin: 0;
+
+  color: #475569;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   DESCRIPCIÓN / OBSERVACIONES
+   ========================================================= */
+
+.detalle-descripcion {
+  margin-top: 18px;
+
+  padding: 14px 16px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.detalle-descripcion strong {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #0f3460;
+
+  font-size: 13px;
+}
+
+.detalle-descripcion p {
+  margin: 0;
+
+  color: #475569;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   DIMENSIONES
+   ========================================================= */
+
+.dimensiones-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.dimension-item {
+  display: flex;
+  flex-direction: column;
+
+  padding: 13px 14px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.dimension-item span {
+  margin-bottom: 5px;
+
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dimension-item strong {
+  color: #0f3460;
+
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   MATERIALES
+   ========================================================= */
+
+.materiales-resumen {
+  padding: 15px 17px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.materiales-resumen p {
+  margin: 0;
+
+  color: #475569;
+
+  font-size: 14px;
+  line-height: 1.6;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   COSTOS
+   ========================================================= */
+
+.costos-cotizacion {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  padding: 15px 17px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.costo-item {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 5px 0;
+}
+
+.costo-item span {
+  color: #475569;
+
+  font-size: 14px;
+}
+
+.costo-item strong {
+  color: #0f3460;
+
+  font-size: 14px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   TOTAL
+   ========================================================= */
+
+.costo-total {
+  margin-top: 5px;
+
+  padding-top: 14px;
+
+  border-top: 1px solid #cbd5e1;
+}
+
+.costo-total span {
+  color: #0f3460;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.costo-total strong {
+  color: #0f3460;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+
+.detalle-item p:has(.estado-badge) {
+  display: flex;
+
+  align-items: center;
+
+  min-height: 24px;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+/*
+   Si ModalBase permite que el contenido tenga
+   esta clase, evita que el modal crezca infinitamente.
+*/
+
+.detalle-cotizacion-modal {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   SCROLL
+   ========================================================= */
+
+.detalle-cotizacion::-webkit-scrollbar {
+  width: 7px;
+}
+
+.detalle-cotizacion::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.detalle-cotizacion::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+
+  border-radius: 10px;
+}
+
+.detalle-cotizacion::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .detalle-cotizacion {
+    gap: 22px;
+  }
+
+  .detalle-grid {
+    grid-template-columns: 1fr 1fr;
+
+    column-gap: 20px;
+  }
+
+  .dimensiones-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE - CELULAR
+   ========================================================= */
+
+@media (max-width: 560px) {
+
+  .detalle-cotizacion {
+    gap: 20px;
+
+    font-size: 13px;
+  }
+
+  .detalle-seccion {
+    padding-bottom: 18px;
+  }
+
+  .detalle-seccion h3 {
+    margin-bottom: 13px;
+
+    font-size: 16px;
+  }
+
+  .detalle-grid {
+    grid-template-columns: 1fr;
+
+    row-gap: 14px;
+  }
+
+  .dimensiones-grid {
+    grid-template-columns: 1fr 1fr;
+
+    gap: 9px;
+  }
+
+  .dimension-item {
+    padding: 11px;
+  }
+
+  .dimension-item strong {
+    font-size: 14px;
+  }
+
+  .costo-item {
+    gap: 10px;
+  }
+
+  .costo-total strong {
+    font-size: 16px;
+  }
+}
+
+
+/* =========================================================
+   CELULAR MUY PEQUEÑO
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .dimensiones-grid {
+    grid-template-columns: 1fr;
+  }
+
+}

@@ -19,6 +19,7 @@ import {
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
+import MaterialesProyectoDetalle from "../../components/cliente/MaterialesProyectoDetalle";
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/DetalleProyecto.css";
@@ -377,7 +378,11 @@ export default function DetalleProyecto() {
                 />
               </div>
             </article>
+            
           </section>
+          <MaterialesProyectoDetalle
+            idProyecto={proyecto.idProyecto}
+          />
       </main>
 
       {mostrarConfirmacion && (

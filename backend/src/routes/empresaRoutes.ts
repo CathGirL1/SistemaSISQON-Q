@@ -7,6 +7,8 @@ const router = Router();
 
 const controller = new EmpresaController();
 
+router.get("/", controller.obtenerEmpresas);
+
 router.get(
   "/usuario/:idUsuario",
   controller.obtenerEmpresaPorUsuario

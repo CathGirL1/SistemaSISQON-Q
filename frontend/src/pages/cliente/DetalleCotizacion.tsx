@@ -1,32 +1,41 @@
 import {
   useEffect,
   useState,
-  type ChangeEvent,
-  type FormEvent,
   type ReactNode,
 } from "react";
 
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 import {
   ArrowLeft,
-  Pencil,
-  Save,
-  X,
   Trash2,
   FileText,
-  CircleDollarSign,
   CalendarDays,
   FolderOpen,
   Ruler,
   MapPin,
+  Package,
 } from "lucide-react";
+
+import { type ProyectoAPI } from "../cliente/MisProyectos";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
 
+import {
+  formatearPrecioUYU,
+  formatearPrecioUSD,
+} from "../../utilities/formatoMoneda";
+
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/DetalleCotizacion.css";
+
+// =========================================================
+// ESTADOS
+// =========================================================
 
 type EstadoCotizacion =
   | "Borrador"
@@ -35,59 +44,116 @@ type EstadoCotizacion =
   | "Aceptada"
   | "Rechazada";
 
+// =========================================================
+// INTERFAZ COTIZACIÓN
+// =========================================================
+
 interface Cotizacion {
   idCotizacion: number;
   idProyecto: number;
   codigo: string;
+
   fechaCreacion: string;
   fechaActualizacion: string | null;
+
+  version: number;
   estado: EstadoCotizacion;
+
+  // Precio original en USD
   precioEstimado: number | null;
+
+  // Precio convertido a UYU
+  precioEstimadoUYU: number | null;
+
+  // Tipo de cambio utilizado
+  tipoCambio: number;
+
+  moneda: string;
+
   observaciones: string | null;
 
+  // CLIENTE
   idCliente: number;
+
+  // PROYECTO
   idTipoObra: number;
   nombreProyecto: string;
   descripcionProyecto: string | null;
   ubicacion: string | null;
+
   alto: number;
   ancho: number;
   largo: number;
   superficie: number;
+
+  // MATERIALES
+  resumenMateriales: string;
+
+  materiales: {
+    idMaterialProyecto: number;
+    idProyecto: number;
+    idMaterial: number;
+    cantidad: number;
+    nombre: string;
+    costoUnitario: number;
+    unidad: string;
+    subtotal: number;
+  }[];
 }
 
-interface FormularioCotizacion {
-  estado: EstadoCotizacion;
-  precioEstimado: string;
-  observaciones: string;
-}
+// =========================================================
+// RESPUESTA API
+// =========================================================
 
 interface RespuestaAPI {
   mensaje?: string;
 }
 
+// =========================================================
+// API
+// =========================================================
+
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000";
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:3000";
+
+// =========================================================
+// COMPONENTE PRINCIPAL
+// =========================================================
 
 export default function DetalleCotizacion() {
   const navigate = useNavigate();
+
   const { idCotizacion } = useParams();
 
-  const [menuOpen, setMenuOpen] = useState(false);
+  // =======================================================
+  // ESTADOS
+  // =======================================================
+
+  const [menuOpen, setMenuOpen] =
+    useState(false);
+
   const [cotizacion, setCotizacion] =
     useState<Cotizacion | null>(null);
 
-  const [formulario, setFormulario] =
-    useState<FormularioCotizacion | null>(null);
+  const [proyecto, setProyecto] =
+    useState<ProyectoAPI | null>(null);
 
-  const [cargando, setCargando] = useState(true);
-  const [modoEdicion, setModoEdicion] = useState(false);
-  const [guardando, setGuardando] = useState(false);
-  const [eliminando, setEliminando] = useState(false);
+  const [cargando, setCargando] =
+    useState(true);
+
+  const [eliminando, setEliminando] =
+    useState(false);
+
   const [mostrarConfirmacion, setMostrarConfirmacion] =
     useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
+
+  // =======================================================
+  // OBTENER COTIZACIÓN
+  // =======================================================
 
   useEffect(() => {
     obtenerCotizacion();
@@ -104,6 +170,10 @@ export default function DetalleCotizacion() {
         );
       }
 
+      // ---------------------------------------------------
+      // OBTENER COTIZACIÓN
+      // ---------------------------------------------------
+
       const response = await fetch(
         `${API_URL}/api/cotizaciones/${idCotizacion}`
       );
@@ -117,10 +187,41 @@ export default function DetalleCotizacion() {
         );
       }
 
-      const cotizacionRecibida: Cotizacion = data;
+      const cotizacionRecibida: Cotizacion =
+        data;
 
-      setCotizacion(cotizacionRecibida);
-      cargarFormulario(cotizacionRecibida);
+      console.log(
+        "COTIZACIÓN RECIBIDA:",
+        cotizacionRecibida
+      );
+
+      console.log(
+        "MATERIALES DE LA COTIZACIÓN:",
+        cotizacionRecibida.materiales
+      );
+
+      setCotizacion(
+        cotizacionRecibida
+      );
+
+      // ---------------------------------------------------
+      // OBTENER PROYECTO RELACIONADO
+      // ---------------------------------------------------
+
+      const responseProyecto =
+        await fetch(
+          `${API_URL}/api/proyectos/${cotizacionRecibida.idProyecto}`
+        );
+
+      if (responseProyecto.ok) {
+        const proyectoRecibido: ProyectoAPI =
+          await responseProyecto.json();
+
+        setProyecto(
+          proyectoRecibido
+        );
+      }
+
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -128,107 +229,15 @@ export default function DetalleCotizacion() {
           : "Ocurrió un error al cargar la cotización";
 
       setError(mensaje);
+
     } finally {
       setCargando(false);
     }
   };
 
-  const cargarFormulario = (
-    cotizacionActual: Cotizacion
-  ) => {
-    setFormulario({
-      estado: cotizacionActual.estado,
-      precioEstimado:
-        cotizacionActual.precioEstimado !== null
-          ? cotizacionActual.precioEstimado.toString()
-          : "",
-      observaciones:
-        cotizacionActual.observaciones ?? "",
-    });
-  };
-
-  const actualizarCampo = (
-    event: ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = event.target;
-
-    setFormulario((prev) =>
-      prev
-        ? {
-            ...prev,
-            [name]: value,
-          }
-        : prev
-    );
-  };
-
-  const cancelarEdicion = () => {
-    if (cotizacion) {
-      cargarFormulario(cotizacion);
-    }
-
-    setModoEdicion(false);
-    setError("");
-  };
-
-  const guardarCambios = async (
-    event: FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
-
-    if (!formulario || !idCotizacion) {
-      return;
-    }
-
-    try {
-      setGuardando(true);
-      setError("");
-
-      const precio =
-        formulario.precioEstimado.trim() === ""
-          ? null
-          : Number(formulario.precioEstimado);
-
-      const response = await fetch(
-        `${API_URL}/api/cotizaciones/${idCotizacion}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            estado: formulario.estado,
-            precioEstimado: precio,
-            observaciones:
-              formulario.observaciones.trim() || null,
-          }),
-        }
-      );
-
-      const data: RespuestaAPI = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.mensaje ||
-            "No se pudo actualizar la cotización"
-        );
-      }
-
-      await obtenerCotizacion();
-      setModoEdicion(false);
-    } catch (error) {
-      const mensaje =
-        error instanceof Error
-          ? error.message
-          : "Ocurrió un error al actualizar la cotización";
-
-      setError(mensaje);
-    } finally {
-      setGuardando(false);
-    }
-  };
+  // =======================================================
+  // ELIMINAR COTIZACIÓN
+  // =======================================================
 
   const eliminarCotizacion = async () => {
     if (!idCotizacion) {
@@ -246,7 +255,8 @@ export default function DetalleCotizacion() {
         }
       );
 
-      const data: RespuestaAPI = await response.json();
+      const data: RespuestaAPI =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -255,7 +265,10 @@ export default function DetalleCotizacion() {
         );
       }
 
-      navigate("/panel-cliente/cotizaciones");
+      navigate(
+        "/panel-cliente/cotizaciones"
+      );
+
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -263,11 +276,19 @@ export default function DetalleCotizacion() {
           : "Ocurrió un error al eliminar la cotización";
 
       setError(mensaje);
-      setMostrarConfirmacion(false);
+
+      setMostrarConfirmacion(
+        false
+      );
+
     } finally {
       setEliminando(false);
     }
   };
+
+  // =======================================================
+  // CARGANDO
+  // =======================================================
 
   if (cargando) {
     return (
@@ -282,6 +303,10 @@ export default function DetalleCotizacion() {
     );
   }
 
+  // =======================================================
+  // ERROR
+  // =======================================================
+
   if (error && !cotizacion) {
     return (
       <EstructuraDetalle
@@ -289,96 +314,132 @@ export default function DetalleCotizacion() {
         setMenuOpen={setMenuOpen}
       >
         <div className="detalle-cotizacion-feedback">
-          <p>{error}</p>
+
+          <p>
+            {error}
+          </p>
 
           <button
             type="button"
             onClick={() =>
-              navigate("/panel-cliente/cotizaciones")
+              navigate(
+                "/panel-cliente/cotizaciones"
+              )
             }
           >
             Volver a Mis cotizaciones
           </button>
+
         </div>
       </EstructuraDetalle>
     );
   }
 
-  if (!cotizacion || !formulario) {
+  if (!cotizacion) {
     return null;
   }
 
+  // =======================================================
+  // VISTA PRINCIPAL
+  // =======================================================
+
   return (
     <div className="cliente-panel">
+
+      {/* ================================================= */}
+      {/* SIDEBAR */}
+      {/* ================================================= */}
+
       <SidebarCliente
         menuOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
+        onClose={() =>
+          setMenuOpen(false)
+        }
       />
 
       <main className="cliente-main">
-    
+
+        {/* ================================================= */}
+        {/* ENCABEZADO */}
+        {/* ================================================= */}
 
         <section className="detalle-cotizacion-top">
+
           <button
             type="button"
             className="detalle-cotizacion-back"
             onClick={() =>
-              navigate("/panel-cliente/cotizaciones")
+              navigate(
+                "/panel-cliente/cotizaciones"
+              )
             }
           >
             <ArrowLeft size={18} />
+
             Volver a Mis cotizaciones
           </button>
 
           <div className="detalle-cotizacion-header">
-            <div>
-              <div className="detalle-cotizacion-title-row">
-                <h2>{cotizacion.codigo}</h2>
 
-                <EstadoBadge estado={cotizacion.estado} />
+            <div>
+
+              <div className="detalle-cotizacion-title-row">
+
+                <h2>
+                  {cotizacion.codigo}
+                </h2>
+
+                <EstadoBadge
+                  estado={cotizacion.estado}
+                />
+
               </div>
 
-              <p>{cotizacion.nombreProyecto}</p>
+              <p>
+                {cotizacion.nombreProyecto}
+              </p>
+
             </div>
 
-            {!modoEdicion && (
-              <div className="detalle-cotizacion-actions">
-                <button
-                  type="button"
-                  className="detalle-cotizacion-project-button"
-                  onClick={() =>
-                    navigate(
-                      `/panel-cliente/proyectos/${cotizacion.idProyecto}`
-                    )
-                  }
-                >
-                  <FolderOpen size={17} />
-                  Ver proyecto
-                </button>
+            <div className="detalle-cotizacion-actions">
 
-                <button
-                  type="button"
-                  className="detalle-cotizacion-edit-button"
-                  onClick={() => setModoEdicion(true)}
-                >
-                  <Pencil size={17} />
-                  Editar
-                </button>
+              <button
+                type="button"
+                className="detalle-cotizacion-project-button"
+                onClick={() =>
+                  navigate(
+                    `/panel-cliente/proyectos/${cotizacion.idProyecto}`
+                  )
+                }
+              >
+                <FolderOpen size={17} />
 
-                <button
-                  type="button"
-                  className="detalle-cotizacion-delete-button"
-                  onClick={() =>
-                    setMostrarConfirmacion(true)
-                  }
-                >
-                  <Trash2 size={17} />
-                  Eliminar
-                </button>
-              </div>
-            )}
+                Ver proyecto
+              </button>
+
+              <button
+                type="button"
+                className="detalle-cotizacion-delete-button"
+                onClick={() =>
+                  setMostrarConfirmacion(
+                    true
+                  )
+                }
+              >
+                <Trash2 size={17} />
+
+                Eliminar
+              </button>
+
+            </div>
+
           </div>
+
         </section>
+
+        {/* ================================================= */}
+        {/* ERROR */}
+        {/* ================================================= */}
 
         {error && (
           <div className="detalle-cotizacion-error">
@@ -386,239 +447,438 @@ export default function DetalleCotizacion() {
           </div>
         )}
 
-        {!modoEdicion ? (
-          <section className="detalle-cotizacion-content">
-            <article className="detalle-cotizacion-card">
-              <CardTitle
-                icon={<FileText size={21} />}
-                title="Información de la cotización"
+        {/* ================================================= */}
+        {/* CONTENIDO */}
+        {/* ================================================= */}
+
+        <section className="detalle-cotizacion-content">
+
+          {/* ================================================= */}
+          {/* INFORMACIÓN DE COTIZACIÓN */}
+          {/* ================================================= */}
+
+          <article className="detalle-cotizacion-card">
+
+            <CardTitle
+              icon={
+                <FileText size={21} />
+              }
+              title="Información de la cotización"
+            />
+
+            <div className="detalle-cotizacion-info-grid">
+
+              <InfoItem
+                label="Código"
+                value={
+                  cotizacion.codigo
+                }
               />
 
-              <div className="detalle-cotizacion-info-grid">
-                <InfoItem
-                  label="Código"
-                  value={cotizacion.codigo}
-                />
-
-                <InfoItem
-                  label="Estado"
-                  value={cotizacion.estado}
-                />
-
-                <InfoItem
-                  label="Fecha de creación"
-                  value={formatearFecha(
-                    cotizacion.fechaCreacion
-                  )}
-                  icon={<CalendarDays size={16} />}
-                />
-
-                <InfoItem
-                  label="Última actualización"
-                  value={
-                    cotizacion.fechaActualizacion
-                      ? formatearFecha(
-                          cotizacion.fechaActualizacion
-                        )
-                      : "Sin modificaciones"
-                  }
-                />
-
-                <InfoItem
-                  label="Precio estimado"
-                  value={formatearPrecio(
-                    cotizacion.precioEstimado
-                  )}
-                  icon={<CircleDollarSign size={16} />}
-                />
-
-                <div className="detalle-cotizacion-description">
-                  <span>Observaciones</span>
-
-                  <p>
-                    {cotizacion.observaciones ||
-                      "Sin observaciones"}
-                  </p>
-                </div>
-              </div>
-            </article>
-
-            <article className="detalle-cotizacion-card">
-              <CardTitle
-                icon={<FolderOpen size={21} />}
-                title="Proyecto relacionado"
+              <InfoItem
+                label="Estado"
+                value={
+                  cotizacion.estado
+                }
               />
 
-              <div className="detalle-cotizacion-info-grid">
-                <InfoItem
-                  label="Proyecto"
-                  value={cotizacion.nombreProyecto}
-                />
-
-                <InfoItem
-                  label="Ubicación"
-                  value={
-                    cotizacion.ubicacion ||
-                    "No especificada"
-                  }
-                  icon={<MapPin size={16} />}
-                />
-
-                <InfoItem
-                  label="Tipo de obra"
-                  value={`Tipo #${cotizacion.idTipoObra}`}
-                />
-
-                <InfoItem
-                  label="Superficie"
-                  value={`${formatearNumero(
-                    cotizacion.superficie
-                  )} m²`}
-                  icon={<Ruler size={16} />}
-                />
-              </div>
-
-              <div className="detalle-cotizacion-measures">
-                <MeasureItem
-                  label="Alto"
-                  value={`${cotizacion.alto} m`}
-                />
-
-                <MeasureItem
-                  label="Ancho"
-                  value={`${cotizacion.ancho} m`}
-                />
-
-                <MeasureItem
-                  label="Largo"
-                  value={`${cotizacion.largo} m`}
-                />
-              </div>
-            </article>
-          </section>
-        ) : (
-          <form
-            className="detalle-cotizacion-edit-form"
-            onSubmit={guardarCambios}
-          >
-            <article className="detalle-cotizacion-card">
-              <CardTitle
-                icon={<Pencil size={21} />}
-                title="Editar cotización"
+              <InfoItem
+                label="Versión"
+                value={`${cotizacion.version}`}
               />
 
-              <div className="detalle-cotizacion-form-grid">
-                <label className="detalle-cotizacion-field">
-                  <span>Estado</span>
+              <InfoItem
+                label="Fecha de creación"
+                value={formatearFecha(
+                  cotizacion.fechaCreacion
+                )}
+                icon={
+                  <CalendarDays size={16} />
+                }
+              />
 
-                  <select
-                    name="estado"
-                    value={formulario.estado}
-                    onChange={actualizarCampo}
-                  >
-                    <option value="Borrador">
-                      Borrador
-                    </option>
+              <InfoItem
+                label="Última actualización"
+                value={
+                  cotizacion.fechaActualizacion
+                    ? formatearFecha(
+                        cotizacion.fechaActualizacion
+                      )
+                    : "Sin modificaciones"
+                }
+              />
 
-                    <option value="Enviada">
-                      Enviada
-                    </option>
+              {/* ================================================= */}
+              {/* PRECIO ESTIMADO */}
+              {/* ================================================= */}
 
-                    <option value="Revisada">
-                      Revisada
-                    </option>
+              <div className="detalle-cotizacion-info-item">
 
-                    <option value="Aceptada">
-                      Aceptada
-                    </option>
+                <span>
+                  Precio estimado
+                </span>
 
-                    <option value="Rechazada">
-                      Rechazada
-                    </option>
-                  </select>
-                </label>
+                <strong className="detalle-cotizacion-precio">
 
-                <label className="detalle-cotizacion-field">
-                  <span>Precio estimado</span>
+                  <div className="precio-doble">
 
-                  <input
-                    type="number"
-                    name="precioEstimado"
-                    min="0"
-                    step="0.01"
-                    value={formulario.precioEstimado}
-                    onChange={actualizarCampo}
-                    placeholder="Ej.: 850000"
-                  />
-                </label>
+                    <span>
+                      {formatearPrecioUYU(
+                        cotizacion.precioEstimadoUYU
+                      )}{" "}
+                      UYU
+                    </span>
 
-                <label className="detalle-cotizacion-field detalle-cotizacion-field-full">
-                  <span>Observaciones</span>
+                    <small>
+                      (
+                      {formatearPrecioUSD(
+                        cotizacion.precioEstimado
+                      )}{" "}
+                      USD)
+                    </small>
 
-                  <textarea
-                    name="observaciones"
-                    value={formulario.observaciones}
-                    onChange={actualizarCampo}
-                    maxLength={1000}
-                    rows={6}
-                    placeholder="Agregá observaciones sobre la cotización..."
-                  />
-                </label>
+                  </div>
+
+                </strong>
+
               </div>
-            </article>
 
-            <div className="detalle-cotizacion-edit-actions">
-              <button
-                type="button"
-                className="detalle-cotizacion-cancel-button"
-                onClick={cancelarEdicion}
-                disabled={guardando}
-              >
-                <X size={17} />
-                Cancelar
-              </button>
+              {/* ================================================= */}
+              {/* OBSERVACIONES */}
+              {/* ================================================= */}
 
-              <button
-                type="submit"
-                className="detalle-cotizacion-save-button"
-                disabled={guardando}
-              >
-                <Save size={17} />
+              <div className="detalle-cotizacion-description">
 
-                {guardando
-                  ? "Guardando..."
-                  : "Guardar cambios"}
-              </button>
+                <span>
+                  Observaciones
+                </span>
+
+                <p>
+                  {cotizacion.observaciones ||
+                    "Sin observaciones"}
+                </p>
+
+              </div>
+
             </div>
-          </form>
-        )}
+
+          </article>
+
+          {/* ================================================= */}
+          {/* PROYECTO RELACIONADO */}
+          {/* ================================================= */}
+
+          <article className="detalle-cotizacion-card">
+
+            <CardTitle
+              icon={
+                <FolderOpen size={21} />
+              }
+              title="Proyecto relacionado"
+            />
+
+            <div className="detalle-cotizacion-info-grid">
+
+              <InfoItem
+                label="Proyecto"
+                value={
+                  cotizacion.nombreProyecto
+                }
+              />
+
+              <InfoItem
+                label="Ubicación"
+                value={
+                  cotizacion.ubicacion ||
+                  "No especificada"
+                }
+                icon={
+                  <MapPin size={16} />
+                }
+              />
+
+              <InfoItem
+                label="Tipo de obra"
+                value={
+                  proyecto?.tipoObra ??
+                  "No especificado"
+                }
+              />
+
+              <InfoItem
+                label="Superficie"
+                value={`${formatearNumero(
+                  cotizacion.superficie
+                )} m²`}
+                icon={
+                  <Ruler size={16} />
+                }
+              />
+
+            </div>
+
+            {/* ================================================= */}
+            {/* DIMENSIONES */}
+            {/* ================================================= */}
+
+            <div className="detalle-cotizacion-measures">
+
+              <MeasureItem
+                label="Alto"
+                value={`${cotizacion.alto} m`}
+              />
+
+              <MeasureItem
+                label="Ancho"
+                value={`${cotizacion.ancho} m`}
+              />
+
+              <MeasureItem
+                label="Largo"
+                value={`${cotizacion.largo} m`}
+              />
+
+            </div>
+
+          </article>
+
+          {/* ================================================= */}
+          {/* MATERIALES */}
+          {/* ================================================= */}
+
+          <article className="detalle-cotizacion-card">
+
+            <CardTitle
+              icon={
+                <Package size={21} />
+              }
+              title="Materiales utilizados"
+            />
+
+            {cotizacion.materiales?.length === 0 ? (
+
+              <p>
+                No hay materiales asociados a
+                este proyecto.
+              </p>
+
+            ) : (
+
+              <div className="detalle-cotizacion-materiales-lista">
+
+                {cotizacion.materiales?.map(
+                  (material) => {
+
+                    
+
+                    // -----------------------------------------
+                    // PRECIO UNITARIO USD
+                    // -----------------------------------------
+
+                    const precioUSD =
+                      Number(
+                        material.costoUnitario
+                      );
+
+                    // -----------------------------------------
+                    // PRECIO UNITARIO UYU
+                    // -----------------------------------------
+
+                    const precioUYU =
+                      precioUSD *
+                      Number(
+                        cotizacion.tipoCambio
+                      );
+
+                    // -----------------------------------------
+                    // SUBTOTAL USD
+                    // -----------------------------------------
+
+                    const subtotalUSD =
+                      Number(
+                        material.subtotal
+                      );
+
+                    // -----------------------------------------
+                    // SUBTOTAL UYU
+                    // -----------------------------------------
+
+                    const subtotalUYU =
+                      subtotalUSD *
+                      Number(
+                        cotizacion.tipoCambio
+                      );
+
+                    return (
+
+                      <div
+                        key={
+                          material.idMaterialProyecto
+                        }
+                        className="detalle-cotizacion-material"
+                      >
+
+                        {/* ================================= */}
+                        {/* MATERIAL */}
+                        {/* ================================= */}
+
+                        <div className="detalle-cotizacion-material-nombre">
+
+                          {material.nombre}
+
+                        </div>
+
+                        {/* ================================= */}
+                        {/* CANTIDAD */}
+                        {/* ================================= */}
+
+                        <div className="detalle-cotizacion-material-dato">
+
+                          <span>
+                            Cantidad
+                          </span>
+
+                          <strong>
+                            {material.cantidad}{" "}
+                            {material.unidad}
+                          </strong>
+
+                        </div>
+
+                        {/* ================================= */}
+                        {/* PRECIO UNITARIO */}
+                        {/* ================================= */}
+
+                        <div className="detalle-cotizacion-material-dato">
+
+                          <span>
+                            Precio unitario
+                          </span>
+
+                          <strong>
+
+                            <div className="precio-doble">
+
+                              <span>
+                                {formatearPrecioUYU(
+                                  precioUYU
+                                )}{" "}
+                                UYU
+                              </span>
+
+                              <small>
+                                (
+                                {formatearPrecioUSD(
+                                  precioUSD
+                                )}{" "}
+                                USD)
+                              </small>
+
+                            </div>
+
+                          </strong>
+
+                        </div>
+
+                        {/* ================================= */}
+                        {/* SUBTOTAL */}
+                        {/* ================================= */}
+
+                        <div className="detalle-cotizacion-material-dato">
+
+                          <span>
+                            Subtotal
+                          </span>
+
+                          <strong>
+
+                            <div className="precio-doble">
+
+                              <span>
+                                {formatearPrecioUYU(
+                                  subtotalUYU
+                                )}{" "}
+                                UYU
+                              </span>
+
+                              <small>
+                                (
+                                {formatearPrecioUSD(
+                                  subtotalUSD
+                                )}{" "}
+                                USD)
+                              </small>
+
+                            </div>
+
+                          </strong>
+
+                        </div>
+
+                      </div>
+
+                    );
+                  }
+                )}
+
+              </div>
+
+            )}
+
+          </article>
+
+        </section>
+
       </main>
 
+      {/* ================================================= */}
+      {/* MODAL ELIMINAR */}
+      {/* ================================================= */}
+
       {mostrarConfirmacion && (
+
         <div className="detalle-cotizacion-modal-overlay">
+
           <div
             className="detalle-cotizacion-modal"
             role="dialog"
             aria-modal="true"
           >
+
             <div className="detalle-cotizacion-modal-icon">
+
               <Trash2 size={25} />
+
             </div>
 
-            <h3>Eliminar cotización</h3>
+            <h3>
+              Eliminar cotización
+            </h3>
 
             <p>
-              ¿Seguro que querés eliminar la cotización{" "}
-              <strong>{cotizacion.codigo}</strong>? Esta
-              acción no se puede deshacer.
+
+              ¿Seguro que querés eliminar la
+              cotización{" "}
+
+              <strong>
+                {cotizacion.codigo}
+              </strong>
+              ?
+
+              {" "}
+              Esta acción no se puede deshacer.
+
             </p>
 
             <div className="detalle-cotizacion-modal-actions">
+
               <button
                 type="button"
                 className="detalle-cotizacion-cancel-button"
                 onClick={() =>
-                  setMostrarConfirmacion(false)
+                  setMostrarConfirmacion(
+                    false
+                  )
                 }
                 disabled={eliminando}
               >
@@ -628,20 +888,31 @@ export default function DetalleCotizacion() {
               <button
                 type="button"
                 className="detalle-cotizacion-confirm-delete"
-                onClick={eliminarCotizacion}
+                onClick={
+                  eliminarCotizacion
+                }
                 disabled={eliminando}
               >
                 {eliminando
                   ? "Eliminando..."
                   : "Eliminar cotización"}
               </button>
+
             </div>
+
           </div>
+
         </div>
+
       )}
+
     </div>
   );
 }
+
+// =========================================================
+// ESTRUCTURA PARA CARGA / ERROR
+// =========================================================
 
 interface EstructuraDetalleProps {
   menuOpen: boolean;
@@ -658,53 +929,85 @@ function EstructuraDetalle({
 }: EstructuraDetalleProps) {
   return (
     <div className="cliente-panel">
+
       <SidebarCliente
         menuOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
+        onClose={() =>
+          setMenuOpen(false)
+        }
       />
 
       <main className="cliente-main">
+
         <HeaderCliente
           title="Detalle de cotización"
           subtitle="Información de la cotización."
           menuOpen={menuOpen}
           onToggleMenu={() =>
-            setMenuOpen((prev) => !prev)
+            setMenuOpen(
+              (prev) => !prev
+            )
           }
         />
 
         {children}
+
       </main>
+
     </div>
   );
 }
+
+// =========================================================
+// ESTADO
+// =========================================================
 
 function EstadoBadge({
   estado,
 }: {
   estado: EstadoCotizacion;
 }) {
-  const clase = `detalle-cotizacion-status detalle-cotizacion-status-${estado.toLowerCase()}`;
+  const clase =
+    `detalle-cotizacion-status detalle-cotizacion-status-${estado.toLowerCase()}`;
 
-  return <span className={clase}>{estado}</span>;
+  return (
+    <span className={clase}>
+      {estado}
+    </span>
+  );
 }
+
+// =========================================================
+// TÍTULO DE CARD
+// =========================================================
 
 interface CardTitleProps {
   icon: ReactNode;
   title: string;
 }
 
-function CardTitle({ icon, title }: CardTitleProps) {
+function CardTitle({
+  icon,
+  title,
+}: CardTitleProps) {
   return (
     <div className="detalle-cotizacion-card-title">
+
       <div className="detalle-cotizacion-card-icon">
         {icon}
       </div>
 
-      <h3>{title}</h3>
+      <h3>
+        {title}
+      </h3>
+
     </div>
   );
 }
+
+// =========================================================
+// ITEM DE INFORMACIÓN
+// =========================================================
 
 interface InfoItemProps {
   label: string;
@@ -719,15 +1022,23 @@ function InfoItem({
 }: InfoItemProps) {
   return (
     <div className="detalle-cotizacion-info-item">
-      <span>{label}</span>
+
+      <span>
+        {label}
+      </span>
 
       <strong>
         {icon}
         {value}
       </strong>
+
     </div>
   );
 }
+
+// =========================================================
+// MEDIDAS
+// =========================================================
 
 interface MeasureItemProps {
   label: string;
@@ -740,42 +1051,57 @@ function MeasureItem({
 }: MeasureItemProps) {
   return (
     <div className="detalle-cotizacion-measure">
-      <span>{label}</span>
-      <strong>{value}</strong>
+
+      <span>
+        {label}
+      </span>
+
+      <strong>
+        {value}
+      </strong>
+
     </div>
   );
 }
 
-function formatearFecha(fecha: string): string {
-  const fechaCotizacion = new Date(fecha);
+// =========================================================
+// FORMATEAR FECHA
+// =========================================================
 
-  if (Number.isNaN(fechaCotizacion.getTime())) {
+function formatearFecha(
+  fecha: string
+): string {
+  const fechaCotizacion =
+    new Date(fecha);
+
+  if (
+    Number.isNaN(
+      fechaCotizacion.getTime()
+    )
+  ) {
     return "Fecha no disponible";
   }
 
-  return new Intl.DateTimeFormat("es-UY", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(fechaCotizacion);
+  return new Intl.DateTimeFormat(
+    "es-UY",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  ).format(fechaCotizacion);
 }
 
-function formatearPrecio(
-  precio: number | null
+// =========================================================
+// FORMATEAR NÚMERO
+// =========================================================
+
+function formatearNumero(
+  numero: number
 ): string {
-  if (precio === null) {
-    return "Sin calcular";
-  }
-
-  return new Intl.NumberFormat("es-UY", {
-    style: "currency",
-    currency: "UYU",
-    maximumFractionDigits: 0,
-  }).format(precio);
-}
-
-function formatearNumero(numero: number): string {
-  return Number(numero).toFixed(2).replace(".00", "");
+  return Number(numero)
+    .toFixed(2)
+    .replace(".00", "");
 }

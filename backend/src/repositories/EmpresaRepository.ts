@@ -8,7 +8,7 @@ import type {
 } from "../models/PerfilEmpresa";
 
 interface PerfilEmpresaDB {
-idEmpresa: number;
+  idEmpresa: number;
   idUsuario: number;
 
   razonSocial: string;
@@ -27,19 +27,14 @@ idEmpresa: number;
   logo: string;
 
   zonasTrabajo: string;
-
   condicionesComerciales: string;
-
   textoLegal: string;
-
   impuestos: string;
 
   validezCotizacion: number;
 
   diasLaborables: string;
-
   horarioInicio: string;
-
   horarioFin: string;
 
   idiomaDocumentos: string;
@@ -47,7 +42,26 @@ idEmpresa: number;
   fechaRegistro: Date | null;
 }
 
+export interface Empresa {
+  idEmpresa: number;
+  nombreEmpresa: string;
+}
+
 export class EmpresaRepository {
+  public async obtenerEmpresas(): Promise<Empresa[]> {
+    const pool = await connectDB();
+
+    const resultado = await pool.request().query<Empresa>(`
+      SELECT
+        id_Empresa AS idEmpresa,
+        nombreEmpresa
+      FROM Empresa
+      ORDER BY nombreEmpresa ASC
+    `);
+
+    return resultado.recordset;
+  }
+
   public async obtenerEmpresaPorId(
     idEmpresa: number
   ): Promise<PerfilEmpresa | null> {
@@ -116,8 +130,6 @@ export class EmpresaRepository {
             e.idiomaDocumentos,
             ''
           ) AS idiomaDocumentos,
-
-
 
           e.fechaRegistro
         FROM Empresa e

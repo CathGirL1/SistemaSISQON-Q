@@ -10,16 +10,17 @@ import loginRoutes from "../routes/loginUsuario";
 import recuperacionAcceso from "../routes/RecuperacionAcceso";
 import materialRoutes from "../routes/materialRoutes";
 import clienteRoutes from "../routes/clienteRoutes";
+import empresaRoutes from "../routes/empresaRoutes";
 import tipoObraRoutes from "../routes/tipoObraRoutes";
 import manoObraRoutes from "../routes/ManoObraRoutes";
-import empresaRoutes from "../routes/empresaRoutes";
 import usuarioRoutes from "../routes/usuarioRoutes";
 import dashboardRoutes from "../routes/dashboardRoutes";
 
 
 import proyectoRoutes from "../routes/proyectoRoutes";
 import cotizacionRoutes from "../routes/CotizacionRoutes";
-
+import materialProyectoRoutes from "../routes/MaterialProyectoRoutes";
+import monedaRoutes from "../routes/monedaRoutes";
 
 
 import { connectDB } from "./database";
@@ -45,16 +46,17 @@ servidor.use("/api/login", loginRoutes);
 
 servidor.use("/api/recuperacionAcceso", recuperacionAcceso);
 servidor.use("/api/clientes", clienteRoutes);
+servidor.use("/api/empresas", empresaRoutes);
 servidor.use("/api/tipos-obra",tipoObraRoutes);
 servidor.use("/api/mano-obra", manoObraRoutes);
-servidor.use("/api/empresa", empresaRoutes);
 servidor.use("/api/usuario",usuarioRoutes);
 servidor.use("/api/dashboard",dashboardRoutes);
 
 
- servidor.use("/api/proyectos", proyectoRoutes);
+servidor.use("/api/proyectos", proyectoRoutes);
 servidor.use("/api/cotizaciones", cotizacionRoutes); 
-servidor.use("/api/materiales", materialRoutes);
+servidor.use("/api/materiales-proyecto",materialProyectoRoutes);
+servidor.use("/api/moneda", monedaRoutes);
 
 
 const puerto = Number(process.env.PORT) || 3000;

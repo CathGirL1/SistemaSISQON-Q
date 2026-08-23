@@ -14,6 +14,7 @@ export interface MaterialEmpresa {
   unidad: string;
 
   costoUnitario: number;
+  costoUnitarioUYU: number;
   stockCantidad: number;
 
   imagenUrl: string;

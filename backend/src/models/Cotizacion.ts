@@ -2,11 +2,17 @@ export class Cotizacion {
   constructor(
     private _idCotizacion: number | null,
     private _idProyecto: number,
+    private _idEmpresa: number | null,
+    private _fechaRealizada: Date | null,
+    private _costoMateriales: number,
+    private _costoManoObra: number,
+    private _totalCotizacion: number,
     private _fechaCreacion: Date | null,
     private _fechaActualizacion: Date | null,
     private _estado: string,
     private _precioEstimado: number | null,
-    private _observaciones: string | null
+    private _observaciones: string | null,
+    private _version: number = 1
   ) {}
 
   public get idCotizacion(): number | null {
@@ -23,6 +29,38 @@ export class Cotizacion {
 
   public set idProyecto(value: number) {
     this._idProyecto = value;
+  }
+
+  public get fechaRealizada(): Date | null {
+    return this._fechaRealizada;
+  }
+
+  public set fechaRealizada(value: Date | null) {
+    this._fechaRealizada = value;
+  }
+
+  public get costoMateriales(): number {
+    return this._costoMateriales;
+  }
+
+  public set costoMateriales(value: number) {
+    this._costoMateriales = value;
+  }
+
+  public get costoManoObra(): number {
+    return this._costoManoObra;
+  }
+
+  public set costoManoObra(value: number) {
+    this._costoManoObra = value;
+  }
+
+  public get totalCotizacion(): number {
+    return this._totalCotizacion;
+  }
+
+  public set totalCotizacion(value: number) {
+    this._totalCotizacion = value;
   }
 
   public get fechaCreacion(): Date | null {
@@ -64,4 +102,44 @@ export class Cotizacion {
   public set observaciones(value: string | null) {
     this._observaciones = value;
   }
+
+  public get version(): number {
+    return this._version;
+  }
+
+  public set version(value: number) {
+    this._version = value;
+  }
+}
+
+
+// ======================================================
+// DATOS PARA GUARDAR UNA COTIZACIÓN
+// ======================================================
+
+export interface CrearCotizacionDTO {
+  idProyecto: number;
+  idEmpresa?: number | null;
+  estado: string;
+  costoMateriales: number;
+  costoManoObra: number;
+  totalCotizacion: number;
+  precioEstimado: number | null;
+  observaciones: string | null;
+  version: number;
+}
+
+
+// ======================================================
+// DATOS PARA ACTUALIZAR UNA COTIZACIÓN
+// ======================================================
+
+export interface ActualizarCotizacionDTO {
+  idEmpresa?: number | null;
+  estado?: string;
+  costoMateriales?: number;
+  costoManoObra?: number;
+  totalCotizacion?: number;
+  precioEstimado?: number | null;
+  observaciones?: string | null;
 }

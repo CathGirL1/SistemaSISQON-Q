@@ -17,7 +17,7 @@ import {
   Eye,
   Pencil,
   FileText,
-  MoreVertical,
+  
 } from "lucide-react";
 
 
@@ -54,6 +54,7 @@ export interface ProyectoAPI {
 
   tipoObra: string;
 }
+
 
 
 const API_URL =
@@ -371,13 +372,7 @@ const IMAGEN_PROYECTO =
                       estado={proyecto.estado}
                     />
 
-                    <button
-                      type="button"
-                      className="proyecto-options"
-                      aria-label={`Opciones de ${proyecto.nombre}`}
-                    >
-                      <MoreVertical size={19} />
-                    </button>
+                    
                   </div>
 
                   <div className="proyecto-card-content">
