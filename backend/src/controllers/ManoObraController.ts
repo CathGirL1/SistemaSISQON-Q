@@ -1,25 +1,33 @@
-import type { Request, Response } from "express";
+import type {
+  Request,
+  Response,
+} from "express";
 
 import { ManoObraService } from "../services/ManoObraService";
 
 export class ManoObraController {
   private service = new ManoObraService();
 
-  public obtenerManoObra = async (
-    _req: Request,
+  public obtenerManoObraPorEmpresa = async (
+    req: Request,
     res: Response
   ): Promise<void> => {
     try {
+      const idEmpresa = this.convertirIdEmpresa(
+        req.params.idEmpresa
+      );
+
       const manoObra =
-        await this.service.obtenerManoObra();
+        await this.service.obtenerManoObraPorEmpresa(
+          idEmpresa
+        );
 
       res.status(200).json(manoObra);
     } catch (error) {
-      console.error("Error al obtener la mano de obra:", error);
+      const mensaje =
+        this.obtenerMensajeError(error);
 
-      res.status(500).json({
-        mensaje: "Error al obtener la mano de obra",
-      });
+      res.status(400).json({ mensaje });
     }
   };
 
@@ -28,17 +36,29 @@ export class ManoObraController {
     res: Response
   ): Promise<void> => {
     try {
-      const idManoObra = this.convertirId(req.params.id);
+      const idManoObra = this.convertirId(
+        req.params.id
+      );
+
+      const idEmpresa = this.convertirIdEmpresa(
+        req.params.idEmpresa
+      );
 
       const manoObra =
-        await this.service.obtenerManoObraPorId(idManoObra);
+        await this.service.obtenerManoObraPorId(
+          idManoObra,
+          idEmpresa
+        );
 
       res.status(200).json(manoObra);
     } catch (error) {
-      const mensaje = this.obtenerMensajeError(error);
+      const mensaje =
+        this.obtenerMensajeError(error);
 
       const estado =
-        mensaje === "Mano de obra no encontrada" ? 404 : 400;
+        mensaje === "Mano de obra no encontrada"
+          ? 404
+          : 400;
 
       res.status(estado).json({ mensaje });
     }
@@ -50,11 +70,14 @@ export class ManoObraController {
   ): Promise<void> => {
     try {
       const manoObra =
-        await this.service.crearManoObra(req.body);
+        await this.service.crearManoObra(
+          req.body
+        );
 
       res.status(201).json(manoObra);
     } catch (error) {
-      const mensaje = this.obtenerMensajeError(error);
+      const mensaje =
+        this.obtenerMensajeError(error);
 
       res.status(400).json({ mensaje });
     }
@@ -65,20 +88,30 @@ export class ManoObraController {
     res: Response
   ): Promise<void> => {
     try {
-      const idManoObra = this.convertirId(req.params.id);
+      const idManoObra = this.convertirId(
+        req.params.id
+      );
+
+      const idEmpresa = this.convertirIdEmpresa(
+        req.params.idEmpresa
+      );
 
       const manoObra =
         await this.service.actualizarManoObra(
           idManoObra,
+          idEmpresa,
           req.body
         );
 
       res.status(200).json(manoObra);
     } catch (error) {
-      const mensaje = this.obtenerMensajeError(error);
+      const mensaje =
+        this.obtenerMensajeError(error);
 
       const estado =
-        mensaje === "Mano de obra no encontrada" ? 404 : 400;
+        mensaje === "Mano de obra no encontrada"
+          ? 404
+          : 400;
 
       res.status(estado).json({ mensaje });
     }
@@ -89,23 +122,40 @@ export class ManoObraController {
     res: Response
   ): Promise<void> => {
     try {
-      const idManoObra = this.convertirId(req.params.id);
+      const idManoObra = this.convertirId(
+        req.params.id
+      );
 
-      await this.service.eliminarManoObra(idManoObra);
+      const idEmpresa = this.convertirIdEmpresa(
+        req.params.idEmpresa
+      );
+
+      await this.service.eliminarManoObra(
+        idManoObra,
+        idEmpresa
+      );
 
       res.status(204).send();
     } catch (error) {
-      const mensaje = this.obtenerMensajeError(error);
+      const mensaje =
+        this.obtenerMensajeError(error);
 
       const estado =
-        mensaje === "Mano de obra no encontrada" ? 404 : 400;
+        mensaje === "Mano de obra no encontrada"
+          ? 404
+          : 400;
 
       res.status(estado).json({ mensaje });
     }
   };
 
-  private convertirId(valor: string | string[]): number {
-    const valorId = Array.isArray(valor) ? valor[0] : valor;
+  private convertirId(
+    valor: string | string[]
+  ): number {
+    const valorId = Array.isArray(valor)
+      ? valor[0]
+      : valor;
+
     const id = Number(valorId);
 
     if (!Number.isInteger(id) || id <= 0) {
@@ -117,7 +167,30 @@ export class ManoObraController {
     return id;
   }
 
-  private obtenerMensajeError(error: unknown): string {
+  private convertirIdEmpresa(
+    valor: string | string[]
+  ): number {
+    const valorId = Array.isArray(valor)
+      ? valor[0]
+      : valor;
+
+    const idEmpresa = Number(valorId);
+
+    if (
+      !Number.isInteger(idEmpresa) ||
+      idEmpresa <= 0
+    ) {
+      throw new Error(
+        "El identificador de la empresa no es válido"
+      );
+    }
+
+    return idEmpresa;
+  }
+
+  private obtenerMensajeError(
+    error: unknown
+  ): string {
     if (error instanceof Error) {
       return error.message;
     }

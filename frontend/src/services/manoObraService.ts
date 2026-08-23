@@ -3,10 +3,13 @@ import type {
   ManoObraEmpresa,
 } from "../interfaces/ManoObraEmpresa";
 
-const API_URL = "http://localhost:3000/api/mano-obra";
+const API_URL =
+  "http://localhost:3000/api/mano-obra";
 
 export type ManoObraApi = {
   id_ManoObra: number;
+  id_Empresa: number;
+
   codigo: string;
   nombre: string;
   descripcion: string | null;
@@ -28,22 +31,33 @@ export type GuardarManoObraRequest = {
   estado?: EstadoManoObra;
 };
 
-export type CrearManoObraRequest = GuardarManoObraRequest;
+export type CrearManoObraRequest =
+  GuardarManoObraRequest & {
+    idEmpresa: number;
+  };
+
 export type ActualizarManoObraRequest =
   GuardarManoObraRequest;
 
-const formatearFecha = (fecha: string): string => {
+const formatearFecha = (
+  fecha: string
+): string => {
   const fechaConvertida = new Date(fecha);
 
-  if (Number.isNaN(fechaConvertida.getTime())) {
+  if (
+    Number.isNaN(fechaConvertida.getTime())
+  ) {
     return "Sin fecha";
   }
 
-  return new Intl.DateTimeFormat("es-UY", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(fechaConvertida);
+  return new Intl.DateTimeFormat(
+    "es-UY",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }
+  ).format(fechaConvertida);
 };
 
 const transformarManoObra = (
@@ -54,18 +68,27 @@ const transformarManoObra = (
     codigo: trabajo.codigo,
 
     nombre: trabajo.nombre,
-    descripcion: trabajo.descripcion ?? "",
+    descripcion:
+      trabajo.descripcion ?? "",
 
-    categoria: trabajo.categoria ?? "Sin categoría",
-    unidad: trabajo.unidad ?? "",
+    categoria:
+      trabajo.categoria ??
+      "Sin categoría",
 
-    costoUnitario: Number(trabajo.costoUnitario),
+    unidad:
+      trabajo.unidad ?? "",
 
-    observaciones: trabajo.observaciones ?? "",
-
-    ultimaActualizacion: formatearFecha(
-      trabajo.ultimaActualizacion
+    costoUnitario: Number(
+      trabajo.costoUnitario
     ),
+
+    observaciones:
+      trabajo.observaciones ?? "",
+
+    ultimaActualizacion:
+      formatearFecha(
+        trabajo.ultimaActualizacion
+      ),
 
     estado: trabajo.estado,
   };
@@ -76,7 +99,8 @@ const obtenerMensajeError = async (
   mensajePredeterminado: string
 ): Promise<string> => {
   try {
-    const cuerpo: unknown = await respuesta.json();
+    const cuerpo: unknown =
+      await respuesta.json();
 
     if (
       cuerpo &&
@@ -93,36 +117,47 @@ const obtenerMensajeError = async (
   return mensajePredeterminado;
 };
 
-export const obtenerManoObra = async (): Promise<
-  ManoObraEmpresa[]
-> => {
-  const respuesta = await fetch(API_URL);
-
-  if (!respuesta.ok) {
-    throw new Error(
-      await obtenerMensajeError(
-        respuesta,
-        "No se pudo obtener la mano de obra."
-      )
+export const obtenerManoObraPorEmpresa =
+  async (
+    idEmpresa: number
+  ): Promise<ManoObraEmpresa[]> => {
+    const respuesta = await fetch(
+      `${API_URL}/empresa/${idEmpresa}`
     );
-  }
 
-  const trabajosApi: ManoObraApi[] =
-    await respuesta.json();
+    if (!respuesta.ok) {
+      throw new Error(
+        await obtenerMensajeError(
+          respuesta,
+          "No se pudo obtener la mano de obra."
+        )
+      );
+    }
 
-  return trabajosApi.map(transformarManoObra);
-};
+    const trabajosApi: ManoObraApi[] =
+      await respuesta.json();
+
+    return trabajosApi.map(
+      transformarManoObra
+    );
+  };
 
 export const crearManoObra = async (
   datos: CrearManoObraRequest
 ): Promise<ManoObraEmpresa> => {
-  const respuesta = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(datos),
-  });
+  const respuesta = await fetch(
+    API_URL,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+
+      body: JSON.stringify(datos),
+    }
+  );
 
   if (!respuesta.ok) {
     throw new Error(
@@ -136,49 +171,67 @@ export const crearManoObra = async (
   const trabajoCreado: ManoObraApi =
     await respuesta.json();
 
-  return transformarManoObra(trabajoCreado);
+  return transformarManoObra(
+    trabajoCreado
+  );
 };
 
-export const actualizarManoObra = async (
-  id: string,
-  datos: ActualizarManoObraRequest
-): Promise<ManoObraEmpresa> => {
-  const respuesta = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(datos),
-  });
+export const actualizarManoObra =
+  async (
+    id: string,
+    idEmpresa: number,
+    datos: ActualizarManoObraRequest
+  ): Promise<ManoObraEmpresa> => {
+    const respuesta = await fetch(
+      `${API_URL}/${id}/empresa/${idEmpresa}`,
+      {
+        method: "PUT",
 
-  if (!respuesta.ok) {
-    throw new Error(
-      await obtenerMensajeError(
-        respuesta,
-        "No se pudo actualizar la mano de obra."
-      )
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify(datos),
+      }
     );
-  }
 
-  const trabajoActualizado: ManoObraApi =
-    await respuesta.json();
+    if (!respuesta.ok) {
+      throw new Error(
+        await obtenerMensajeError(
+          respuesta,
+          "No se pudo actualizar la mano de obra."
+        )
+      );
+    }
 
-  return transformarManoObra(trabajoActualizado);
-};
+    const trabajoActualizado:
+      ManoObraApi =
+      await respuesta.json();
 
-export const eliminarManoObra = async (
-  id: string
-): Promise<void> => {
-  const respuesta = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!respuesta.ok) {
-    throw new Error(
-      await obtenerMensajeError(
-        respuesta,
-        "No se pudo eliminar la mano de obra."
-      )
+    return transformarManoObra(
+      trabajoActualizado
     );
-  }
-};
+  };
+
+export const eliminarManoObra =
+  async (
+    id: string,
+    idEmpresa: number
+  ): Promise<void> => {
+    const respuesta = await fetch(
+      `${API_URL}/${id}/empresa/${idEmpresa}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(
+        await obtenerMensajeError(
+          respuesta,
+          "No se pudo eliminar la mano de obra."
+        )
+      );
+    }
+  };

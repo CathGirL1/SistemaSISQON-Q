@@ -9,39 +9,49 @@ import type {
 } from "../models/ManoObra";
 
 export class ManoObraRepository {
-  public async obtenerManoObra(): Promise<ManoObra[]> {
+  public async obtenerManoObraPorEmpresa(
+    idEmpresa: number
+  ): Promise<ManoObra[]> {
     const pool = await connectDB();
 
-    const resultado = await pool.request().query<ManoObra>(`
-      SELECT
-        id_ManoObra,
-        codigo,
-        nombre,
-        descripcion,
-        categoria,
-        unidad,
-        costoUnitario,
-        observaciones,
-        ultimaActualizacion,
-        estado
-      FROM ManoObra
-      ORDER BY id_ManoObra DESC
-    `);
+    const resultado = await pool
+      .request()
+      .input("idEmpresa", sql.Int, idEmpresa)
+      .query<ManoObra>(`
+        SELECT
+          id_ManoObra,
+          id_Empresa,
+          codigo,
+          nombre,
+          descripcion,
+          categoria,
+          unidad,
+          costoUnitario,
+          observaciones,
+          ultimaActualizacion,
+          estado
+        FROM ManoObra
+        WHERE id_Empresa = @idEmpresa
+        ORDER BY id_ManoObra DESC
+      `);
 
     return resultado.recordset;
   }
 
   public async obtenerManoObraPorId(
-    idManoObra: number
+    idManoObra: number,
+    idEmpresa: number
   ): Promise<ManoObra | null> {
     const pool = await connectDB();
 
     const resultado = await pool
       .request()
       .input("idManoObra", sql.Int, idManoObra)
+      .input("idEmpresa", sql.Int, idEmpresa)
       .query<ManoObra>(`
         SELECT
           id_ManoObra,
+          id_Empresa,
           codigo,
           nombre,
           descripcion,
@@ -53,6 +63,7 @@ export class ManoObraRepository {
           estado
         FROM ManoObra
         WHERE id_ManoObra = @idManoObra
+          AND id_Empresa = @idEmpresa
       `);
 
     return resultado.recordset[0] ?? null;
@@ -65,7 +76,16 @@ export class ManoObraRepository {
 
     const resultado = await pool
       .request()
-      .input("nombre", sql.VarChar(100), manoObra.nombre)
+      .input(
+        "idEmpresa",
+        sql.Int,
+        manoObra.idEmpresa
+      )
+      .input(
+        "nombre",
+        sql.VarChar(100),
+        manoObra.nombre
+      )
       .input(
         "descripcion",
         sql.VarChar(255),
@@ -98,6 +118,7 @@ export class ManoObraRepository {
       )
       .query<ManoObra>(`
         INSERT INTO ManoObra (
+          id_Empresa,
           nombre,
           descripcion,
           categoria,
@@ -109,6 +130,7 @@ export class ManoObraRepository {
         )
         OUTPUT
           INSERTED.id_ManoObra,
+          INSERTED.id_Empresa,
           INSERTED.codigo,
           INSERTED.nombre,
           INSERTED.descripcion,
@@ -119,6 +141,7 @@ export class ManoObraRepository {
           INSERTED.ultimaActualizacion,
           INSERTED.estado
         VALUES (
+          @idEmpresa,
           @nombre,
           @descripcion,
           @categoria,
@@ -135,6 +158,7 @@ export class ManoObraRepository {
 
   public async actualizarManoObra(
     idManoObra: number,
+    idEmpresa: number,
     manoObra: ActualizarManoObraDTO
   ): Promise<ManoObra | null> {
     const pool = await connectDB();
@@ -142,7 +166,12 @@ export class ManoObraRepository {
     const resultado = await pool
       .request()
       .input("idManoObra", sql.Int, idManoObra)
-      .input("nombre", sql.VarChar(100), manoObra.nombre)
+      .input("idEmpresa", sql.Int, idEmpresa)
+      .input(
+        "nombre",
+        sql.VarChar(100),
+        manoObra.nombre
+      )
       .input(
         "descripcion",
         sql.VarChar(255),
@@ -186,6 +215,7 @@ export class ManoObraRepository {
           estado = @estado
         OUTPUT
           INSERTED.id_ManoObra,
+          INSERTED.id_Empresa,
           INSERTED.codigo,
           INSERTED.nombre,
           INSERTED.descripcion,
@@ -196,22 +226,26 @@ export class ManoObraRepository {
           INSERTED.ultimaActualizacion,
           INSERTED.estado
         WHERE id_ManoObra = @idManoObra
+          AND id_Empresa = @idEmpresa
       `);
 
     return resultado.recordset[0] ?? null;
   }
 
   public async eliminarManoObra(
-    idManoObra: number
+    idManoObra: number,
+    idEmpresa: number
   ): Promise<boolean> {
     const pool = await connectDB();
 
     const resultado = await pool
       .request()
       .input("idManoObra", sql.Int, idManoObra)
+      .input("idEmpresa", sql.Int, idEmpresa)
       .query(`
         DELETE FROM ManoObra
         WHERE id_ManoObra = @idManoObra
+          AND id_Empresa = @idEmpresa
       `);
 
     return (resultado.rowsAffected[0] ?? 0) > 0;

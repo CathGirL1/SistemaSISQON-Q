@@ -14,8 +14,10 @@ import {
   actualizarManoObra,
   crearManoObra,
   eliminarManoObra as eliminarManoObraApi,
-  obtenerManoObra,
+  obtenerManoObraPorEmpresa,
 } from "../services/manoObraService";
+
+import useEmpresa from "./useEmpresa";
 
 type ModoModalManoObra =
   | "crear"
@@ -46,6 +48,10 @@ const normalizarTexto = (
 };
 
 export default function useManoObra() {
+  const { empresa } = useEmpresa();
+
+  const idEmpresa = empresa?.idEmpresa;
+
   const [trabajos, setTrabajos] =
     useState<ManoObraEmpresa[]>([]);
 
@@ -112,18 +118,6 @@ export default function useManoObra() {
   const timeoutToast =
     useRef<number | null>(null);
 
-  useEffect(() => {
-    void cargarManoObra();
-
-    return () => {
-      if (timeoutToast.current !== null) {
-        window.clearTimeout(
-          timeoutToast.current
-        );
-      }
-    };
-  }, []);
-
   const mostrarToast = (
     mensaje: string,
     tipo: "success" | "error" =
@@ -160,12 +154,20 @@ export default function useManoObra() {
 
   const cargarManoObra =
     async (): Promise<void> => {
+      if (!idEmpresa) {
+        setTrabajos([]);
+        setCargando(false);
+        return;
+      }
+
       try {
         setCargando(true);
         setError(null);
 
         const datos =
-          await obtenerManoObra();
+          await obtenerManoObraPorEmpresa(
+            idEmpresa
+          );
 
         const datosOrdenados = [
           ...datos,
@@ -188,6 +190,22 @@ export default function useManoObra() {
         setCargando(false);
       }
     };
+
+  useEffect(() => {
+    if (!idEmpresa) {
+      return;
+    }
+
+    void cargarManoObra();
+
+    return () => {
+      if (timeoutToast.current !== null) {
+        window.clearTimeout(
+          timeoutToast.current
+        );
+      }
+    };
+  }, [idEmpresa]);
 
   const abrirCrear = () => {
     setTrabajoAccion(null);
@@ -219,23 +237,47 @@ export default function useManoObra() {
   const guardarManoObra = async (
     trabajoFormulario: ManoObraEmpresa
   ): Promise<void> => {
+    if (!idEmpresa) {
+      mostrarToast(
+        "No se pudo identificar la empresa.",
+        "error"
+      );
+      return;
+    }
+
     try {
       setGuardando(true);
 
       if (modoModal === "crear") {
-        const trabajoParaCrear: ManoObraEmpresa =
-          {
-            ...trabajoFormulario,
-
-            // El backend genera estos valores.
-            id: "",
-            codigo: "",
-          };
-
         const trabajoCreado =
-          await crearManoObra(
-            trabajoParaCrear
-          );
+          await crearManoObra({
+            nombre:
+              trabajoFormulario.nombre,
+
+            descripcion:
+              trabajoFormulario.descripcion ||
+              null,
+
+            categoria:
+              trabajoFormulario.categoria ||
+              null,
+
+            unidad:
+              trabajoFormulario.unidad ||
+              null,
+
+            costoUnitario:
+              trabajoFormulario.costoUnitario,
+
+            observaciones:
+              trabajoFormulario.observaciones ||
+              null,
+
+            estado:
+              trabajoFormulario.estado,
+
+            idEmpresa,
+          });
 
         setTrabajos(
           (listaActual) =>
@@ -263,7 +305,33 @@ export default function useManoObra() {
         const trabajoActualizado =
           await actualizarManoObra(
             trabajoAccion.id,
-            trabajoFormulario
+            idEmpresa,
+            {
+              nombre:
+                trabajoFormulario.nombre,
+
+              descripcion:
+                trabajoFormulario.descripcion ||
+                null,
+
+              categoria:
+                trabajoFormulario.categoria ||
+                null,
+
+              unidad:
+                trabajoFormulario.unidad ||
+                null,
+
+              costoUnitario:
+                trabajoFormulario.costoUnitario,
+
+              observaciones:
+                trabajoFormulario.observaciones ||
+                null,
+
+              estado:
+                trabajoFormulario.estado,
+            }
           );
 
         setTrabajos(
@@ -307,22 +375,44 @@ export default function useManoObra() {
   const cambiarEstado = async (
     trabajo: ManoObraEmpresa
   ): Promise<void> => {
+    if (!idEmpresa) {
+      mostrarToast(
+        "No se pudo identificar la empresa.",
+        "error"
+      );
+      return;
+    }
+
     try {
       const nuevoEstado: EstadoManoObra =
         trabajo.estado === "Activo"
           ? "Inactivo"
           : "Activo";
 
-      const trabajoParaActualizar: ManoObraEmpresa =
-        {
-          ...trabajo,
-          estado: nuevoEstado,
-        };
-
       const trabajoActualizado =
         await actualizarManoObra(
           trabajo.id,
-          trabajoParaActualizar
+          idEmpresa,
+          {
+            nombre: trabajo.nombre,
+
+            descripcion:
+              trabajo.descripcion || null,
+
+            categoria:
+              trabajo.categoria || null,
+
+            unidad:
+              trabajo.unidad || null,
+
+            costoUnitario:
+              trabajo.costoUnitario,
+
+            observaciones:
+              trabajo.observaciones || null,
+
+            estado: nuevoEstado,
+          }
         );
 
       setTrabajos(
@@ -361,11 +451,21 @@ export default function useManoObra() {
         return;
       }
 
+      if (!idEmpresa) {
+        mostrarToast(
+          "No se pudo identificar la empresa.",
+          "error"
+        );
+
+        return;
+      }
+
       try {
         setGuardando(true);
 
         await eliminarManoObraApi(
-          trabajoAccion.id
+          trabajoAccion.id,
+          idEmpresa
         );
 
         const idEliminado =

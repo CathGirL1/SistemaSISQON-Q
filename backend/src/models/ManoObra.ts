@@ -3,6 +3,7 @@ export type EstadoManoObra = "Activo" | "Inactivo";
 export class ManoObra {
   constructor(
     public id_ManoObra: number,
+    public id_Empresa: number,
     public codigo: string,
     public nombre: string,
     public descripcion: string | null,
@@ -16,6 +17,8 @@ export class ManoObra {
 }
 
 export interface CrearManoObraDTO {
+  idEmpresa: number;
+
   nombre: string;
   descripcion?: string | null;
   categoria?: string | null;
@@ -25,5 +28,12 @@ export interface CrearManoObraDTO {
   estado?: EstadoManoObra;
 }
 
-export interface ActualizarManoObraDTO
-  extends CrearManoObraDTO {}
+export interface ActualizarManoObraDTO {
+  nombre: string;
+  descripcion?: string | null;
+  categoria?: string | null;
+  unidad?: string | null;
+  costoUnitario: number;
+  observaciones?: string | null;
+  estado?: EstadoManoObra;
+}
