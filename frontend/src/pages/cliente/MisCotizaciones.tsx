@@ -49,6 +49,7 @@ interface CotizacionAPI {
   observaciones: string | null;
   idCliente: number;
   idTipoObra: number;
+  tipoObra: string;
   nombreProyecto: string;
   descripcionProyecto: string | null;
   ubicacion: string | null;
@@ -71,6 +72,11 @@ export default function MisCotizaciones() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [tipoSeleccionado, setTipoSeleccionado] = useState("Todos");
+  const [estadoSeleccionado, setEstadoSeleccionado] = useState("Todos");
+  const [ordenFecha, setOrdenFecha] = useState<"reciente" | "antigua">(
+    "reciente"
+  );
 
   const [cotizaciones, setCotizaciones] = useState<CotizacionAPI[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -94,7 +100,7 @@ export default function MisCotizaciones() {
       if (!response.ok) {
         throw new Error(
           data.mensaje ||
-            "No se pudieron obtener las cotizaciones"
+          "No se pudieron obtener las cotizaciones"
         );
       }
 
@@ -111,25 +117,61 @@ export default function MisCotizaciones() {
     }
   };
 
+  const tiposObra = useMemo(() => {
+    return Array.from(
+      new Set(
+        cotizaciones
+          .map((cotizaciones) => cotizaciones.tipoObra)
+          .filter(Boolean)
+      )
+    ).sort();
+  }, [cotizaciones]);
+
   const cotizacionesFiltradas = useMemo(() => {
     const textoBusqueda = busqueda.trim().toLowerCase();
 
-    if (!textoBusqueda) {
-      return cotizaciones;
-    }
-
-    return cotizaciones.filter((cotizacion) => {
+    const resultado = cotizaciones.filter((cotizacion) => {
       const texto = `
         ${cotizacion.codigo}
         ${cotizacion.nombreProyecto}
+        ${cotizacion.tipoObra}
         ${cotizacion.estado}
         ${cotizacion.ubicacion ?? ""}
-        ${cotizacion.idTipoObra}
-      `;
+      `.toLowerCase();
 
-      return texto.toLowerCase().includes(textoBusqueda);
+      const coincideBusqueda =
+        !textoBusqueda || texto.includes(textoBusqueda);
+
+      const coincideTipo =
+        tipoSeleccionado === "Todos" ||
+        cotizacion.tipoObra === tipoSeleccionado;
+
+      const coincideEstado =
+        estadoSeleccionado === "Todos" ||
+        cotizacion.estado === estadoSeleccionado;
+
+      return (
+        coincideBusqueda &&
+        coincideTipo &&
+        coincideEstado
+      );
     });
-  }, [busqueda, cotizaciones]);
+
+    return [...resultado].sort((a, b) => {
+      const fechaA = new Date(a.fechaCreacion).getTime();
+      const fechaB = new Date(b.fechaCreacion).getTime();
+
+      return ordenFecha === "reciente"
+        ? fechaB - fechaA
+        : fechaA - fechaB;
+    });
+  }, [
+    busqueda,
+    tipoSeleccionado,
+    estadoSeleccionado,
+    ordenFecha,
+    cotizaciones,
+  ]);
 
   const totalPendientes = cotizaciones.filter(
     (cotizacion) =>
@@ -239,23 +281,88 @@ export default function MisCotizaciones() {
             />
           </label>
 
-          <button type="button" className="filter-button">
-            Todos los tipos
-            <ChevronDown size={17} />
-          </button>
+          <div className="filter-select">
+            <span>
+              {tipoSeleccionado === "Todos"
+                ? "Todos los tipos"
+                : tipoSeleccionado}
+            </span>
 
-          <button type="button" className="filter-button">
-            Todos los estados
             <ChevronDown size={17} />
-          </button>
 
-          <button
-            type="button"
-            className="filter-button date-filter"
-          >
+            <select
+              aria-label="Filtrar por tipo de obra"
+              value={tipoSeleccionado}
+              onChange={(event) =>
+                setTipoSeleccionado(event.target.value)
+              }
+            >
+              <option value="Todos">Todos los tipos</option>
+
+              {tiposObra.map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {tipo}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-select">
+            <span>
+              {estadoSeleccionado === "Todos"
+                ? "Todos los estados"
+                : estadoSeleccionado}
+            </span>
+
+            <ChevronDown size={17} />
+
+            <select
+              aria-label="Filtrar por estado"
+              value={estadoSeleccionado}
+              onChange={(event) =>
+                setEstadoSeleccionado(event.target.value)
+              }
+            >
+              <option value="Todos">Todos los estados</option>
+              <option value="Borrador">Borrador</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Enviada">Enviada</option>
+              <option value="Revisada">Revisada</option>
+              <option value="Aceptada">Aceptada</option>
+              <option value="Aprobada">Aprobada</option>
+              <option value="Rechazada">Rechazada</option>
+            </select>
+          </div>
+
+          <div className="filter-select date-filter">
             <CalendarDays size={18} />
-            Fecha: más reciente
-          </button>
+
+            <span>
+              {ordenFecha === "reciente"
+                ? "Fecha: más reciente"
+                : "Fecha: más antigua"}
+            </span>
+
+            <ChevronDown size={17} />
+
+            <select
+              aria-label="Ordenar por fecha"
+              value={ordenFecha}
+              onChange={(event) =>
+                setOrdenFecha(
+                  event.target.value as "reciente" | "antigua"
+                )
+              }
+            >
+              <option value="reciente">
+                Fecha: más reciente
+              </option>
+
+              <option value="antigua">
+                Fecha: más antigua
+              </option>
+            </select>
+          </div>
         </section>
 
         {cargando && (
@@ -363,7 +470,7 @@ export default function MisCotizaciones() {
                           </td>
 
                           <td>
-                            Tipo #{cotizacion.idTipoObra}
+                            {cotizacion.tipoObra}
                           </td>
 
                           <td>
@@ -461,7 +568,7 @@ export default function MisCotizaciones() {
           </div>
         </aside>
       </main>
-    </div>
+    </div >
   );
 }
 
@@ -470,11 +577,11 @@ interface StatCardProps {
   value: string;
   label: string;
   variant:
-    | "blue"
-    | "orange"
-    | "purple"
-    | "green"
-    | "red";
+  | "blue"
+  | "orange"
+  | "purple"
+  | "green"
+  | "red";
 }
 
 function StatCard({

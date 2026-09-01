@@ -147,16 +147,74 @@
 }
 
 .filter-button {
-  padding: 0 14px;
-  cursor: pointer;
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
+}
+
+.filter-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  height: 44px;
+  padding: 0 14px;
+
+  background: #ffffff;
+  border: 1px solid #d7e0ee;
+  border-radius: 10px;
+
+  color: #0b2d63;
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.filter-select:hover {
+  border-color: #9fb2cc;
+}
+
+.filter-select span {
+  flex: 1;
+  min-width: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  pointer-events: none;
+}
+
+.filter-select svg {
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.filter-select select {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  opacity: 0;
+  cursor: pointer;
 }
 
 .date-filter {
-  justify-content: flex-start;
+  display: flex;
+  align-items: center;
+}
+
+.date-filter span {
+  flex: 1;
+}
+
+.date-filter select {
+  padding-right: 10px;
 }
 
 /* TABLA */

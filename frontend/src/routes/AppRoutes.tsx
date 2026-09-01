@@ -15,7 +15,6 @@ import AsistenteIA from "../pages/cliente/AsistenteIA";
 import CrearProyecto from "../pages/cliente/CrearProyecto";
 import DetalleProyecto from "../pages/cliente/DetalleProyecto"
 import DetalleCotizacion from "../pages/cliente/DetalleCotizacion";
-import { Import } from "lucide-react";
 
 export default function AppRoutes() {
   return (

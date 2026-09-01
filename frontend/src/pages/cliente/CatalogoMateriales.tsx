@@ -18,13 +18,6 @@ import HeaderCliente from "../../components/cliente/HeaderCliente";
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/CatalogoMateriales.css";
 
-type CategoriaMaterial =
-  | "Maderas"
-  | "Pisos"
-  | "Revestimientos"
-  | "Cubiertas"
-  | "Aberturas";
-
 interface MaterialAPI {
   idMaterial: number;
   nombre: string;
@@ -61,8 +54,6 @@ export default function CatalogoMateriales() {
     "http://localhost:3000";
 
   const [materiales, setMateriales] = useState<Material[]>([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     obtenerMateriales();

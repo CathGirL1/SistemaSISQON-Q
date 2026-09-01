@@ -47,6 +47,7 @@ interface Cotizacion {
 
   idCliente: number;
   idTipoObra: number;
+  tipoObra: string;
   nombreProyecto: string;
   descripcionProyecto: string | null;
   ubicacion: string | null;
@@ -471,7 +472,7 @@ export default function DetalleCotizacion() {
 
                 <InfoItem
                   label="Tipo de obra"
-                  value={`Tipo #${cotizacion.idTipoObra}`}
+                  value={cotizacion.tipoObra}
                 />
 
                 <InfoItem
