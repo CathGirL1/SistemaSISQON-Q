@@ -290,6 +290,9 @@ export class CotizacionRepository {
 
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
         INNER JOIN Empresa e
           ON e.id_Empresa = c.id_Empresa
@@ -631,7 +634,7 @@ export class CotizacionRepository {
 
           p.id_Cliente AS idCliente,
           p.id_TipoObra AS idTipoObra,
-
+          t.nombre AS tipoObra,
           p.nombre AS nombreProyecto,
           p.descripcion AS descripcionProyecto,
 
@@ -650,6 +653,9 @@ export class CotizacionRepository {
 
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
         WHERE c.id_Proyecto = @idProyecto
 
@@ -716,7 +722,7 @@ export class CotizacionRepository {
 
           p.id_Cliente AS idCliente,
           p.id_TipoObra AS idTipoObra,
-
+          t.nombre AS tipoObra,
           p.nombre AS nombreProyecto,
           p.descripcion AS descripcionProyecto,
 
@@ -735,6 +741,9 @@ export class CotizacionRepository {
 
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
         LEFT JOIN Empresa e
           ON e.id_Empresa = c.id_Empresa
@@ -935,7 +944,7 @@ export class CotizacionRepository {
   }
 
 
-  public async enviarCotizacion(
+    public async enviarCotizacion(
     idCotizacion: number,
     idEmpresa: number
   ): Promise<boolean> {
@@ -966,9 +975,33 @@ export class CotizacionRepository {
     return result.rowsAffected[0] > 0;
   }
 
-  // ====================================================
-  // VERIFICAR SI EXISTE PROYECTO
-  // ====================================================
+  public async obtenerCotizacionBorradorPorProyecto(
+    idProyecto: number
+  ) {
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+      .input("idProyecto", sql.Int, idProyecto)
+      .query(`
+        SELECT TOP 1
+          c.id_Cotizacion AS idCotizacion,
+          c.id_Proyecto AS idProyecto,
+          c.fechaCreacion,
+          c.fechaActualizacion,
+          c.estado,
+          c.precioEstimado,
+          c.observaciones
+        FROM Cotizacion c
+        WHERE c.id_Proyecto = @idProyecto
+          AND c.estado = 'Borrador'
+        ORDER BY
+          c.fechaCreacion DESC,
+          c.id_Cotizacion DESC
+      `);
+
+    return result.recordset[0] ?? null;
+  }
 
   public async existeProyecto(
     idProyecto: number
