@@ -1,4 +1,4 @@
-import { MaterialRepository } from "../repositories/MaterialRepository";
+import { MaterialRepository } from "../repositories/materialRepository";
 import { MonedaService } from "./MonedaService";
 
 import type {
