@@ -61,6 +61,7 @@ interface CotizacionAPI {
 
   idCliente: number;
   idTipoObra: number;
+  tipoObra: string;
   nombreProyecto: string;
   descripcionProyecto: string | null;
   ubicacion: string | null;
@@ -80,6 +81,11 @@ export default function MisCotizaciones() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [tipoSeleccionado, setTipoSeleccionado] = useState("Todos");
+  const [estadoSeleccionado, setEstadoSeleccionado] = useState("Todos");
+  const [ordenFecha, setOrdenFecha] = useState<"reciente" | "antigua">(
+    "reciente"
+  );
 
   const [cotizaciones, setCotizaciones] =
     useState<CotizacionAPI[]>([]);
@@ -225,37 +231,67 @@ export default function MisCotizaciones() {
   // -----------------------------------------
   // FILTRO DE BÚSQUEDA
   // -----------------------------------------
+  const tiposObra = useMemo(() => {
+    return Array.from(
+      new Set(
+        cotizaciones
+          .map((cotizaciones) => cotizaciones.tipoObra)
+          .filter(Boolean)
+      )
+    ).sort();
+  }, [cotizaciones]);
 
   const cotizacionesFiltradas = useMemo(() => {
     const textoBusqueda =
       busqueda.trim().toLowerCase();
 
-    if (!textoBusqueda) {
-      return cotizaciones;
-    }
+    const resultado = cotizaciones.filter((cotizacion) => {
+      const texto = `
+        ${cotizacion.codigo}
+        ${cotizacion.nombreProyecto}
+        ${cotizacion.tipoObra}
+        ${cotizacion.estado}
+        ${cotizacion.ubicacion ?? ""}
+      `.toLowerCase();
 
-    return cotizaciones.filter(
-      (cotizacion) => {
-        const texto = `
-          ${cotizacion.codigo}
-          ${cotizacion.nombreProyecto}
-          ${cotizacion.estado}
-          ${cotizacion.ubicacion ?? ""}
-          ${cotizacion.idTipoObra}
-        `;
+      const coincideBusqueda =
+        !textoBusqueda || texto.includes(textoBusqueda);
 
-        return texto
-          .toLowerCase()
-          .includes(textoBusqueda);
-      }
-    );
-  }, [busqueda, cotizaciones]);
+      const coincideTipo =
+        tipoSeleccionado === "Todos" ||
+        cotizacion.tipoObra === tipoSeleccionado;
 
+      const coincideEstado =
+        estadoSeleccionado === "Todos" ||
+        cotizacion.estado === estadoSeleccionado;
+
+      return (
+        coincideBusqueda &&
+        coincideTipo &&
+        coincideEstado
+      );
+    });
+
+    return [...resultado].sort((a, b) => {
+      const fechaA = new Date(a.fechaCreacion).getTime();
+      const fechaB = new Date(b.fechaCreacion).getTime();
+
+      return ordenFecha === "reciente"
+        ? fechaB - fechaA
+        : fechaA - fechaB;
+    });
+  }, [
+    busqueda,
+    tipoSeleccionado,
+    estadoSeleccionado,
+    ordenFecha,
+    cotizaciones,
+  ]);
   // -----------------------------------------
   // ESTADÍSTICAS
   // -----------------------------------------
 
-    const totalBorradores =
+  const totalBorradores =
     cotizaciones.filter(
       (cotizacion) =>
         cotizacion.estado === "Borrador"
@@ -387,70 +423,131 @@ export default function MisCotizaciones() {
 
           </label>
 
-          <button
-            type="button"
-            className="filter-button"
-          >
-            Todos los tipos
-            <ChevronDown size={17} />
-          </button>
+          <div className="filter-select">
+            <span>
+              {tipoSeleccionado === "Todos"
+                ? "Todos los tipos"
+                : tipoSeleccionado}
+            </span>
 
-          <button
-            type="button"
-            className="filter-button"
-          >
-            Todos los estados
             <ChevronDown size={17} />
-          </button>
 
-          <button
-            type="button"
-            className="filter-button date-filter"
-          >
+            <select
+              aria-label="Filtrar por tipo de obra"
+              value={tipoSeleccionado}
+              onChange={(event) =>
+                setTipoSeleccionado(event.target.value)
+              }
+            >
+              <option value="Todos">Todos los tipos</option>
+
+              {tiposObra.map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {tipo}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-select">
+            <span>
+              {estadoSeleccionado === "Todos"
+                ? "Todos los estados"
+                : estadoSeleccionado}
+            </span>
+
+            <ChevronDown size={17} />
+
+            <select
+              aria-label="Filtrar por estado"
+              value={estadoSeleccionado}
+              onChange={(event) =>
+                setEstadoSeleccionado(event.target.value)
+              }
+            >
+              <option value="Todos">Todos los estados</option>
+              <option value="Borrador">Borrador</option>
+              <option value="Enviada">Enviada</option>
+              <option value="Revisada">Revisada</option>
+              <option value="Aceptada">Aceptada</option>
+              <option value="Rechazada">Rechazada</option>
+            </select>
+          </div>
+
+          <div className="filter-select date-filter">
             <CalendarDays size={18} />
-            Fecha: más reciente
-          </button>
 
+            <span>
+              {ordenFecha === "reciente"
+                ? "Fecha: más reciente"
+                : "Fecha: más antigua"}
+            </span>
+
+            <ChevronDown size={17} />
+
+            <select
+              aria-label="Ordenar por fecha"
+              value={ordenFecha}
+              onChange={(event) =>
+                setOrdenFecha(
+                  event.target.value as "reciente" | "antigua"
+                )
+              }
+            >
+              <option value="reciente">
+                Fecha: más reciente
+              </option>
+
+              <option value="antigua">
+                Fecha: más antigua
+              </option>
+            </select>
+          </div>
         </section>
 
         {/* ---------------------------------- */}
         {/* CARGANDO */}
         {/* ---------------------------------- */}
 
-        {cargando && (
-          <section className="cotizaciones-feedback">
-            <p>
-              Cargando cotizaciones...
-            </p>
-          </section>
-        )}
+        {
+          cargando && (
+            <section className="cotizaciones-feedback">
+              <p>
+                Cargando cotizaciones...
+              </p>
+            </section>
+          )
+        }
 
         {/* ---------------------------------- */}
         {/* ERROR */}
         {/* ---------------------------------- */}
 
-        {!cargando && error && (
-          <section className="cotizaciones-feedback">
+        {
+          !cargando && error && (
+            <section className="cotizaciones-feedback">
 
-            <p>
-              {error}
-            </p>
+              <p>
+                {error}
+              </p>
 
-            <button
-              type="button"
-              onClick={obtenerCotizaciones}
-            >
-              Volver a intentar
-            </button>
+              <button
+                type="button"
+                onClick={obtenerCotizaciones}
+              >
+                Volver a intentar
+              </button>
 
-          </section>
-        )}
+            </section>
+          )
+        }
 
         {/* ---------------------------------- */}
         {/* TABLA */}
         {/* ---------------------------------- */}
 
-        {!cargando &&
+        {
+          !cargando &&
           !error &&
           cotizacionesFiltradas.length > 0 && (
 
@@ -504,7 +601,7 @@ export default function MisCotizaciones() {
                               <img
                                 src={
                                   imagenesProyectos[
-                                    cotizacion.idProyecto
+                                  cotizacion.idProyecto
                                   ] ??
                                   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200"
                                 }
@@ -566,23 +663,26 @@ export default function MisCotizaciones() {
                           <td>
                             {
                               tiposObraProyectos[
-                                cotizacion.idProyecto
+                              cotizacion.idProyecto
                               ] ??
                               "No especificado"
                             }
-                          </td>
+                            {cotizacion.tipoObra}
+                          </td >
 
                           {/* SUPERFICIE */}
 
                           <td>
-                            {formatearSuperficie(
-                              cotizacion.superficie
-                            )}
-                          </td>
+                            {
+                              formatearSuperficie(
+                                cotizacion.superficie
+                              )
+                            }
+                          </td >
 
                           {/* ESTADO */}
 
-                          <td>
+                          < td >
 
                             <EstadoBadge
                               estado={
@@ -590,11 +690,11 @@ export default function MisCotizaciones() {
                               }
                             />
 
-                          </td>
+                          </td >
 
                           {/* PRECIO */}
 
-                          <td className="cotizacion-precio">
+                          < td className="cotizacion-precio" >
 
                             <div className="precio-doble">
 
@@ -616,11 +716,11 @@ export default function MisCotizaciones() {
 
                             </div>
 
-                          </td>
+                          </td >
 
                           {/* ACCIONES */}
 
-                          <td>
+                          < td >
 
                             <div className="cotizacion-actions">
 
@@ -682,22 +782,23 @@ export default function MisCotizaciones() {
 
                             </div>
 
-                          </td>
+                          </td >
 
-                        </tr>
+                        </tr >
 
                       )
-                    )}
+                    )
+                    }
 
-                  </tbody>
+                  </tbody >
 
-                </table>
+                </table >
 
-              </div>
+              </div >
 
               {/* PAGINACIÓN */}
 
-              <footer className="cotizaciones-pagination">
+              < footer className="cotizaciones-pagination" >
 
                 <span>
 
@@ -711,17 +812,19 @@ export default function MisCotizaciones() {
 
                 </span>
 
-              </footer>
+              </footer >
 
-            </section>
+            </section >
 
-          )}
+          )
+        }
 
         {/* ---------------------------------- */}
         {/* SIN RESULTADOS */}
         {/* ---------------------------------- */}
 
-        {!cargando &&
+        {
+          !cargando &&
           !error &&
           cotizacionesFiltradas.length === 0 && (
 
@@ -733,7 +836,8 @@ export default function MisCotizaciones() {
 
             </section>
 
-          )}
+          )
+        }
 
         {/* ---------------------------------- */}
         {/* CONSEJO */}
@@ -764,9 +868,9 @@ export default function MisCotizaciones() {
 
         </aside>
 
-      </main>
+      </main >
 
-    </div>
+    </div >
   );
 }
 
@@ -779,11 +883,11 @@ interface StatCardProps {
   value: string;
   label: string;
   variant:
-    | "blue"
-    | "orange"
-    | "purple"
-    | "green"
-    | "red";
+  | "blue"
+  | "orange"
+  | "purple"
+  | "green"
+  | "red";
 }
 
 function StatCard({
