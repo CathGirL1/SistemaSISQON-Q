@@ -42,9 +42,28 @@ export class CotizacionService {
       this.validarObservaciones(data.observaciones);
     }
 
+    const estado =
+      data.estado?.trim() || "Borrador";
+
+    if(estado === "Borrador") {
+      const borradorExistente =
+        await this.repository.obtenerCotizacionBorradorPorProyecto(
+          data.idProyecto
+        );
+
+        console.log(
+          "BORRADOR ENCONTRADO:",
+          borradorExistente
+        );
+
+      if(borradorExistente) {
+        return borradorExistente.idCotizacion;
+      }
+    }
+
     return this.repository.crearCotizacion({
       idProyecto: data.idProyecto,
-      estado: data.estado?.trim() || "Borrador",
+      estado,
       precioEstimado: data.precioEstimado ?? null,
       observaciones:
         data.observaciones !== undefined

@@ -70,23 +70,38 @@ export class ProyectoRepository {
       .request()
       .input("idCliente", sql.Int, idCliente)
       .query(`
-        SELECT
-          p.id_Proyecto AS idProyecto,
-          p.id_Cliente AS idCliente,
-          p.id_Empresa AS idEmpresa,
-          p.id_TipoObra AS idTipoObra,
-          p.nombre,
-          p.descripcion,
-          p.ubicacion,
-          p.estado,
-          p.alto,
-          p.ancho,
-          p.largo,
-          p.fechaCreacion
-        FROM Proyecto p
-        WHERE p.id_Cliente = @idCliente
-        ORDER BY p.fechaCreacion DESC, p.id_Proyecto DESC
-      `);
+      SELECT
+        p.id_Proyecto AS idProyecto,
+        p.id_Cliente AS idCliente,
+        p.id_Empresa AS idEmpresa,
+        p.id_TipoObra AS idTipoObra,
+
+        t.nombre AS tipoObra,
+
+        p.nombre,
+        p.descripcion,
+        p.ubicacion,
+        p.estado,
+        p.alto,
+        p.ancho,
+        p.largo,
+        p.fechaCreacion,
+
+        CAST(
+          p.ancho * p.largo AS DECIMAL(18, 2)
+        ) AS superficie
+
+      FROM Proyecto p
+
+      INNER JOIN TipoObra t
+        ON t.id_TipoObra = p.id_TipoObra
+
+      WHERE p.id_Cliente = @idCliente
+
+      ORDER BY
+        p.fechaCreacion DESC,
+        p.id_Proyecto DESC
+    `);
 
     return result.recordset;
   }
@@ -98,22 +113,34 @@ export class ProyectoRepository {
       .request()
       .input("idProyecto", sql.Int, idProyecto)
       .query(`
-        SELECT
-          p.id_Proyecto AS idProyecto,
-          p.id_Cliente AS idCliente,
-          p.id_Empresa AS idEmpresa,
-          p.id_TipoObra AS idTipoObra,
-          p.nombre,
-          p.descripcion,
-          p.ubicacion,
-          p.estado,
-          p.alto,
-          p.ancho,
-          p.largo,
-          p.fechaCreacion
-        FROM Proyecto p
-        WHERE p.id_Proyecto = @idProyecto
-      `);
+      SELECT
+        p.id_Proyecto AS idProyecto,
+        p.id_Cliente AS idCliente,
+        p.id_Empresa AS idEmpresa,
+        p.id_TipoObra AS idTipoObra,
+
+        t.nombre AS tipoObra,
+
+        p.nombre,
+        p.descripcion,
+        p.ubicacion,
+        p.estado,
+        p.alto,
+        p.ancho,
+        p.largo,
+        p.fechaCreacion,
+
+        CAST(
+          p.ancho * p.largo AS DECIMAL(18, 2)
+        ) AS superficie
+
+      FROM Proyecto p
+
+      INNER JOIN TipoObra t
+        ON t.id_TipoObra = p.id_TipoObra
+
+      WHERE p.id_Proyecto = @idProyecto
+    `);
 
     return result.recordset[0] ?? null;
   }
@@ -296,7 +323,7 @@ export class ProyectoRepository {
 
     return result.rowsAffected[0] > 0;
   }
-  
+
   public async eliminarProyecto(idProyecto: number): Promise<boolean> {
     const pool = await connectDB();
 
