@@ -49,7 +49,6 @@ export default function TablaTiposObra({
             <tr>
               <th>Tipo de obra</th>
               <th>Descripción</th>
-              <th>Materiales asociados</th>
               <th>Tiempo aprox.</th>
               <th>Estado</th>
               <th>Acciones</th>

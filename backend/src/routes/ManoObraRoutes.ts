@@ -7,12 +7,12 @@ const router = Router();
 const controller = new ManoObraController();
 
 router.get(
-  "/",
-  controller.obtenerManoObra
+  "/empresa/:idEmpresa",
+  controller.obtenerManoObraPorEmpresa
 );
 
 router.get(
-  "/:id",
+  "/:id/empresa/:idEmpresa",
   controller.obtenerManoObraPorId
 );
 
@@ -22,12 +22,12 @@ router.post(
 );
 
 router.put(
-  "/:id",
+  "/:id/empresa/:idEmpresa",
   controller.actualizarManoObra
 );
 
 router.delete(
-  "/:id",
+  "/:id/empresa/:idEmpresa",
   controller.eliminarManoObra
 );
 

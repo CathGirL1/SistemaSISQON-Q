@@ -10,7 +10,7 @@ export class Empresa extends Usuario{
         nombreUsuario : string, 
         rol : string,
         gmail : string, 
-        telefono : number, 
+        telefono : string, 
         contrasenia : string,
         direccion : string
 

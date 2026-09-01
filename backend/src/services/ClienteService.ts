@@ -14,6 +14,17 @@ export class ClienteService {
     return this.repository.obtenerClientes();
   }
 
+  public async obtenerClientesPorEmpresa(idEmpresa: number): Promise<Cliente[]> {
+    this.validarId(
+      idEmpresa,
+      "El identificador de la empresa no es válido"
+    );
+
+    return this.repository.obtenerClientesPorEmpresa(
+      idEmpresa
+    );
+  }
+
   public async obtenerClientePorId(
     idCliente: number
   ): Promise<Cliente> {
@@ -27,6 +38,26 @@ export class ClienteService {
     }
 
     return cliente;
+  }
+
+  public async obtenerHistorialCotizaciones(
+  idCliente: number,
+  idEmpresa: number
+  ) {
+  this.validarId(
+    idCliente,
+    "El identificador del cliente no es válido"
+  );
+
+  this.validarId(
+    idEmpresa,
+    "El identificador de la empresa no es válido"
+  );
+
+  return this.repository.obtenerHistorialCotizaciones(
+    idCliente,
+    idEmpresa
+  );
   }
 
   public async crearCliente(
@@ -91,10 +122,35 @@ export class ClienteService {
   public async eliminarCliente(
     idCliente: number
   ): Promise<void> {
-    this.validarId(idCliente);
+    this.validarId(
+      idCliente,
+      "El identificador del cliente no es válido"
+    );
+
+    const cliente =
+      await this.repository.obtenerClientePorId(
+        idCliente
+      );
+
+    if (!cliente) {
+      throw new Error("Cliente no encontrado");
+    }
+
+    const tieneProyectos =
+      await this.repository.clienteTieneProyectos(
+        idCliente
+      );
+
+    if (tieneProyectos) {
+      throw new Error(
+        "No se puede eliminar el cliente porque tiene proyectos asociados."
+      );
+    }
 
     const eliminado =
-      await this.repository.eliminarCliente(idCliente);
+      await this.repository.eliminarCliente(
+        idCliente
+      );
 
     if (!eliminado) {
       throw new Error("Cliente no encontrado");
@@ -154,11 +210,9 @@ export class ClienteService {
     }
   }
 
-  private validarId(idCliente: number): void {
-    if (!Number.isInteger(idCliente) || idCliente <= 0) {
-      throw new Error(
-        "El identificador del cliente no es válido"
-      );
+  private validarId(id: number,mensaje = "El identificador no es válido"): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error(mensaje);
     }
   }
 

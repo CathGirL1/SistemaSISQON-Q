@@ -39,6 +39,65 @@ export class ClienteRepository {
     return resultado.recordset;
   }
 
+  public async obtenerClientesPorEmpresa(
+    idEmpresa: number
+  ) {
+    const pool = await connectDB();
+
+    const resultado = await pool
+      .request()
+      .input("idEmpresa", sql.Int, idEmpresa)
+      .query(`
+        SELECT
+          c.id_Cliente,
+          c.id_Usuario,
+          c.cedula,
+          c.nombre,
+          c.apellido,
+          c.ciudad,
+          c.estado,
+          c.notas,
+
+          u.nombreUsuario,
+          u.gmail,
+          u.telefono,
+          u.direccion,
+
+          COUNT(DISTINCT co.id_Cotizacion) AS cantidadCotizaciones,
+          MAX(co.fechaRealizada) AS ultimaCotizacion
+
+        FROM Cliente c
+
+        INNER JOIN Usuario u
+          ON u.id_Usuario = c.id_Usuario
+
+        INNER JOIN Proyecto p
+          ON p.id_Cliente = c.id_Cliente
+          AND p.id_Empresa = @idEmpresa
+
+        LEFT JOIN Cotizacion co
+          ON co.id_Proyecto = p.id_Proyecto
+
+        GROUP BY
+          c.id_Cliente,
+          c.id_Usuario,
+          c.cedula,
+          c.nombre,
+          c.apellido,
+          c.ciudad,
+          c.estado,
+          c.notas,
+          u.nombreUsuario,
+          u.gmail,
+          u.telefono,
+          u.direccion
+
+        ORDER BY c.id_Cliente DESC
+      `);
+
+    return resultado.recordset;
+  }
+
   public async obtenerClientePorId(
     idCliente: number
   ): Promise<Cliente | null> {
@@ -351,6 +410,30 @@ export class ClienteRepository {
     }
   }
 
+  public async clienteTieneProyectos(
+    idCliente: number
+  ): Promise<boolean> {
+    const pool = await connectDB();
+
+    const resultado = await pool
+      .request()
+      .input(
+        "idCliente",
+        sql.Int,
+        idCliente
+      )
+      .query<{ cantidad: number }>(`
+        SELECT COUNT(*) AS cantidad
+        FROM Proyecto
+        WHERE id_Cliente = @idCliente
+      `);
+
+    const cantidad =
+      resultado.recordset[0]?.cantidad ?? 0;
+
+    return cantidad > 0;
+  }
+
   public async eliminarCliente(
     idCliente: number
   ): Promise<boolean> {
@@ -413,5 +496,42 @@ export class ClienteRepository {
 
       throw error;
     }
+  }
+
+    public async obtenerHistorialCotizaciones(
+    idCliente: number,
+    idEmpresa: number
+    ) {
+    const pool = await connectDB();
+
+    const resultado = await pool
+      .request()
+      .input("idCliente", sql.Int, idCliente)
+      .input("idEmpresa", sql.Int, idEmpresa)
+      .query(`
+        SELECT
+          co.id_Cotizacion AS idCotizacion,
+          co.fechaRealizada,
+          co.totalCotizacion,
+          co.estado,
+          co.observaciones,
+
+          p.id_Proyecto AS idProyecto,
+          p.nombre AS nombreProyecto
+
+        FROM Cotizacion co
+
+        INNER JOIN Proyecto p
+          ON p.id_Proyecto = co.id_Proyecto
+
+        WHERE p.id_Cliente = @idCliente
+          AND p.id_Empresa = @idEmpresa
+
+        ORDER BY
+          co.fechaRealizada DESC,
+          co.id_Cotizacion DESC
+      `);
+
+    return resultado.recordset;
   }
 }

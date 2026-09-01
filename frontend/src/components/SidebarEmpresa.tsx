@@ -19,7 +19,18 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
+import useEmpresa from "../hooks/useEmpresa";
+
 export default function SidebarEmpresa() {
+  const { empresa } = useEmpresa();
+
+  const nombreEmpresa =
+    empresa?.nombreComercial ||
+    empresa?.razonSocial ||
+    "Empresa";
+
+  const inicial = nombreEmpresa.charAt(0).toUpperCase();
+
   return (
     <aside className="sidebar-empresa">
       <div className="sidebar-logo">
@@ -51,10 +62,7 @@ export default function SidebarEmpresa() {
           <span>Clientes</span>
         </NavLink>
 
-        <NavLink to="/empresa/proyectos" className="sidebar-link">
-          <FaFolderOpen />
-          <span>Proyectos</span>
-        </NavLink>
+
 
         <p className="sidebar-section-title">Gestión</p>
 
@@ -80,16 +88,6 @@ export default function SidebarEmpresa() {
           <span>Reportes</span>
         </NavLink>
 
-        <NavLink to="/empresa/usuarios" className="sidebar-link">
-          <FaUserShield />
-          <span>Usuarios</span>
-        </NavLink>
-
-        <NavLink to="/empresa/configuracion" className="sidebar-link">
-          <FaCog />
-          <span>Configuración</span>
-        </NavLink>
-
         <NavLink to="/empresa/perfil" className="sidebar-link">
           <FaUserCircle />
           <span>Mi perfil</span>
@@ -108,10 +106,20 @@ export default function SidebarEmpresa() {
       </div>
 
       <div className="sidebar-user">
-        <div className="sidebar-avatar">E</div>
+        <div className="sidebar-avatar">
+          {empresa?.logo ? (
+            <img
+              src={empresa.logo}
+              alt={nombreEmpresa}
+              className="sidebar-avatar-img"
+            />
+          ) : (
+            inicial
+          )}
+        </div>
 
         <div className="sidebar-user-info">
-          <h4>Empresa Demo</h4>
+          <h4>{nombreEmpresa}</h4>
           <p>Administrador</p>
         </div>
 
@@ -122,3 +130,4 @@ export default function SidebarEmpresa() {
     </aside>
   );
 }
+

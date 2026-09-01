@@ -9,17 +9,28 @@ import type {
 export class ManoObraService {
   private repository = new ManoObraRepository();
 
-  public async obtenerManoObra(): Promise<ManoObra[]> {
-    return this.repository.obtenerManoObra();
+  public async obtenerManoObraPorEmpresa(
+    idEmpresa: number
+  ): Promise<ManoObra[]> {
+    this.validarIdEmpresa(idEmpresa);
+
+    return this.repository.obtenerManoObraPorEmpresa(
+      idEmpresa
+    );
   }
 
   public async obtenerManoObraPorId(
-    idManoObra: number
+    idManoObra: number,
+    idEmpresa: number
   ): Promise<ManoObra> {
     this.validarId(idManoObra);
+    this.validarIdEmpresa(idEmpresa);
 
     const manoObra =
-      await this.repository.obtenerManoObraPorId(idManoObra);
+      await this.repository.obtenerManoObraPorId(
+        idManoObra,
+        idEmpresa
+      );
 
     if (!manoObra) {
       throw new Error("Mano de obra no encontrada");
@@ -31,41 +42,55 @@ export class ManoObraService {
   public async crearManoObra(
     manoObra: CrearManoObraDTO
   ): Promise<ManoObra> {
+    this.validarIdEmpresa(manoObra.idEmpresa);
     this.validarManoObra(manoObra);
 
     const manoObraNormalizada: CrearManoObraDTO = {
       ...manoObra,
       nombre: manoObra.nombre.trim(),
-      descripcion: manoObra.descripcion?.trim() || null,
-      categoria: manoObra.categoria?.trim() || null,
-      unidad: manoObra.unidad?.trim() || null,
-      observaciones: manoObra.observaciones?.trim() || null,
+      descripcion:
+        manoObra.descripcion?.trim() || null,
+      categoria:
+        manoObra.categoria?.trim() || null,
+      unidad:
+        manoObra.unidad?.trim() || null,
+      observaciones:
+        manoObra.observaciones?.trim() || null,
       estado: manoObra.estado ?? "Activo",
     };
 
-    return this.repository.crearManoObra(manoObraNormalizada);
+    return this.repository.crearManoObra(
+      manoObraNormalizada
+    );
   }
 
   public async actualizarManoObra(
     idManoObra: number,
+    idEmpresa: number,
     manoObra: ActualizarManoObraDTO
   ): Promise<ManoObra> {
     this.validarId(idManoObra);
+    this.validarIdEmpresa(idEmpresa);
     this.validarManoObra(manoObra);
 
     const manoObraNormalizada: ActualizarManoObraDTO = {
       ...manoObra,
       nombre: manoObra.nombre.trim(),
-      descripcion: manoObra.descripcion?.trim() || null,
-      categoria: manoObra.categoria?.trim() || null,
-      unidad: manoObra.unidad?.trim() || null,
-      observaciones: manoObra.observaciones?.trim() || null,
+      descripcion:
+        manoObra.descripcion?.trim() || null,
+      categoria:
+        manoObra.categoria?.trim() || null,
+      unidad:
+        manoObra.unidad?.trim() || null,
+      observaciones:
+        manoObra.observaciones?.trim() || null,
       estado: manoObra.estado ?? "Activo",
     };
 
     const manoObraActualizada =
       await this.repository.actualizarManoObra(
         idManoObra,
+        idEmpresa,
         manoObraNormalizada
       );
 
@@ -77,12 +102,17 @@ export class ManoObraService {
   }
 
   public async eliminarManoObra(
-    idManoObra: number
+    idManoObra: number,
+    idEmpresa: number
   ): Promise<void> {
     this.validarId(idManoObra);
+    this.validarIdEmpresa(idEmpresa);
 
     const eliminada =
-      await this.repository.eliminarManoObra(idManoObra);
+      await this.repository.eliminarManoObra(
+        idManoObra,
+        idEmpresa
+      );
 
     if (!eliminada) {
       throw new Error("Mano de obra no encontrada");
@@ -90,9 +120,14 @@ export class ManoObraService {
   }
 
   private validarManoObra(
-    manoObra: CrearManoObraDTO | ActualizarManoObraDTO
+    manoObra:
+      | CrearManoObraDTO
+      | ActualizarManoObraDTO
   ): void {
-    if (!manoObra.nombre || !manoObra.nombre.trim()) {
+    if (
+      !manoObra.nombre ||
+      !manoObra.nombre.trim()
+    ) {
       throw new Error("El nombre es obligatorio");
     }
 
@@ -106,7 +141,10 @@ export class ManoObraService {
       );
     }
 
-    const estadosValidos = ["Activo", "Inactivo"];
+    const estadosValidos = [
+      "Activo",
+      "Inactivo",
+    ];
 
     if (
       manoObra.estado &&
@@ -117,9 +155,23 @@ export class ManoObraService {
   }
 
   private validarId(idManoObra: number): void {
-    if (!Number.isInteger(idManoObra) || idManoObra <= 0) {
+    if (
+      !Number.isInteger(idManoObra) ||
+      idManoObra <= 0
+    ) {
       throw new Error(
         "El identificador de la mano de obra no es válido"
+      );
+    }
+  }
+
+  private validarIdEmpresa(idEmpresa: number): void {
+    if (
+      !Number.isInteger(idEmpresa) ||
+      idEmpresa <= 0
+    ) {
+      throw new Error(
+        "El identificador de la empresa no es válido"
       );
     }
   }

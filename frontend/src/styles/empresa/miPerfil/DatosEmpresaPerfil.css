@@ -1,0 +1,164 @@
+.perfil-panel {
+  background: #fff;
+  border-radius: 22px;
+  padding: 2rem;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.perfil-panel-header {
+  margin-bottom: 2rem;
+}
+
+.perfil-panel-header h2 {
+  margin: 0;
+  color: #08255b;
+  font-size: 1.45rem;
+}
+
+.perfil-panel-header p {
+  margin-top: .4rem;
+  color: #64748b;
+}
+
+.perfil-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  margin-bottom: .45rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 0.85rem 0.9rem;
+
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+
+  outline: none;
+
+  font-size: .95rem;
+  font-family: inherit;
+
+  transition: .2s;
+
+  background: #fff;
+}
+
+.form-group textarea {
+  resize: vertical;
+
+  min-height: 80px;
+
+  line-height: 1.5;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #42b48a;
+
+  box-shadow: 0 0 0 3px rgba(66,180,138,.15);
+}
+
+.form-group input:focus {
+  border-color: #42b48a;
+  box-shadow: 0 0 0 3px rgba(66,180,138,.15);
+}
+
+.perfil-form-actions {
+  grid-column: 1 / -1;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+
+  margin-top: .5rem;
+}
+
+.btn-cancelar {
+  padding: .85rem 1.4rem;
+
+  border-radius: 12px;
+  border: 1px solid #dbe3ef;
+
+  background: white;
+
+  cursor: pointer;
+
+  font-weight: 600;
+
+  transition: .2s;
+}
+
+.btn-cancelar:hover {
+  background: #f8fafc;
+}
+
+.btn-guardar {
+  padding: .85rem 1.6rem;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #08255b;
+
+  color: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+.btn-guardar:hover {
+  background: #0b347d;
+}
+
+@media (max-width: 900px) {
+  .perfil-form {
+    grid-template-columns: 1fr;
+  }
+
+  .perfil-form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancelar,
+  .btn-guardar {
+    width: 100%;
+  }
+}
+
+.perfil-seccion {
+  grid-column: 1 / -1;
+
+  margin-top: 20px;
+  padding-top: 20px;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.perfil-seccion h3 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 600;
+}

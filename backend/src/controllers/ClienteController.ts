@@ -23,6 +23,24 @@ export class ClienteController {
     }
   };
 
+    public obtenerClientesPorEmpresa = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idEmpresa = Number(req.params.idEmpresa);
+
+      const clientes =
+        await this.service.obtenerClientesPorEmpresa(
+          idEmpresa
+        );
+
+      res.status(200).json(clientes);
+    } catch (error) {
+      this.responderError(res, error);
+    }
+  };
+
   public obtenerClientePorId = async (
     req: Request,
     res: Response
@@ -112,8 +130,31 @@ export class ClienteController {
     const estado =
       mensaje === "Cliente no encontrado"
         ? 404
-        : 400;
+        : mensaje ===
+            "No se puede eliminar el cliente porque tiene proyectos asociados."
+          ? 409
+          : 400;
 
     res.status(estado).json({ mensaje });
   }
+
+  public obtenerHistorialCotizaciones = async (
+  req: Request,
+  res: Response
+  ): Promise<void> => {
+  try {
+    const idCliente = Number(req.params.idCliente);
+    const idEmpresa = Number(req.params.idEmpresa);
+
+    const historial =
+      await this.service.obtenerHistorialCotizaciones(
+        idCliente,
+        idEmpresa
+      );
+
+    res.status(200).json(historial);
+  } catch (error) {
+    this.responderError(res, error);
+  }
+  };  
 }

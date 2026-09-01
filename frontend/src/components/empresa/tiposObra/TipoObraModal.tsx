@@ -334,26 +334,6 @@ export default function TipoObraModal({
         </div>
 
         <div>
-          <label htmlFor="materialesTipoObra">
-            Materiales asociados
-          </label>
-
-          <input
-            id="materialesTipoObra"
-            type="number"
-            value={
-              formulario.materialesAsociados
-            }
-            disabled
-          />
-
-          <small className="campo-ayuda">
-            Se calcula según los materiales
-            relacionados con el tipo de obra.
-          </small>
-        </div>
-
-        <div>
           <label htmlFor="tiempoTipoObra">
             Tiempo aproximado
           </label>

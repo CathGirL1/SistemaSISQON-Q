@@ -1,24 +1,32 @@
 import "../styles/EmpresaLayout.css";
 
+import type { ReactNode } from "react";
+
 import SidebarEmpresa from "../components/SidebarEmpresa";
 import NavbarEmpresa from "../components/NavbarEmpresa";
 
+import { EmpresaProvider } from "../context/EmpresaContext";
+
 type EmpresaLayoutProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-export default function EmpresaLayout({ children }: EmpresaLayoutProps) {
+export default function EmpresaLayout({
+  children,
+}: EmpresaLayoutProps) {
   return (
-    <div className="empresa-layout">
-      <SidebarEmpresa />
+    <EmpresaProvider>
+      <div className="empresa-layout">
+        <SidebarEmpresa />
 
-      <div className="empresa-main">
-        <NavbarEmpresa />
+        <div className="empresa-main">
+          <NavbarEmpresa />
 
-        <main className="empresa-content">
-          {children}
-        </main>
+          <main className="empresa-content">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </EmpresaProvider>
   );
 }

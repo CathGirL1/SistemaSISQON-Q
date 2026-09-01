@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
 
 import rutaPrueba from "../routes/rutaPrueba";
 import registroRoutes from "../routes/RegistroUsuario";
@@ -12,6 +13,8 @@ import clienteRoutes from "../routes/clienteRoutes";
 import empresaRoutes from "../routes/empresaRoutes";
 import tipoObraRoutes from "../routes/tipoObraRoutes";
 import manoObraRoutes from "../routes/ManoObraRoutes";
+import usuarioRoutes from "../routes/usuarioRoutes";
+import dashboardRoutes from "../routes/dashboardRoutes";
 
 
 import proyectoRoutes from "../routes/proyectoRoutes";
@@ -35,18 +38,21 @@ servidor.use(
 );
 
 servidor.use(express.json());
+servidor.use("/uploads",express.static(path.resolve(process.cwd(), "uploads")));
 
 servidor.use("/", rutaPrueba);
 servidor.use("/api/registro", registroRoutes);
 servidor.use("/api/login", loginRoutes);
 
 servidor.use("/api/recuperacionAcceso", recuperacionAcceso);
-servidor.use("/api/materiales", materialRoutes);
 servidor.use("/api/clientes", clienteRoutes);
-servidor.use("/api/empresas", empresaRoutes);
+servidor.use("/api/empresa", empresaRoutes);
 servidor.use("/api/tipos-obra",tipoObraRoutes);
 servidor.use("/api/mano-obra", manoObraRoutes);
+servidor.use("/api/usuario",usuarioRoutes);
+servidor.use("/api/dashboard",dashboardRoutes);
 
+servidor.use("/api/materiales", materialRoutes);
 servidor.use("/api/proyectos", proyectoRoutes);
 servidor.use("/api/cotizaciones", cotizacionRoutes); 
 servidor.use("/api/materiales-proyecto",materialProyectoRoutes);
