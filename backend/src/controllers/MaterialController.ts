@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { MaterialService } from "../services/MaterialService";
+import { MaterialService } from "../services/materialService";
 
 export class MaterialController {
   private service = new MaterialService();
@@ -49,11 +49,13 @@ export class MaterialController {
     res: Response
   ): Promise<void> => {
     try {
+      console.log(req.body);
       const material =
         await this.service.crearMaterial(req.body);
 
       res.status(201).json(material);
     } catch (error) {
+      console.error(error);
       const mensaje = this.obtenerMensajeError(error);
 
       res.status(400).json({ mensaje });
