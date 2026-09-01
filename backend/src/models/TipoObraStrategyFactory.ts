@@ -29,6 +29,7 @@ export class TipoObraStrategyFactory {
                 return new Requincho();
 
             case "CONSTRUCCION":
+            case "CONSTRUCCION NUEVA":
                 return new ConstruccionObra();
 
             default:

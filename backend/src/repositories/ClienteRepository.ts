@@ -410,6 +410,30 @@ export class ClienteRepository {
     }
   }
 
+  public async clienteTieneProyectos(
+    idCliente: number
+  ): Promise<boolean> {
+    const pool = await connectDB();
+
+    const resultado = await pool
+      .request()
+      .input(
+        "idCliente",
+        sql.Int,
+        idCliente
+      )
+      .query<{ cantidad: number }>(`
+        SELECT COUNT(*) AS cantidad
+        FROM Proyecto
+        WHERE id_Cliente = @idCliente
+      `);
+
+    const cantidad =
+      resultado.recordset[0]?.cantidad ?? 0;
+
+    return cantidad > 0;
+  }
+
   public async eliminarCliente(
     idCliente: number
   ): Promise<boolean> {

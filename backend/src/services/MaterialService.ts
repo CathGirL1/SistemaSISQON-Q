@@ -1,4 +1,5 @@
 import { MaterialRepository } from "../repositories/MaterialRepository";
+import { MonedaService } from "./MonedaService";
 
 import type {
   ActualizarMaterialDTO,
@@ -9,9 +10,22 @@ import type {
 
 export class MaterialService {
   private repository = new MaterialRepository();
+  private monedaService = new MonedaService();
 
-  public async obtenerMateriales(): Promise<Material[]> {
-    return this.repository.obtenerMateriales();
+  public async obtenerMateriales() {
+    const materiales =
+      await this.repository.obtenerMateriales();
+
+    const tipoCambio =
+      await this.monedaService.obtenerDolarAPesoUruguayo();
+
+    return materiales.map((material) => ({
+      ...material,
+      moneda: "USD",
+      tipoCambio,
+      costoUnitarioUYU:
+        Number(material.costoUnitario) * tipoCambio,
+    }));
   }
 
   public async obtenerMaterialPorId(

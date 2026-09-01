@@ -52,7 +52,7 @@ servidor.use("/api/mano-obra", manoObraRoutes);
 servidor.use("/api/usuario",usuarioRoutes);
 servidor.use("/api/dashboard",dashboardRoutes);
 
-
+servidor.use("/api/materiales", materialRoutes);
 servidor.use("/api/proyectos", proyectoRoutes);
 servidor.use("/api/cotizaciones", cotizacionRoutes); 
 servidor.use("/api/materiales-proyecto",materialProyectoRoutes);

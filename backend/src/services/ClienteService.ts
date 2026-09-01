@@ -122,10 +122,35 @@ export class ClienteService {
   public async eliminarCliente(
     idCliente: number
   ): Promise<void> {
-    this.validarId(idCliente);
+    this.validarId(
+      idCliente,
+      "El identificador del cliente no es válido"
+    );
+
+    const cliente =
+      await this.repository.obtenerClientePorId(
+        idCliente
+      );
+
+    if (!cliente) {
+      throw new Error("Cliente no encontrado");
+    }
+
+    const tieneProyectos =
+      await this.repository.clienteTieneProyectos(
+        idCliente
+      );
+
+    if (tieneProyectos) {
+      throw new Error(
+        "No se puede eliminar el cliente porque tiene proyectos asociados."
+      );
+    }
 
     const eliminado =
-      await this.repository.eliminarCliente(idCliente);
+      await this.repository.eliminarCliente(
+        idCliente
+      );
 
     if (!eliminado) {
       throw new Error("Cliente no encontrado");

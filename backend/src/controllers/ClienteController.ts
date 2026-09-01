@@ -130,7 +130,10 @@ export class ClienteController {
     const estado =
       mensaje === "Cliente no encontrado"
         ? 404
-        : 400;
+        : mensaje ===
+            "No se puede eliminar el cliente porque tiene proyectos asociados."
+          ? 409
+          : 400;
 
     res.status(estado).json({ mensaje });
   }
