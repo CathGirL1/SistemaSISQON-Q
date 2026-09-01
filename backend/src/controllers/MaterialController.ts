@@ -49,13 +49,11 @@ export class MaterialController {
     res: Response
   ): Promise<void> => {
     try {
-      console.log(req.body);
       const material =
         await this.service.crearMaterial(req.body);
 
       res.status(201).json(material);
     } catch (error) {
-      console.error(error);
       const mensaje = this.obtenerMensajeError(error);
 
       res.status(400).json({ mensaje });

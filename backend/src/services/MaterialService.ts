@@ -1,5 +1,4 @@
 import { MaterialRepository } from "../repositories/MaterialRepository";
-import { MonedaService } from "./MonedaService";
 
 import type {
   ActualizarMaterialDTO,
@@ -7,25 +6,11 @@ import type {
   Material,
 } from "../models/Material";
 
-
 export class MaterialService {
   private repository = new MaterialRepository();
-  private monedaService = new MonedaService();
 
-  public async obtenerMateriales() {
-    const materiales =
-      await this.repository.obtenerMateriales();
-
-    const tipoCambio =
-      await this.monedaService.obtenerDolarAPesoUruguayo();
-
-    return materiales.map((material) => ({
-      ...material,
-      moneda: "USD",
-      tipoCambio,
-      costoUnitarioUYU:
-        Number(material.costoUnitario) * tipoCambio,
-    }));
+  public async obtenerMateriales(): Promise<Material[]> {
+    return this.repository.obtenerMateriales();
   }
 
   public async obtenerMaterialPorId(
@@ -52,7 +37,6 @@ export class MaterialService {
       descripcion: material.descripcion?.trim() || null,
       categoria: material.categoria?.trim() || null,
       unidad: material.unidad?.trim() || null,
-      imagenUrl: material.imagenUrl?.trim() || null,
       disponibilidad:
         material.disponibilidad ?? this.calcularDisponibilidad(material.stock),
       estado: material.estado ?? "Activo",
@@ -74,7 +58,6 @@ export class MaterialService {
       descripcion: material.descripcion?.trim() || null,
       categoria: material.categoria?.trim() || null,
       unidad: material.unidad?.trim() || null,
-      imagenUrl: material.imagenUrl?.trim() || null,
       disponibilidad:
         material.disponibilidad ?? this.calcularDisponibilidad(material.stock),
       estado: material.estado ?? "Activo",
@@ -130,23 +113,6 @@ export class MaterialService {
     ) {
       throw new Error(
         "El costo unitario debe ser un número mayor o igual a cero"
-      );
-    }
-
-    if (material.imagenUrl) {
-      try {
-        new URL(material.imagenUrl);
-      } catch {
-        throw new Error("La URL de la imagen no es válida");
-      }
-    }
-
-    if (
-      !Number.isInteger(material.idEmpresa) ||
-      material.idEmpresa <= 0
-    ) {
-      throw new Error(
-        "La empresa propietaria del material es obligatoria"
       );
     }
 
