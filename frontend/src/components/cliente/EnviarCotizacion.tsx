@@ -48,7 +48,7 @@ export default function EnviarCotizacion({
       setError("");
 
       const response = await fetch(
-        `${API_URL}/api/empresas`
+        `${API_URL}/api/empresa`
       );
 
       const data = await response.json();
