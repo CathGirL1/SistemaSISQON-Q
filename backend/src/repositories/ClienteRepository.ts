@@ -73,10 +73,10 @@ export class ClienteRepository {
 
         INNER JOIN Proyecto p
           ON p.id_Cliente = c.id_Cliente
-          AND p.id_Empresa = @idEmpresa
 
-        LEFT JOIN Cotizacion co
+        INNER JOIN Cotizacion co
           ON co.id_Proyecto = p.id_Proyecto
+          AND co.id_Empresa = @idEmpresa
 
         GROUP BY
           c.id_Cliente,
@@ -499,39 +499,37 @@ export class ClienteRepository {
   }
 
     public async obtenerHistorialCotizaciones(
-    idCliente: number,
-    idEmpresa: number
+      idCliente: number,
+      idEmpresa: number
     ) {
-    const pool = await connectDB();
+      const pool = await connectDB();
 
-    const resultado = await pool
-      .request()
-      .input("idCliente", sql.Int, idCliente)
-      .input("idEmpresa", sql.Int, idEmpresa)
-      .query(`
-        SELECT
-          co.id_Cotizacion AS idCotizacion,
-          co.fechaRealizada,
-          co.totalCotizacion,
-          co.estado,
-          co.observaciones,
+      const resultado = await pool
+        .request()
+        .input("idCliente", sql.Int, idCliente)
+        .input("idEmpresa", sql.Int, idEmpresa)
+        .query(`
+          SELECT
+            co.id_Cotizacion AS idCotizacion,
+            co.fechaRealizada,
+            co.totalCotizacion,
+            co.estado,
+            co.observaciones,
+            co.version,
+            p.id_Proyecto AS idProyecto,
+            p.nombre AS nombreProyecto
+          FROM Cotizacion co
+          INNER JOIN Proyecto p
+            ON p.id_Proyecto = co.id_Proyecto
+          WHERE p.id_Cliente = @idCliente
+            AND co.id_Empresa = @idEmpresa
+            AND co.estado = 'Enviada'
+          ORDER BY
+            co.fechaRealizada DESC,
+            co.version DESC,
+            co.id_Cotizacion DESC
+        `);
 
-          p.id_Proyecto AS idProyecto,
-          p.nombre AS nombreProyecto
-
-        FROM Cotizacion co
-
-        INNER JOIN Proyecto p
-          ON p.id_Proyecto = co.id_Proyecto
-
-        WHERE p.id_Cliente = @idCliente
-          AND p.id_Empresa = @idEmpresa
-
-        ORDER BY
-          co.fechaRealizada DESC,
-          co.id_Cotizacion DESC
-      `);
-
-    return resultado.recordset;
-  }
+      return resultado.recordset;
+    }
 }

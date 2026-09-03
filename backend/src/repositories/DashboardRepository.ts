@@ -181,41 +181,33 @@ export class DashboardRepository {
     }
 
     private async obtenerClientesRecientes(
-    idEmpresa: number
+        idEmpresa: number
     ) {
+        const pool = await connectDB();
 
-    const pool = await connectDB();
+        const resultado = await pool.request()
+            .input(
+                "idEmpresa",
+                sql.Int,
+                idEmpresa
+            )
+            .query(`
+                SELECT TOP 5
+                    c.id_Cliente,
+                    c.nombre,
+                    c.apellido,
+                    p.nombre AS proyecto
+                FROM Cotizacion co
+                INNER JOIN Proyecto p
+                    ON p.id_Proyecto = co.id_Proyecto
+                INNER JOIN Cliente c
+                    ON c.id_Cliente = p.id_Cliente
+                WHERE co.id_Empresa = @idEmpresa
+                AND co.estado = 'Enviada'
+                ORDER BY co.fechaRealizada DESC
+            `);
 
-    const resultado = await pool.request()
-        .input(
-            "idEmpresa",
-            sql.Int,
-            idEmpresa
-        )
-        .query(`
-            SELECT TOP 5
-
-                c.id_Cliente,
-
-                c.nombre,
-
-                c.apellido,
-
-                p.nombre AS proyecto
-
-            FROM Cliente c
-
-            INNER JOIN Proyecto p
-
-                ON p.id_Cliente = c.id_Cliente
-
-            WHERE p.id_Empresa=@idEmpresa
-
-            ORDER BY p.fechaCreacion DESC
-        `);
-
-    return resultado.recordset;
-
+        return resultado.recordset;
     }
 
     private async obtenerProyectosActivos(
