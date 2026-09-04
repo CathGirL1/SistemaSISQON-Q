@@ -668,25 +668,24 @@ export class CotizacionRepository {
   public async obtenerCotizacionPorId(
     idCotizacion: number
   ) {
-
     const pool = await connectDB();
 
     const result = await pool
       .request()
-
       .input(
         "idCotizacion",
         sql.Int,
         idCotizacion
       )
-
       .query(`
         SELECT
+          -- ==========================================
+          -- COTIZACIÓN
+          -- ==========================================
 
           c.id_Cotizacion AS idCotizacion,
           c.id_Proyecto AS idProyecto,
           c.id_Empresa AS idEmpresa,
-          e.nombreEmpresa AS nombreEmpresa,
 
           CONCAT(
             'COT-',
@@ -705,23 +704,28 @@ export class CotizacionRepository {
           c.fechaCreacion,
           c.fechaActualizacion,
           c.version,
-
           c.costoMateriales,
           c.costoManoObra,
           c.totalCotizacion,
-
           c.estado,
           c.precioEstimado,
           c.observaciones,
 
+          -- ==========================================
+          -- EMPRESA
+          -- ==========================================
+
+          e.nombreEmpresa AS nombreEmpresa,
+
+          -- ==========================================
+          -- PROYECTO
+          -- ==========================================
+
           p.id_Cliente AS idCliente,
           p.id_TipoObra AS idTipoObra,
-
           p.nombre AS nombreProyecto,
           p.descripcion AS descripcionProyecto,
-
           p.ubicacion,
-
           p.alto,
           p.ancho,
           p.largo,
@@ -729,13 +733,36 @@ export class CotizacionRepository {
           CAST(
             p.ancho * p.largo
             AS DECIMAL(18, 2)
-          ) AS superficie
+          ) AS superficie,
+
+          -- ==========================================
+          -- CLIENTE
+          -- ==========================================
+
+          cl.nombre AS cliente,
+
+          -- ==========================================
+          -- USUARIO
+          -- ==========================================
+
+          u.gmail AS email,
+          u.telefono AS telefono
 
         FROM Cotizacion c
 
+        -- Cotización → Proyecto
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
 
+        -- Proyecto → Cliente
+        INNER JOIN Cliente cl
+          ON cl.id_Cliente = p.id_Cliente
+
+        -- Cliente → Usuario
+        INNER JOIN Usuario u
+          ON u.id_Usuario = cl.id_Usuario
+
+        -- Cotización → Empresa
         LEFT JOIN Empresa e
           ON e.id_Empresa = c.id_Empresa
 

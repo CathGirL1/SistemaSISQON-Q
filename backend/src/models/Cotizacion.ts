@@ -13,6 +13,7 @@ export class Cotizacion {
     private _precioEstimado: number | null,
     private _observaciones: string | null,
     private _version: number = 1
+    
   ) {}
 
   public get idCotizacion(): number | null {
