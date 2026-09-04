@@ -9,7 +9,6 @@ import {
   CircleCheck,
   CircleX,
   Eye,
-  Download,
   Pencil,
   Lightbulb,
 } from "lucide-react";
@@ -26,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import ActualizarCotizacion from "../../components/cliente/ActualizarCotizacion";
 import EnviarCotizacion from "../../components/cliente/EnviarCotizacion";
+import DescargarCotizacionPDF from "../../components/cliente/DescargarCotizacionPDF";
 
 import {
   formatearPrecioUYU,
@@ -639,18 +639,9 @@ export default function MisCotizaciones() {
 
                               </button>
 
-                              <button
-                                type="button"
-                                disabled
-                              >
-
-                                <Download
-                                  size={16}
-                                />
-
-                                PDF
-
-                              </button>
+                              <DescargarCotizacionPDF
+                                idCotizacion={cotizacion.idCotizacion}
+                              />
 
                               <EnviarCotizacion
                                 idCotizacion={cotizacion.idCotizacion}

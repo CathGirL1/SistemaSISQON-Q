@@ -63,6 +63,8 @@ export interface Cotizacion {
   // MATERIALES
   // ==========================================
 
+ 
+
   resumenMateriales: string;
   materiales: {
     idMaterialProyecto: number;
@@ -88,4 +90,7 @@ export interface Cotizacion {
   moneda: string;
   tipoCambio: number;
   precioEstimadoUYU: number | null;
+
+  
 }
+
