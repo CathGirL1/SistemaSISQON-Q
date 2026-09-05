@@ -341,6 +341,23 @@ export class CotizacionService {
         });
     }
 
+    // =========================================================
+    // OBTENER ESTADÍSTICAS DEL CLIENTE
+    // =========================================================
+
+    public async obtenerEstadisticasCliente(
+    idCliente: number
+    ) {
+
+    this.validarId(
+        idCliente,
+        "El id del cliente no es válido"
+    );
+
+    return await this.repository
+        .obtenerEstadisticasCliente(idCliente);
+    }
+
 
     // =========================================================
     // ACTUALIZAR / GENERAR NUEVA VERSIÓN

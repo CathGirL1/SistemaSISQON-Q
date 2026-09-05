@@ -994,6 +994,51 @@ export class CotizacionRepository {
   }
 
   // ====================================================
+  // ESTADÍSTICAS DEL CLIENTE
+  // ====================================================
+
+  public async obtenerEstadisticasCliente(
+    idCliente: number
+  ) {
+
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+      .input(
+        "idCliente",
+        sql.Int,
+        idCliente
+      )
+      .query(`
+        SELECT
+
+          COUNT(DISTINCT
+            CASE
+              WHEN c.fechaRealizada IS NOT NULL
+              THEN c.id_Cotizacion
+            END
+          ) AS cotizacionesEnviadas,
+
+          COUNT(DISTINCT
+            CASE
+              WHEN c.fechaRealizada IS NOT NULL
+              THEN c.id_Proyecto
+            END
+          ) AS proyectosEnviados
+
+        FROM Cotizacion c
+
+        INNER JOIN Proyecto p
+          ON p.id_Proyecto = c.id_Proyecto
+
+        WHERE p.id_Cliente = @idCliente
+      `);
+
+    return result.recordset[0];
+  }
+
+  // ====================================================
   // VERIFICAR SI EXISTE PROYECTO
   // ====================================================
 

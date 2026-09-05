@@ -49,6 +49,11 @@ router.post(
   controller.generarCotizacion
 );
 
+router.get(
+    "/estadisticas/cliente/:idCliente",
+    controller.obtenerEstadisticasCliente
+);
+
 router.put(
   "/:idCotizacion/enviar",
   controller.enviarCotizacion
