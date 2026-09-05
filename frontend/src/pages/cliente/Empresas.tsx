@@ -1,176 +1,197 @@
-import { useState } from "react";
-import {
-  Search,
-  ChevronDown,
-  MapPin,
-  Star,
-  Heart,
-  Building2,
-  BriefcaseBusiness,
-  ShieldCheck,
-  Send,
-  Eye,
-  SlidersHorizontal,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 
+import type { EmpresaCliente } from "../../interfaces/EmpresaCliente";
+import EmpresaCard from "../../components/cliente/EmpresaCard";
+import EmpresaDetalle from "../../pages/cliente/EmpresaDetalle";
+import EmpresaStatCard from "../../pages/cliente/EmpresaStatCard";
+import FiltrosEmpresaCliente from "../../components/cliente/FiltrosEmpresaCliente";
 
+import {
+  Building2,
+  FileText,
+  BriefcaseBusiness,
+} from "lucide-react";
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/EmpresasCliente.css";
 
-interface Empresa {
-  id: number;
-  nombre: string;
-  iniciales: string;
-  especialidad: string;
-  ubicacion: string;
-  descripcion: string;
-  calificacion: string;
-  reseñas: number;
-  proyectos: number;
-  experiencia: string;
-  verificada: boolean;
-  disponible: boolean;
-  imagen: string;
-  servicios: string[];
-}
 
-const empresas: Empresa[] = [
-  {
-    id: 1,
-    nombre: "Constructora ABC",
-    iniciales: "ABC",
-    especialidad: "Quinchos y terrazas",
-    ubicacion: "Maldonado, Uruguay",
-    descripcion:
-      "Empresa especializada en quinchos, barbacoas, pérgolas y espacios exteriores.",
-    calificacion: "4.8",
-    reseñas: 42,
-    proyectos: 68,
-    experiencia: "12 años",
-    verificada: true,
-    disponible: true,
-    imagen:
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900",
-    servicios: ["Quinchos", "Terrazas", "Pérgolas"],
-  },
-  {
-    id: 2,
-    nombre: "Construcciones del Norte",
-    iniciales: "CN",
-    especialidad: "Construcción general",
-    ubicacion: "Canelones, Uruguay",
-    descripcion:
-      "Construcción de viviendas, ampliaciones y obras de mediana escala.",
-    calificacion: "4.6",
-    reseñas: 35,
-    proyectos: 54,
-    experiencia: "9 años",
-    verificada: true,
-    disponible: true,
-    imagen:
-      "https://images.unsplash.com/photo-1541971875076-8f970d573be6?w=900",
-    servicios: ["Viviendas", "Ampliaciones", "Obra nueva"],
-  },
-  {
-    id: 3,
-    nombre: "Hogar Construcciones",
-    iniciales: "HC",
-    especialidad: "Remodelaciones",
-    ubicacion: "Montevideo, Uruguay",
-    descripcion:
-      "Reformas de cocinas, baños, interiores y mejoras integrales del hogar.",
-    calificacion: "4.5",
-    reseñas: 28,
-    proyectos: 41,
-    experiencia: "7 años",
-    verificada: true,
-    disponible: false,
-    imagen:
-      "https://images.unsplash.com/photo-1523413363574-c30aa1c2a516?w=900",
-    servicios: ["Cocinas", "Baños", "Interiores"],
-  },
-  {
-    id: 4,
-    nombre: "Obras y Servicios SRL",
-    iniciales: "OS",
-    especialidad: "Obras integrales",
-    ubicacion: "Punta del Este, Uruguay",
-    descripcion:
-      "Soluciones completas de construcción, mantenimiento y terminaciones.",
-    calificacion: "4.3",
-    reseñas: 21,
-    proyectos: 37,
-    experiencia: "10 años",
-    verificada: true,
-    disponible: true,
-    imagen:
-      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=900",
-    servicios: ["Construcción", "Mantenimiento", "Terminaciones"],
-  },
-  {
-    id: 5,
-    nombre: "Madera Sur",
-    iniciales: "MS",
-    especialidad: "Estructuras de madera",
-    ubicacion: "Rocha, Uruguay",
-    descripcion:
-      "Diseño y construcción de decks, pérgolas, techos y estructuras de madera.",
-    calificacion: "4.7",
-    reseñas: 31,
-    proyectos: 46,
-    experiencia: "8 años",
-    verificada: true,
-    disponible: true,
-    imagen:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=900",
-    servicios: ["Decks", "Pérgolas", "Madera"],
-  },
-  {
-    id: 6,
-    nombre: "Estudio Obra Moderna",
-    iniciales: "EOM",
-    especialidad: "Arquitectura y diseño",
-    ubicacion: "Maldonado, Uruguay",
-    descripcion:
-      "Proyectos modernos con asesoramiento arquitectónico y ejecución de obra.",
-    calificacion: "4.9",
-    reseñas: 48,
-    proyectos: 59,
-    experiencia: "11 años",
-    verificada: true,
-    disponible: false,
-    imagen:
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=900",
-    servicios: ["Diseño", "Arquitectura", "Dirección de obra"],
-  },
-];
 
 export default function Empresas() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [busqueda, setBusqueda] = useState("");
-  const [favoritas, setFavoritas] = useState<number[]>([1, 5]);
 
+  const [empresas, setEmpresas] = useState<EmpresaCliente[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [empresaSeleccionada, setEmpresaSeleccionada] =
+  useState<EmpresaCliente | null>(null);
+  const [error, setError] = useState("");
+  const [cotizacionesEnviadas, setCotizacionesEnviadas] = useState(0);
+  const [cantidadProyectos, setCantidadProyectos] = useState(0);
+  const [filtroNombre, setFiltroNombre] = useState("");
+  const [filtroDireccion, setFiltroDireccion] = useState("");
+  const [filtroRubro, setFiltroRubro] = useState("");
+
+  const rubros = Array.from(
+    new Set(
+      empresas
+        .map((empresa) => empresa.rubro)
+        .filter(Boolean)
+    )
+  );
+
+  
   const empresasFiltradas = empresas.filter((empresa) => {
-    const texto = `${empresa.nombre} ${empresa.especialidad} ${empresa.ubicacion} ${empresa.servicios.join(
-      " ",
-    )}`;
+    const coincideNombre = empresa.nombreEmpresa
+      .toLowerCase()
+      .includes(filtroNombre.toLowerCase());
 
-    return texto.toLowerCase().includes(busqueda.toLowerCase());
+    const coincideDireccion = empresa.direccion
+      .toLowerCase()
+      .includes(filtroDireccion.toLowerCase());
+
+    const coincideRubro =
+      !filtroRubro ||
+      empresa.rubro === filtroRubro;
+
+    return (
+      coincideNombre &&
+      coincideDireccion &&
+      coincideRubro
+    );
   });
 
-  const alternarFavorita = (id: number) => {
-    setFavoritas((actuales) =>
-      actuales.includes(id)
-        ? actuales.filter((empresaId) => empresaId !== id)
-        : [...actuales, id],
-    );
+
+  useEffect(() => {
+    const obtenerEmpresas = async () => {
+      try {
+        setCargando(true);
+        setError("");
+
+        const respuesta = await fetch( "http://localhost:3000/api/empresa");
+
+        if (!respuesta.ok) {
+          throw new Error("No se pudieron obtener las empresas");
+        }
+
+        const datos = await respuesta.json();
+        console.log("Empresas recibidas:", datos);
+
+        setEmpresas(datos);
+      } catch (error) {
+        console.error("Error al obtener empresas:", error);
+        setError("No se pudieron cargar las empresas.");
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    obtenerEmpresas();
+
+    const obtenerEstadisticas = async () => {
+    try {
+
+      
+
+      const usuario = JSON.parse(
+        localStorage.getItem("usuario") || "{}"
+      );
+
+      const idCliente = Number(usuario.id_Cliente);
+
+      console.log("USUARIO GUARDADO:", usuario);
+console.log("ID CLIENTE:", usuario.idCliente);
+console.log("ID_CLIENTE:", usuario.id_Cliente);
+
+      const respuesta = await fetch(
+        `http://localhost:3000/api/cotizaciones/estadisticas/cliente/${idCliente}`
+      );
+
+      if (!respuesta.ok) {
+        throw new Error(
+          "No se pudieron obtener las estadísticas"
+        );
+      }
+
+      const datos = await respuesta.json();
+
+      console.log(
+        "Estadísticas recibidas:",
+        datos
+      );
+
+      setCotizacionesEnviadas(
+        datos.cotizacionesEnviadas
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Error al obtener estadísticas:",
+        error
+      );
+
+    }
   };
+
+  obtenerEstadisticas();
+
+  const obtenerProyectosDeCliente = async () => {
+    try {
+      const usuarioGuardado =
+        localStorage.getItem("usuario");
+
+      if (!usuarioGuardado) {
+        throw new Error("No hay un usuario autenticado");
+      }
+
+      const usuario = JSON.parse(usuarioGuardado);
+
+      const respuestaProyectos = await fetch(
+        `http://localhost:3000/api/proyectos/cliente/${usuario.id_Cliente}`
+      );
+
+      if (!respuestaProyectos.ok) {
+        throw new Error(
+          "No se pudieron obtener los proyectos"
+        );
+      }
+
+      const proyectos =
+        await respuestaProyectos.json();
+
+      console.log(
+        "Proyectos del cliente:",
+        proyectos
+      );
+
+      setCantidadProyectos(proyectos.length);
+
+    } catch (error) {
+      console.error(
+        "Error al obtener proyectos:",
+        error
+      );
+
+      setError(
+        "No se pudieron cargar los proyectos."
+      );
+
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  obtenerProyectosDeCliente();
+  }, []);
+
+  
 
   return (
     <div className="cliente-panel">
+
       <SidebarCliente
         menuOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
@@ -178,229 +199,112 @@ export default function Empresas() {
 
       <main className="cliente-main">
 
+        {empresaSeleccionada ? (
 
-        <section className="empresas-heading">
-          <div>
-            <h2>Empresas disponibles</h2>
-            <p>
-              Compará experiencia, especialidades y calificaciones antes de
-              solicitar una cotización.
-            </p>
-          </div>
-
-          <button type="button" className="empresas-filters-button">
-            <SlidersHorizontal size={18} />
-            Filtros avanzados
-          </button>
-        </section>
-
-        <section className="empresas-stats">
-          <EmpresaStat
-            icon={<Building2 size={23} />}
-            value="28"
-            label="Empresas registradas"
-            variant="blue"
+          <EmpresaDetalle
+            empresa={empresaSeleccionada}
+            onVolver={() => setEmpresaSeleccionada(null)}
           />
 
-          <EmpresaStat
-            icon={<ShieldCheck size={23} />}
-            value="24"
-            label="Empresas verificadas"
-            variant="green"
-          />
+        ) : (
 
-          <EmpresaStat
-            icon={<BriefcaseBusiness size={23} />}
-            value="186"
-            label="Proyectos realizados"
-            variant="purple"
-          />
+          <>
+            <section className="empresas-heading">
+              <div>
+                <h2>Empresas disponibles</h2>
 
-          <EmpresaStat
-            icon={<Star size={23} />}
-            value="4.7"
-            label="Calificación promedio"
-            variant="orange"
-          />
-        </section>
+                <p>
+                  Conocé las empresas disponibles antes de
+                  elegir una para tu proyecto.
+                </p>
+              </div>
+            </section>
 
-        <section className="empresas-toolbar">
-          <label className="empresas-search">
-            <Search size={19} />
+            {cargando && (
+              <section className="empresas-estado">
+                <p>Cargando empresas...</p>
+              </section>
+            )}
 
-            <input
-              type="search"
-              placeholder="Buscar empresa, especialidad o ubicación..."
-              value={busqueda}
-              onChange={(event) => setBusqueda(event.target.value)}
-            />
-          </label>
+            {!cargando && error && (
+              <section className="empresas-estado empresas-estado-error">
+                <p>{error}</p>
+              </section>
+            )}
 
-          <button type="button" className="empresa-filter-button">
-            Todas las especialidades
-            <ChevronDown size={17} />
-          </button>
+            {!cargando && !error && empresas.length === 0 && (
+              <section className="empresas-estado">
+                <p>
+                  No hay empresas disponibles actualmente.
+                </p>
+              </section>
+            )}
+            {!cargando && !error && (
+              <section className="empresas-stats">
 
-          <button type="button" className="empresa-filter-button">
-            Todas las ubicaciones
-            <ChevronDown size={17} />
-          </button>
+                <EmpresaStatCard
+                  icon={<Building2 size={22} />}
+                  valor={empresas.length}
+                  titulo="Empresas disponibles"
+                  variante="blue"
+                />
 
-          <button type="button" className="empresa-filter-button">
-            Mejor calificadas
-            <ChevronDown size={17} />
-          </button>
-        </section>
+                <EmpresaStatCard
+                  icon={<FileText size={22} />}
+                  valor={cotizacionesEnviadas}
+                  titulo="Cotizaciones enviadas a empresas"
+                  variante="green"
+                />
 
-        <section className="empresas-grid">
-          {empresasFiltradas.map((empresa) => {
-            const esFavorita = favoritas.includes(empresa.id);
+                <EmpresaStatCard
+                  icon={<BriefcaseBusiness size={22} />}
+                  valor={cantidadProyectos}
+                  titulo="Proyectos registrados"
+                  variante="purple"
+                />
 
-            return (
-              <article className="empresa-card" key={empresa.id}>
-                <div className="empresa-cover">
-                  <img src={empresa.imagen} alt={empresa.nombre} />
 
-                  {empresa.verificada && (
-                    <span className="empresa-verified">
-                      <ShieldCheck size={14} />
-                      Verificada
-                    </span>
-                  )}
+              </section>
+            )}
 
-                  <button
-                    type="button"
-                    className={`empresa-favorite ${
-                      esFavorita ? "active" : ""
-                    }`}
-                    onClick={() => alternarFavorita(empresa.id)}
-                    aria-label={
-                      esFavorita
-                        ? `Quitar ${empresa.nombre} de favoritas`
-                        : `Agregar ${empresa.nombre} a favoritas`
-                    }
-                  >
-                    <Heart
-                      size={19}
-                      fill={esFavorita ? "currentColor" : "none"}
-                    />
-                  </button>
-                </div>
+            {!cargando && !error && (
+              <FiltrosEmpresaCliente
+                nombre={filtroNombre}
+                direccion={filtroDireccion}
+                rubro={filtroRubro}
+                rubros={rubros}
+                onNombreChange={setFiltroNombre}
+                onDireccionChange={setFiltroDireccion}
+                onRubroChange={setFiltroRubro}
+              />
+            )}
 
-                <div className="empresa-card-body">
-                  <div className="empresa-identity">
-                    <div className="empresa-logo">
-                      {empresa.iniciales}
-                    </div>
+            {!cargando && !error && empresas.length > 0 && (
+              <section className="empresas-grid">
 
-                    <div>
-                      <h3>{empresa.nombre}</h3>
-                      <span>{empresa.especialidad}</span>
-                    </div>
-                  </div>
+                {empresasFiltradas.map((empresa) => (
+                  <EmpresaCard
+                    key={empresa.idEmpresa}
+                    empresa={empresa}
+                    onVerDetalles={setEmpresaSeleccionada}
+                  />
+                ))}
 
-                  <div className="empresa-location">
-                    <MapPin size={15} />
-                    <span>{empresa.ubicacion}</span>
-                  </div>
+              </section>
+            )}
 
-                  <p className="empresa-description">
-                    {empresa.descripcion}
-                  </p>
+            {!cargando && !error && empresas.length > 0 && (
+              <footer className="empresas-results">
+                Mostrando {empresasFiltradas.length} empresas
+              </footer>
+            )}
 
-                  <div className="empresa-services">
-                    {empresa.servicios.map((servicio) => (
-                      <span key={servicio}>{servicio}</span>
-                    ))}
-                  </div>
+          </>
 
-                  <div className="empresa-metrics">
-                    <div>
-                      <span>Calificación</span>
-                      <strong className="empresa-rating">
-                        <Star size={15} fill="currentColor" />
-                        {empresa.calificacion}
-                        <small>({empresa.reseñas})</small>
-                      </strong>
-                    </div>
+        )}
 
-                    <div>
-                      <span>Proyectos</span>
-                      <strong>{empresa.proyectos}</strong>
-                    </div>
-
-                    <div>
-                      <span>Experiencia</span>
-                      <strong>{empresa.experiencia}</strong>
-                    </div>
-                  </div>
-
-                  <div className="empresa-availability">
-                    <span
-                      className={
-                        empresa.disponible
-                          ? "availability-dot available"
-                          : "availability-dot unavailable"
-                      }
-                    />
-
-                    {empresa.disponible
-                      ? "Disponible para nuevos proyectos"
-                      : "Agenda completa temporalmente"}
-                  </div>
-
-                  <div className="empresa-actions">
-                    <button type="button">
-                      <Eye size={16} />
-                      Ver perfil
-                    </button>
-
-                    <button
-                      type="button"
-                      className="empresa-primary-action"
-                      disabled={!empresa.disponible}
-                    >
-                      <Send size={16} />
-                      Solicitar cotización
-                    </button>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </section>
-
-        <footer className="empresas-results">
-          Mostrando {empresasFiltradas.length} de {empresas.length} empresas
-        </footer>
       </main>
+
     </div>
-  );
-}
-
-interface EmpresaStatProps {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-  variant: "blue" | "green" | "purple" | "orange";
-}
-
-function EmpresaStat({
-  icon,
-  value,
-  label,
-  variant,
-}: EmpresaStatProps) {
-  return (
-    <article className="empresa-stat-card">
-      <div className={`empresa-stat-icon empresa-stat-${variant}`}>
-        {icon}
-      </div>
-
-      <div>
-        <strong>{value}</strong>
-        <span>{label}</span>
-      </div>
-    </article>
   );
 }

@@ -1,0 +1,347 @@
+/* ========================================
+   TARJETA DE EMPRESA
+======================================== */
+
+.empresa-card {
+  background: #ffffff;
+  border: 1px solid #dce5f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 45, 90, 0.06);
+
+  display: flex;
+  flex-direction: column;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.empresa-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(15, 45, 90, 0.1);
+}
+
+/* ========================================
+   PORTADA / LOGO
+======================================== */
+
+.empresa-cover {
+  height: 155px;
+  position: relative;
+  overflow: hidden;
+  background: #eef3f9;
+}
+
+.empresa-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.empresa-cover-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #eef3f9;
+  color: #0b2d6b;
+
+  font-size: 38px;
+  font-weight: 700;
+}
+
+/* ========================================
+   EMPRESA VERIFICADA
+======================================== */
+
+.empresa-verified {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 6px 10px;
+
+  background: #ffffff;
+  color: #07885f;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.08);
+}
+
+.empresa-verified svg {
+  stroke-width: 2;
+}
+
+/* ========================================
+   CUERPO
+======================================== */
+
+.empresa-card-body {
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+}
+
+/* ========================================
+   IDENTIDAD
+======================================== */
+
+.empresa-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.empresa-logo {
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: #092c70;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.empresa-identity h3 {
+  margin: 0 0 4px;
+
+  color: #092c70;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  word-break: break-word;
+}
+
+.empresa-identity span {
+  color: #567092;
+  font-size: 13px;
+}
+
+/* ========================================
+   UBICACIÓN
+======================================== */
+
+.empresa-location {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+
+  margin-top: 15px;
+
+  color: #526b8b;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.empresa-location svg {
+  flex-shrink: 0;
+  color: #506b91;
+  margin-top: 1px;
+}
+
+/* ========================================
+   DESCRIPCIÓN
+======================================== */
+
+.empresa-description {
+  margin: 14px 0 0;
+
+  color: #4d6687;
+
+  font-size: 13px;
+  line-height: 1.55;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  min-height: 60px;
+}
+
+/* ========================================
+   ACCIONES
+======================================== */
+
+.empresa-actions {
+  margin-top: 18px;
+  padding-top: 14px;
+
+  border-top: 1px solid #e5ebf3;
+}
+
+.empresa-actions button {
+  width: 100%;
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: 1px solid #d5e1ef;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #092c70;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.empresa-actions button:hover {
+  background: #f3f7fc;
+  border-color: #b9cce2;
+}
+
+.empresa-actions button:active {
+  transform: scale(0.98);
+}
+
+.empresa-actions button svg {
+  stroke-width: 2;
+}
+
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+/* Tablets */
+@media (max-width: 900px) {
+
+  .empresa-cover {
+    height: 145px;
+  }
+
+  .empresa-card-body {
+    padding: 16px;
+  }
+
+  .empresa-identity h3 {
+    font-size: 17px;
+  }
+
+}
+
+
+/* Celulares */
+@media (max-width: 600px) {
+
+  .empresa-card {
+    border-radius: 10px;
+  }
+
+  .empresa-cover {
+    height: 170px;
+  }
+
+  .empresa-card-body {
+    padding: 16px;
+  }
+
+  .empresa-identity {
+    gap: 10px;
+  }
+
+  .empresa-logo {
+    width: 44px;
+    height: 44px;
+    font-size: 13px;
+  }
+
+  .empresa-identity h3 {
+    font-size: 16px;
+  }
+
+  .empresa-identity span {
+    font-size: 12px;
+  }
+
+  .empresa-location {
+    font-size: 12px;
+  }
+
+  .empresa-description {
+    font-size: 12px;
+    min-height: auto;
+    -webkit-line-clamp: 4;
+  }
+
+  .empresa-actions {
+    margin-top: 16px;
+  }
+
+}
+
+
+/* Celulares pequeños */
+@media (max-width: 400px) {
+
+  .empresa-cover {
+    height: 150px;
+  }
+
+  .empresa-card-body {
+    padding: 14px;
+  }
+
+  .empresa-verified {
+    top: 9px;
+    left: 9px;
+
+    padding: 5px 8px;
+
+    font-size: 11px;
+  }
+
+  .empresa-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .empresa-identity h3 {
+    font-size: 15px;
+  }
+
+  .empresa-description {
+    font-size: 12px;
+  }
+
+}
