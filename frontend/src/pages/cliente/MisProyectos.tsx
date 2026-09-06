@@ -62,7 +62,7 @@ const API_URL =
 
 const ID_CLIENTE_TEMPORAL = 1;
 
-const PROYECTOS_POR_PAGINA = 6;
+const PROYECTOS_POR_PAGINA = 3;
 
 
 

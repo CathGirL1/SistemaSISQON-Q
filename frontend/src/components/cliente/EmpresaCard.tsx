@@ -2,7 +2,7 @@ import { MapPin, ShieldCheck, Eye } from "lucide-react";
 import type { EmpresaCliente } from "../../interfaces/EmpresaCliente";
 import "../../styles/EmpresaCard.css";
 
-const API_URL = import.meta.env.VITE_API_URL;
+
 
 interface EmpresaCardProps {
   empresa: EmpresaCliente;
@@ -21,7 +21,7 @@ export default function EmpresaCard({ empresa, onVerDetalles }: EmpresaCardProps
       <div className="empresa-cover">
         {empresa.logo ? (
           <img
-            src={`${API_URL}${empresa.logo}`}
+            src={empresa.logo}
             alt={`Logo de ${empresa.nombreEmpresa}`}
           />
         ) : (

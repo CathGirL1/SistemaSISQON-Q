@@ -1,3 +1,7 @@
+import { obtenerEmpresaPorId } from "../../services/empresaService";
+import type { EmpresaCliente } from "../../interfaces/EmpresaCliente";
+import { useEffect, useState } from "react";
+
 import {
   ArrowLeft,
   Mail,
@@ -10,11 +14,9 @@ import {
   BriefcaseBusiness,
 } from "lucide-react";
 
-import type { EmpresaCliente } from "../../interfaces/EmpresaCliente";
-
 import "../../styles/EmpresaDetalle.css";
 
-const API_URL = import.meta.env.VITE_API_URL;
+
 
 interface EmpresaDetalleProps {
   empresa: EmpresaCliente;
@@ -25,7 +27,57 @@ export default function EmpresaDetalle({
   empresa,
   onVolver,
 }: EmpresaDetalleProps) {
-  const iniciales = empresa.nombreEmpresa
+  const [empresaDetalle, setEmpresaDetalle] =
+    useState<EmpresaCliente>(empresa);
+
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    const cargarEmpresaDetalle = async () => {
+
+      if (empresa.idEmpresa === undefined) {
+        return;
+      }
+      try {
+        setCargando(true);
+
+        const datos = await obtenerEmpresaPorId(
+          empresa.idEmpresa
+        );
+
+        console.log(
+          "EMPRESA DETALLE RECIBIDA:",
+          datos
+        );
+
+        setEmpresaDetalle(datos);
+      } catch (error) {
+        console.error(
+          "Error al obtener detalle de empresa:",
+          error
+        );
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargarEmpresaDetalle();
+  }, [empresa.idEmpresa]);
+
+  if (cargando) {
+    return (
+      <section className="empresa-detalle">
+        <p>Cargando información de la empresa...</p>
+      </section>
+    );
+  }
+
+  const nombreMostrar =
+    empresaDetalle.nombreComercial ||
+    empresaDetalle.razonSocial ||
+    "Empresa";
+
+  const iniciales = nombreMostrar
     .substring(0, 2)
     .toUpperCase();
 
@@ -46,10 +98,12 @@ export default function EmpresaDetalle({
       <div className="empresa-detalle-header">
 
         <div className="empresa-detalle-logo">
-          {empresa.logo ? (
+          {empresaDetalle.logo ? (
             <img
-              src={`${API_URL}${empresa.logo}`}
-              alt={`Logo de ${empresa.nombreEmpresa}`}
+              src={
+                empresaDetalle.logo
+              }
+              alt={`Logo de ${nombreMostrar}`}
             />
           ) : (
             <span>{iniciales}</span>
@@ -57,18 +111,20 @@ export default function EmpresaDetalle({
         </div>
 
         <div className="empresa-detalle-titulo">
+
           <div className="empresa-detalle-verificada">
             <ShieldCheck size={16} />
             Empresa verificada
           </div>
 
-          <h2>{empresa.nombreEmpresa}</h2>
+          <h2>{nombreMostrar}</h2>
 
           <p>
-            {empresa.rubro || "Rubro no especificado"}
+            {empresaDetalle.rubro ||
+              "Rubro no especificado"}
           </p>
-        </div>
 
+        </div>
       </div>
 
       {/* DESCRIPCIÓN */}
@@ -77,7 +133,7 @@ export default function EmpresaDetalle({
         <h3>Sobre la empresa</h3>
 
         <p>
-          {empresa.descripcion ||
+          {empresaDetalle.descripcion ||
             "La empresa aún no ha agregado una descripción."}
         </p>
 
@@ -92,53 +148,69 @@ export default function EmpresaDetalle({
 
           <div className="empresa-detalle-info">
             <span>Razón social</span>
-            <strong>{empresa.nombreEmpresa}</strong>
+            <strong>
+              {empresaDetalle.razonSocial ||
+                "No registrada"}
+            </strong>
+          </div>
+
+          <div className="empresa-detalle-info">
+            <span>Nombre comercial</span>
+            <strong>
+              {empresaDetalle.nombreComercial ||
+                "No registrado"}
+            </strong>
           </div>
 
           <div className="empresa-detalle-info">
             <span>RUT</span>
-            <strong>{empresa.rut || "No registrado"}</strong>
+            <strong>
+              {empresaDetalle.rut ||
+                "No registrado"}
+            </strong>
           </div>
 
           <div className="empresa-detalle-info">
             <span>Rubro</span>
-            <strong>{empresa.rubro || "No especificado"}</strong>
+            <strong>
+              {empresaDetalle.rubro ||
+                "No especificado"}
+            </strong>
           </div>
 
           <div className="empresa-detalle-info">
             <span>Teléfono</span>
-
             <strong>
-              {empresa.telefono || "No registrado"}
+              {empresaDetalle.telefono ||
+                "No registrado"}
             </strong>
           </div>
 
           <div className="empresa-detalle-info">
             <span>Correo electrónico</span>
-
             <strong>
-              {empresa.email || "No registrado"}
+              {empresaDetalle.email ||
+                "No registrado"}
             </strong>
           </div>
 
           <div className="empresa-detalle-info">
             <span>Dirección</span>
-
             <strong>
-              {empresa.direccion || "No registrada"}
+              {empresaDetalle.direccion ||
+                "No registrada"}
             </strong>
           </div>
 
           <div className="empresa-detalle-info">
             <span>Página web</span>
-
             <strong>
-              {empresa.paginaWeb || "No registrada"}
+              {empresaDetalle.paginaWeb ||
+                "No registrada"}
             </strong>
           </div>
 
         </div>
-
       </div>
 
       {/* DATOS DE CONTACTO */}
@@ -151,33 +223,37 @@ export default function EmpresaDetalle({
           <div>
             <Mail size={18} />
             <span>
-              {empresa.email || "Correo no registrado"}
+              {empresaDetalle.email ||
+                "Correo no registrado"}
             </span>
           </div>
 
           <div>
             <Phone size={18} />
             <span>
-              {empresa.telefono || "Teléfono no registrado"}
+              {empresaDetalle.telefono ||
+                "Teléfono no registrado"}
             </span>
           </div>
 
           <div>
             <MapPin size={18} />
             <span>
-              {empresa.direccion || "Dirección no registrada"}
+              {empresaDetalle.direccion ||
+                "Dirección no registrada"}
             </span>
           </div>
 
-          {empresa.paginaWeb && (
+          {empresaDetalle.paginaWeb && (
             <div>
               <Globe size={18} />
-              <span>{empresa.paginaWeb}</span>
+              <span>
+                {empresaDetalle.paginaWeb}
+              </span>
             </div>
           )}
 
         </div>
-
       </div>
 
       {/* ZONAS DE TRABAJO */}
@@ -189,7 +265,7 @@ export default function EmpresaDetalle({
         </h3>
 
         <p>
-          {empresa.zonasTrabajo ||
+          {empresaDetalle.zonasTrabajo ||
             "La empresa no ha especificado sus zonas de trabajo."}
         </p>
 
@@ -204,7 +280,7 @@ export default function EmpresaDetalle({
         </h3>
 
         <p>
-          {empresa.condicionesComerciales ||
+          {empresaDetalle.condicionesComerciales ||
             "La empresa no ha especificado sus condiciones comerciales."}
         </p>
 
@@ -222,30 +298,35 @@ export default function EmpresaDetalle({
 
           <div>
             <span>Validez de la cotización</span>
+
             <strong>
-              {empresa.validezCotizacion} días
+              {empresaDetalle.validezCotizacion
+                ? `${empresaDetalle.validezCotizacion} días`
+                : "No especificada"}
             </strong>
           </div>
 
           <div>
             <span>Días laborables</span>
+
             <strong>
-              {empresa.diasLaborables || "No especificados"}
+              {empresaDetalle.diasLaborables ||
+                "No especificados"}
             </strong>
           </div>
 
           <div>
             <span>Horario de atención</span>
+
             <strong>
-              {empresa.horarioInicio &&
-              empresa.horarioFin
-                ? `${empresa.horarioInicio} - ${empresa.horarioFin}`
+              {empresaDetalle.horarioInicio &&
+              empresaDetalle.horarioFin
+                ? `${empresaDetalle.horarioInicio} - ${empresaDetalle.horarioFin}`
                 : "No especificado"}
             </strong>
           </div>
 
         </div>
-
       </div>
 
       {/* VOLVER */}

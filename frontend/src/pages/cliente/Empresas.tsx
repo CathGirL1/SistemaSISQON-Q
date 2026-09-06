@@ -5,6 +5,7 @@ import SidebarCliente from "../../components/cliente/SidebarCliente";
 
 import type { EmpresaCliente } from "../../interfaces/EmpresaCliente";
 import EmpresaCard from "../../components/cliente/EmpresaCard";
+import PaginacionEmpresaCliente from "../../components/cliente/PaginacionEmpresaCliente";
 import EmpresaDetalle from "../../pages/cliente/EmpresaDetalle";
 import EmpresaStatCard from "../../pages/cliente/EmpresaStatCard";
 import FiltrosEmpresaCliente from "../../components/cliente/FiltrosEmpresaCliente";
@@ -33,6 +34,8 @@ export default function Empresas() {
   const [filtroNombre, setFiltroNombre] = useState("");
   const [filtroDireccion, setFiltroDireccion] = useState("");
   const [filtroRubro, setFiltroRubro] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const EMPRESAS_POR_PAGINA = 3;
 
   const rubros = Array.from(
     new Set(
@@ -62,6 +65,21 @@ export default function Empresas() {
       coincideRubro
     );
   });
+
+  const totalPaginas = Math.ceil(
+   empresasFiltradas.length / EMPRESAS_POR_PAGINA
+  );
+
+  const indiceInicio =
+    (paginaActual - 1) * EMPRESAS_POR_PAGINA;
+
+  const indiceFin =
+    indiceInicio + EMPRESAS_POR_PAGINA;
+
+  const empresasPaginadas = empresasFiltradas.slice(
+    indiceInicio,
+    indiceFin
+  );
 
 
   useEffect(() => {
@@ -273,29 +291,52 @@ console.log("ID_CLIENTE:", usuario.id_Cliente);
                 direccion={filtroDireccion}
                 rubro={filtroRubro}
                 rubros={rubros}
-                onNombreChange={setFiltroNombre}
-                onDireccionChange={setFiltroDireccion}
-                onRubroChange={setFiltroRubro}
+                onNombreChange={(valor) => {
+                  setFiltroNombre(valor);
+                  setPaginaActual(1);
+                }}
+                onDireccionChange={(valor) => {
+                  setFiltroDireccion(valor);
+                  setPaginaActual(1);
+                }}
+                onRubroChange={(valor) => {
+                  setFiltroRubro(valor);
+                  setPaginaActual(1);
+                }}
               />
             )}
 
             {!cargando && !error && empresas.length > 0 && (
-              <section className="empresas-grid">
+              <>
+                <section className="empresas-grid">
+                  {empresasPaginadas.map((empresa) => (
+                    <EmpresaCard
+                      key={empresa.idEmpresa}
+                      empresa={empresa}
+                      onVerDetalles={setEmpresaSeleccionada}
+                    />
+                  ))}
+                </section>
 
-                {empresasFiltradas.map((empresa) => (
-                  <EmpresaCard
-                    key={empresa.idEmpresa}
-                    empresa={empresa}
-                    onVerDetalles={setEmpresaSeleccionada}
+                {empresasFiltradas.length > 0 && (
+                  <PaginacionEmpresaCliente
+                    paginaActual={paginaActual}
+                    totalPaginas={totalPaginas}
+                    onCambiarPagina={setPaginaActual}
                   />
-                ))}
-
-              </section>
+                )}
+              </>
             )}
 
             {!cargando && !error && empresas.length > 0 && (
               <footer className="empresas-results">
-                Mostrando {empresasFiltradas.length} empresas
+                Mostrando{" "}
+                {empresasFiltradas.length === 0
+                  ? 0
+                  : indiceInicio + 1}
+                –
+                {Math.min(indiceFin, empresasFiltradas.length)} de{" "}
+                {empresasFiltradas.length} empresas
               </footer>
             )}
 
