@@ -72,75 +72,83 @@ export class ProyectoRepository {
       .request()
       .input("idCliente", sql.Int, idCliente)
       .query(`
-        SELECT
-          p.id_Proyecto AS idProyecto,
-          p.id_Cliente AS idCliente,
-          p.id_Empresa AS idEmpresa,
-          p.id_TipoObra AS idTipoObra,
+      SELECT
+        p.id_Proyecto AS idProyecto,
+        p.id_Cliente AS idCliente,
+        p.id_Empresa AS idEmpresa,
+        p.id_TipoObra AS idTipoObra,
 
-          p.nombre,
-          p.descripcion,
-          p.ubicacion,
-          p.estado,
+        t.nombre AS tipoObra,
 
-          p.alto,
-          p.ancho,
-          p.largo,
+        p.nombre,
+        p.descripcion,
+        p.ubicacion,
+        p.estado,
 
-          p.fechaCreacion,
-          p.imagenUrl,
+        p.alto,
+        p.ancho,
+        p.largo,
 
-          t.nombre AS tipoObra
+        p.fechaCreacion,
+        p.imagenUrl,
 
-        FROM Proyecto p
+        CAST(
+          p.ancho * p.largo AS DECIMAL(18, 2)
+        ) AS superficie
 
-        INNER JOIN TipoObra t
-          ON p.id_TipoObra = t.id_TipoObra
+      FROM Proyecto p
 
-        WHERE p.id_Cliente = @idCliente
+      INNER JOIN TipoObra t
+        ON t.id_TipoObra = p.id_TipoObra
 
-        ORDER BY
-          p.fechaCreacion DESC,
-          p.id_Proyecto DESC
-      `);
+      WHERE p.id_Cliente = @idCliente
+
+      ORDER BY
+        p.fechaCreacion DESC,
+        p.id_Proyecto DESC
+    `);
 
     return result.recordset;
   }
 
   public async obtenerProyectoPorId(idProyecto: number) {
-  const pool = await connectDB();
+    const pool = await connectDB();
 
-  const result = await pool
+    const result = await pool
       .request()
       .input("idProyecto", sql.Int, idProyecto)
       .query(`
-        SELECT
-          p.id_Proyecto AS idProyecto,
-          p.id_Cliente AS idCliente,
-          p.id_Empresa AS idEmpresa,
-          p.id_TipoObra AS idTipoObra,
+      SELECT
+        p.id_Proyecto AS idProyecto,
+        p.id_Cliente AS idCliente,
+        p.id_Empresa AS idEmpresa,
+        p.id_TipoObra AS idTipoObra,
 
-          p.nombre,
-          p.descripcion,
-          p.ubicacion,
-          p.estado,
+        t.nombre AS tipoObra,
 
-          p.alto,
-          p.ancho,
-          p.largo,
+        p.nombre,
+        p.descripcion,
+        p.ubicacion,
+        p.estado,
 
-          p.fechaCreacion,
-          imagenUrl,
+        p.alto,
+        p.ancho,
+        p.largo,
 
-          t.nombre AS tipoObra
+        p.fechaCreacion,
+        p.imagenUrl,
 
-        FROM Proyecto p
+        CAST(
+          p.ancho * p.largo AS DECIMAL(18, 2)
+        ) AS superficie
 
-        INNER JOIN TipoObra t
-          ON p.id_TipoObra = t.id_TipoObra
+      FROM Proyecto p
 
-        WHERE p.id_Proyecto = @idProyecto
-      `);
+      INNER JOIN TipoObra t
+        ON t.id_TipoObra = p.id_TipoObra
+
+      WHERE p.id_Proyecto = @idProyecto
+    `);
 
     return result.recordset[0] ?? null;
   }
@@ -186,13 +194,11 @@ export class ProyectoRepository {
   public async eliminarProyecto(
     idProyecto: number
   ): Promise<boolean> {
-
     const pool = await connectDB();
 
     const transaction = pool.transaction();
 
     try {
-
       await transaction.begin();
 
       // ==========================================
@@ -207,10 +213,9 @@ export class ProyectoRepository {
           idProyecto
         )
         .query(`
-          DELETE FROM Cotizacion
-          WHERE id_Proyecto = @idProyecto
-        `);
-
+        DELETE FROM Cotizacion
+        WHERE id_Proyecto = @idProyecto
+      `);
 
       // ==========================================
       // ELIMINAR MATERIALES DEL PROYECTO
@@ -224,10 +229,9 @@ export class ProyectoRepository {
           idProyecto
         )
         .query(`
-          DELETE FROM MaterialProyecto
-          WHERE id_Proyecto = @idProyecto
-        `);
-
+        DELETE FROM MaterialProyecto
+        WHERE id_Proyecto = @idProyecto
+      `);
 
       // ==========================================
       // ELIMINAR PROYECTO
@@ -241,17 +245,14 @@ export class ProyectoRepository {
           idProyecto
         )
         .query(`
-          DELETE FROM Proyecto
-          WHERE id_Proyecto = @idProyecto
-        `);
-
+        DELETE FROM Proyecto
+        WHERE id_Proyecto = @idProyecto
+      `);
 
       await transaction.commit();
 
       return result.rowsAffected[0] > 0;
-
     } catch (error) {
-
       await transaction.rollback();
 
       console.error(

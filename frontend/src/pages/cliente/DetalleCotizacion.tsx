@@ -77,6 +77,7 @@ interface Cotizacion {
 
   // PROYECTO
   idTipoObra: number;
+  tipoObra: string;
   nombreProyecto: string;
   descripcionProyecto: string | null;
   ubicacion: string | null;

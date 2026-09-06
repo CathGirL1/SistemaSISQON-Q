@@ -38,6 +38,7 @@ export default function CatalogoMateriales() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [materiales, setMateriales] = useState<Material[]>([]);
+
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
@@ -61,7 +62,7 @@ export default function CatalogoMateriales() {
   }, []);
 
   useEffect(() => {
-  setPaginaActual(1);
+    setPaginaActual(1);
   }, [
     busqueda,
     categoriaSeleccionada,
@@ -88,7 +89,7 @@ export default function CatalogoMateriales() {
 
           precio: material.costoUnitario,
           precioUYU: material.costoUnitarioUYU,
-          
+
           unidad: material.unidad,
 
           disponibilidad: material.disponibilidad,
@@ -220,20 +221,20 @@ export default function CatalogoMateriales() {
 
 
 
-    const totalPaginas = Math.ceil(
-      materialesFiltrados.length / materialesPorPagina
-    );
+  const totalPaginas = Math.ceil(
+    materialesFiltrados.length / materialesPorPagina
+  );
 
-    const indiceInicial =
-      (paginaActual - 1) * materialesPorPagina;
+  const indiceInicial =
+    (paginaActual - 1) * materialesPorPagina;
 
-    const indiceFinal =
-      indiceInicial + materialesPorPagina;
+  const indiceFinal =
+    indiceInicial + materialesPorPagina;
 
-    const materialesPagina = materialesFiltrados.slice(
-      indiceInicial,
-      indiceFinal
-    );
+  const materialesPagina = materialesFiltrados.slice(
+    indiceInicial,
+    indiceFinal
+  );
 
   return (
     <div className="cliente-panel">
@@ -375,15 +376,14 @@ export default function CatalogoMateriales() {
 
                     <div className="material-footer">
                       <span
-                        className={`material-stock ${
-                          material.disponibilidad ===
-                          "Disponible"
+                        className={`material-stock ${material.disponibilidad ===
+                            "Disponible"
                             ? "available"
                             : material.disponibilidad ===
                               "Stock bajo"
-                            ? "warning"
-                            : "out"
-                        }`}
+                              ? "warning"
+                              : "out"
+                          }`}
                       >
                         {material.disponibilidad}
                       </span>
@@ -395,9 +395,9 @@ export default function CatalogoMateriales() {
           )}
 
         <footer className="catalogo-results">
-           Mostrando {indiceInicial + 1} -{" "}
-            {Math.min(indiceFinal, materialesFiltrados.length)}
-            {" "}de {materialesFiltrados.length} materiales
+          Mostrando {indiceInicial + 1} -{" "}
+          {Math.min(indiceFinal, materialesFiltrados.length)}
+          {" "}de {materialesFiltrados.length} materiales
         </footer>
 
         <PaginacionCatalogoMateriales

@@ -290,6 +290,9 @@ export class CotizacionRepository {
 
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
         INNER JOIN Empresa e
           ON e.id_Empresa = c.id_Empresa
@@ -631,7 +634,7 @@ export class CotizacionRepository {
 
           p.id_Cliente AS idCliente,
           p.id_TipoObra AS idTipoObra,
-
+          t.nombre AS tipoObra,
           p.nombre AS nombreProyecto,
           p.descripcion AS descripcionProyecto,
 
@@ -650,6 +653,9 @@ export class CotizacionRepository {
 
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
         WHERE c.id_Proyecto = @idProyecto
 
@@ -723,6 +729,10 @@ export class CotizacionRepository {
 
           p.id_Cliente AS idCliente,
           p.id_TipoObra AS idTipoObra,
+<<<<<<< HEAD
+=======
+          t.nombre AS tipoObra,
+>>>>>>> origin/main
           p.nombre AS nombreProyecto,
           p.descripcion AS descripcionProyecto,
           p.ubicacion,
@@ -753,6 +763,9 @@ export class CotizacionRepository {
         -- Cotización → Proyecto
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
         -- Proyecto → Cliente
         INNER JOIN Cliente cl
@@ -962,7 +975,7 @@ export class CotizacionRepository {
   }
 
 
-  public async enviarCotizacion(
+    public async enviarCotizacion(
     idCotizacion: number,
     idEmpresa: number
   ): Promise<boolean> {
@@ -993,14 +1006,14 @@ export class CotizacionRepository {
     return result.rowsAffected[0] > 0;
   }
 
+
   // ====================================================
   // ESTADÍSTICAS DEL CLIENTE
   // ====================================================
 
-  public async obtenerEstadisticasCliente(
+ public async obtenerEstadisticasCliente(
     idCliente: number
   ) {
-
     const pool = await connectDB();
 
     const result = await pool
@@ -1039,33 +1052,66 @@ export class CotizacionRepository {
   }
 
   // ====================================================
-  // VERIFICAR SI EXISTE PROYECTO
+  // OBTENER COTIZACIÓN BORRADOR POR PROYECTO
   // ====================================================
 
-  public async existeProyecto(
+  public async obtenerCotizacionBorradorPorProyecto(
     idProyecto: number
-  ): Promise<boolean> {
-
+  ) {
     const pool = await connectDB();
 
     const result = await pool
       .request()
-
-      .input(
-        "idProyecto",
-        sql.Int,
-        idProyecto
-      )
-
+      .input("idProyecto", sql.Int, idProyecto)
       .query(`
         SELECT TOP 1
-          id_Proyecto
-
-        FROM Proyecto
-
-        WHERE id_Proyecto = @idProyecto
+          c.id_Cotizacion AS idCotizacion,
+          c.id_Proyecto AS idProyecto,
+          c.fechaCreacion,
+          c.fechaActualizacion,
+          c.estado,
+          c.precioEstimado,
+          c.observaciones
+        FROM Cotizacion c
+        WHERE c.id_Proyecto = @idProyecto
+          AND c.estado = 'Borrador'
+        ORDER BY
+          c.fechaCreacion DESC,
+          c.id_Cotizacion DESC
       `);
 
-    return result.recordset.length > 0;
+    return result.recordset[0] ?? null;
   }
-}
+
+    // ====================================================
+    // VERIFICAR SI EXISTE PROYECTO
+    // ====================================================
+
+
+    public async existeProyecto(
+      idProyecto: number
+    ): Promise<boolean> {
+
+      const pool = await connectDB();
+
+      const result = await pool
+        .request()
+
+        .input(
+          "idProyecto",
+          sql.Int,
+          idProyecto
+        )
+
+        .query(`
+          SELECT TOP 1
+            id_Proyecto
+
+          FROM Proyecto
+
+          WHERE id_Proyecto = @idProyecto
+        `);
+
+      return result.recordset.length > 0;
+    }
+  }
