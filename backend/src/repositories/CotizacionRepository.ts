@@ -169,9 +169,7 @@ export class CotizacionRepository {
       .query(`
         SELECT
 
-          -- ============================================
-          -- COTIZACIÓN
-          -- ============================================
+       
 
           c.id_Cotizacion AS idCotizacion,
           c.id_Proyecto AS idProyecto,
@@ -203,9 +201,7 @@ export class CotizacionRepository {
           c.precioEstimado,
           c.observaciones,
 
-          -- ============================================
-          -- CLIENTE
-          -- ============================================
+    
 
           p.id_Cliente AS idCliente,
 
@@ -218,9 +214,7 @@ export class CotizacionRepository {
           u.gmail AS emailCliente,
           u.telefono AS telefonoCliente,
 
-          -- ============================================
-          -- PROYECTO
-          -- ============================================
+  
 
           p.id_TipoObra AS idTipoObra,
 
@@ -241,9 +235,6 @@ export class CotizacionRepository {
             AS DECIMAL(18, 2)
           ) AS superficie,
 
-          -- ============================================
-          -- MATERIALES
-          -- ============================================
 
           ISNULL(
             (
@@ -280,9 +271,6 @@ export class CotizacionRepository {
             'Sin materiales agregados'
           ) AS resumenMateriales,
 
-          -- ============================================
-          -- EMPRESA
-          -- ============================================
 
           e.nombreEmpresa AS nombreEmpresa
 
@@ -302,9 +290,6 @@ export class CotizacionRepository {
 
         INNER JOIN Usuario u
           ON u.id_Usuario = cl.id_Usuario
-
-        INNER JOIN TipoObra t
-          ON t.id_TipoObra = p.id_TipoObra
 
         WHERE c.id_Empresa = @idEmpresa
 
@@ -685,9 +670,7 @@ export class CotizacionRepository {
       )
       .query(`
         SELECT
-          -- ==========================================
-          -- COTIZACIÓN
-          -- ==========================================
+      
 
           c.id_Cotizacion AS idCotizacion,
           c.id_Proyecto AS idProyecto,
@@ -717,22 +700,14 @@ export class CotizacionRepository {
           c.precioEstimado,
           c.observaciones,
 
-          -- ==========================================
-          -- EMPRESA
-          -- ==========================================
-
           e.nombreEmpresa AS nombreEmpresa,
 
-          -- ==========================================
-          -- PROYECTO
-          -- ==========================================
 
           p.id_Cliente AS idCliente,
           p.id_TipoObra AS idTipoObra,
-<<<<<<< HEAD
-=======
+
           t.nombre AS tipoObra,
->>>>>>> origin/main
+
           p.nombre AS nombreProyecto,
           p.descripcion AS descripcionProyecto,
           p.ubicacion,
