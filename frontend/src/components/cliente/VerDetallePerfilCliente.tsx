@@ -1,3 +1,5 @@
+import FotoPerfilCliente from "./FotoPerfilCliente";
+
 interface Cliente {
   id_Cliente: number;
   id_Usuario: number;
@@ -11,16 +13,19 @@ interface Cliente {
   ciudad: string | null;
   estado: string;
   notas: string | null;
+  logo: string | null;
 }
 
 interface DetallePerfilClienteProps {
   cliente: Cliente;
   onEditar: () => void;
+  onLogoActualizado: (logo: string | null) => void;
 }
 
 export default function VerDetallePerfilCliente({
   cliente,
   onEditar,
+  onLogoActualizado,
 }: DetallePerfilClienteProps) {
   return (
     <div className="perfil-card">
@@ -29,10 +34,10 @@ export default function VerDetallePerfilCliente({
 
       <div className="perfil-header">
 
-        <div className="perfil-avatar">
-          {cliente.nombre.charAt(0)}
-          {cliente.apellido.charAt(0)}
-        </div>
+        <FotoPerfilCliente
+          cliente={cliente}
+          onFotoActualizada={onLogoActualizado}
+        />
 
         <div className="perfil-header-info">
 

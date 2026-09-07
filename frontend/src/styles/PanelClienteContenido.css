@@ -136,8 +136,33 @@
 .cliente-user .avatar {
   width: 42px;
   height: 42px;
-  flex-shrink: 0;
+  min-width: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  background: linear-gradient(
+    135deg,
+    #00a878,
+    #00c08b
+  );
+
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   font-size: 13px;
+  font-weight: 700;
+
+  flex-shrink: 0;
+}
+
+.cliente-user .avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 /* Nombre */

@@ -23,6 +23,7 @@ interface Cliente {
   ciudad: string | null;
   estado: string;
   notas: string | null;
+  logo: string | null;
 }
 
 export default function VerPerfilCliente() {
@@ -39,6 +40,7 @@ export default function VerPerfilCliente() {
   const [mensaje, setMensaje] = useState("");
 
   const [error, setError] = useState("");
+  
 
 
   // =========================================
@@ -195,6 +197,17 @@ export default function VerPerfilCliente() {
     }
   };
 
+  const actualizarLogo = (logo: string | null) => {
+    setCliente((prev) =>
+      prev
+        ? {
+            ...prev,
+            logo,
+          }
+        : prev
+    );
+  };
+
 
   // =========================================
   // CARGANDO
@@ -308,6 +321,7 @@ export default function VerPerfilCliente() {
                   setError("");
                   setEditando(true);
                 }}
+                onLogoActualizado={actualizarLogo}
               />
 
             )

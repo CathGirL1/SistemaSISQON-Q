@@ -15,6 +15,7 @@ interface Cliente {
   ciudad: string | null;
   estado: string;
   notas: string | null;
+  logo: string | null;
 }
 
 interface EdicionPerfilClienteProps {
@@ -80,8 +81,17 @@ export default function EdicionPerfilCliente({
 
       <div className="editar-perfil-header">
         <div className="editar-perfil-avatar">
-          {datos.nombre.charAt(0)}
-          {datos.apellido.charAt(0)}
+            {datos.logo ? (
+            <img
+              src={`http://localhost:3000${datos.logo}`}
+              alt={`Foto de ${datos.nombre} ${datos.apellido}`}
+            />
+          ) : (
+            <>
+              {datos.nombre.charAt(0)}
+              {datos.apellido.charAt(0)}
+            </>
+          )}
         </div>
 
         <div className="editar-perfil-header-info">

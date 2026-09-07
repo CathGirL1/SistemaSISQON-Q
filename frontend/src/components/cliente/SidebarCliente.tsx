@@ -13,6 +13,7 @@ interface SidebarClienteProps {
 export default function SidebarCliente({
   menuOpen,
   onClose,
+  
 }: SidebarClienteProps) {
 
   const navigate = useNavigate();
@@ -20,20 +21,25 @@ export default function SidebarCliente({
   const [cliente, setCliente] = useState<{
     nombre: string;
     apellido: string;
+    logo: string | null;
   } | null>(null);
 
   const [perfilOpen, setPerfilOpen] = useState(false);
 
   useEffect(() => {
-    const usuarioGuardado = localStorage.getItem("usuario");
-
-    if (!usuarioGuardado) return;
-
-    const usuario = JSON.parse(usuarioGuardado);
-
-    if (!usuario.id_Cliente) return;
-
     const obtenerCliente = async () => {
+      const usuarioGuardado = localStorage.getItem("usuario");
+
+      if (!usuarioGuardado) {
+        return;
+      }
+
+      const usuario = JSON.parse(usuarioGuardado);
+
+      if (!usuario.id_Cliente) {
+        return;
+      }
+
       try {
         const respuesta = await fetch(
           `http://localhost:3000/api/clientes/${usuario.id_Cliente}`
@@ -47,12 +53,31 @@ export default function SidebarCliente({
 
         setCliente(datosCliente);
       } catch (error) {
-        console.error("Error al obtener datos del cliente:", error);
+        console.error(
+          "Error al obtener datos del cliente:",
+          error
+        );
       }
     };
 
+    // Cargar los datos al entrar
     obtenerCliente();
+
+    // Escuchar cuando se actualiza la foto
+    window.addEventListener(
+      "cliente-logo-actualizado",
+      obtenerCliente
+    );
+
+    return () => {
+      window.removeEventListener(
+        "cliente-logo-actualizado",
+        obtenerCliente
+      );
+    };
   }, []);
+
+  
   return (
     <>
       <aside className={`cliente-sidebar ${menuOpen ? "open" : ""}`}>
@@ -140,10 +165,17 @@ export default function SidebarCliente({
             className="cliente-user"
             onClick={() => setPerfilOpen((prev) => !prev)}
           >
-            <div className="avatar">
-              {cliente
-                ? `${cliente.nombre.charAt(0)}${cliente.apellido.charAt(0)}`
-                : "CL"}
+           <div className="avatar">
+              {cliente?.logo ? (
+                <img
+                  src={`http://localhost:3000${cliente.logo}`}
+                  alt={`Foto de ${cliente.nombre} ${cliente.apellido}`}
+                />
+              ) : (
+                cliente
+                  ? `${cliente.nombre.charAt(0)}${cliente.apellido.charAt(0)}`
+                  : "CL"
+              )}
             </div>
 
             <div>
