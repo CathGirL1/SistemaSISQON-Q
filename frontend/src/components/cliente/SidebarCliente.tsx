@@ -1,15 +1,58 @@
+
+import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import iconoHomeMenu from "../../assets/iconoHomeMenu.png";
-import { NavLink } from "react-router-dom";
 
 interface SidebarClienteProps {
   menuOpen: boolean;
   onClose: () => void;
 }
 
+
 export default function SidebarCliente({
   menuOpen,
   onClose,
 }: SidebarClienteProps) {
+
+  const navigate = useNavigate();
+
+  const [cliente, setCliente] = useState<{
+    nombre: string;
+    apellido: string;
+  } | null>(null);
+
+  const [perfilOpen, setPerfilOpen] = useState(false);
+
+  useEffect(() => {
+    const usuarioGuardado = localStorage.getItem("usuario");
+
+    if (!usuarioGuardado) return;
+
+    const usuario = JSON.parse(usuarioGuardado);
+
+    if (!usuario.id_Cliente) return;
+
+    const obtenerCliente = async () => {
+      try {
+        const respuesta = await fetch(
+          `http://localhost:3000/api/clientes/${usuario.id_Cliente}`
+        );
+
+        if (!respuesta.ok) {
+          throw new Error("No se pudo obtener el cliente");
+        }
+
+        const datosCliente = await respuesta.json();
+
+        setCliente(datosCliente);
+      } catch (error) {
+        console.error("Error al obtener datos del cliente:", error);
+      }
+    };
+
+    obtenerCliente();
+  }, []);
   return (
     <>
       <aside className={`cliente-sidebar ${menuOpen ? "open" : ""}`}>
@@ -88,15 +131,46 @@ export default function SidebarCliente({
     ✦ Asistente IA
   </NavLink>
 
-        </nav>
+      </nav>
 
-        <div className="cliente-user">
-          <div className="avatar">NM</div>
+        <div className="cliente-user-container">
 
-          <div>
-            <strong>Nicolás Martinez</strong>
-            <span>Cliente</span>
-          </div>
+          <button
+            type="button"
+            className="cliente-user"
+            onClick={() => setPerfilOpen((prev) => !prev)}
+          >
+            <div className="avatar">
+              {cliente
+                ? `${cliente.nombre.charAt(0)}${cliente.apellido.charAt(0)}`
+                : "CL"}
+            </div>
+
+            <div>
+              <strong>
+                {cliente
+                  ? `${cliente.nombre} ${cliente.apellido}`
+                  : "Cliente"}
+              </strong>
+
+              <span>Cliente</span>
+            </div>
+          </button>
+
+          {perfilOpen && (
+            <div className="perfil-dropdown">
+              <button
+                type="button"
+                onClick={() => {
+                  setPerfilOpen(false);
+                  navigate("/panel-cliente/perfil");
+                }}
+              >
+                ⚙ Configuración de perfil
+              </button>
+            </div>
+          )}
+
         </div>
       </aside>
 

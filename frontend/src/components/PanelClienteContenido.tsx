@@ -14,11 +14,51 @@ import QuoteItem from "./cliente/QuoteItem";
 
 
 import ResponseItem from "./cliente/ResponseItem";
-import { useState } from "react";
+import {useEffect, useState } from "react";
 
 export default function PanelClienteContenido(){
 
     const [menuOpen, setMenuOpen] = useState(false);
+     const [cliente, setCliente] = useState<{
+        nombre: string;
+        apellido: string;
+    } | null>(null);
+
+    useEffect(() => {
+        const usuarioGuardado = localStorage.getItem("usuario");
+
+        if (!usuarioGuardado) return;
+
+        const usuario = JSON.parse(usuarioGuardado);
+
+        if (!usuario.id_Cliente) return;
+
+        const obtenerCliente = async () => {
+            try {
+                const respuesta = await fetch(
+                    `http://localhost:3000/api/clientes/${usuario.id_Cliente}`
+                );
+
+                if (!respuesta.ok) {
+                    throw new Error("No se pudo obtener el cliente");
+                }
+
+                const datosCliente = await respuesta.json();
+
+                setCliente(datosCliente);
+
+            } catch (error) {
+                console.error(
+                    "Error al obtener datos del cliente:",
+                    error
+                );
+            }
+        };
+
+        obtenerCliente();
+
+    }, []);
+
 
     return(
         <div className="cliente-panel">
@@ -29,7 +69,11 @@ export default function PanelClienteContenido(){
 
             <main className="cliente-main">
                 <HeaderCliente
-                    title="Hola, Nicolás 👋"
+                    title={
+                        cliente
+                            ? `Hola, ${cliente.nombre} 👋`
+                            : "Hola 👋"
+                    }
                     subtitle="Bienvenido a tu espacio de proyectos y cotizaciones."
                     menuOpen={menuOpen}
                     onToggleMenu={() => setMenuOpen((prev) => !prev)}
