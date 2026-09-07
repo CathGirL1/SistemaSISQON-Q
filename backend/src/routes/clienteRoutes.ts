@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { ClienteController } from "../controllers/ClienteController";
+import { uploadFotoCliente } from "../middlewares/uploadLogoCliente";
 
 const router = Router();
 
@@ -33,6 +34,12 @@ router.post(
 router.put(
   "/:id",
   controller.actualizarCliente
+);
+
+router.put(
+  "/:id/foto",
+  uploadFotoCliente.single("foto"),
+  controller.actualizarLogoCliente
 );
 
 router.delete(

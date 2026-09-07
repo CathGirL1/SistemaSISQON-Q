@@ -90,6 +90,38 @@ export class ClienteController {
     }
   };
 
+  // =========================================================
+  // ACTUALIZAR LOGO DEL CLIENTE
+  // =========================================================
+
+  public actualizarLogoCliente = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idCliente = this.convertirId(req.params.id);
+
+      if (!req.file) {
+        res.status(400).json({
+          mensaje: "Debés seleccionar una imagen.",
+        });
+        return;
+      }
+
+      const logo = `/uploads/logos-clientes/${req.file.filename}`;
+
+      const cliente =
+        await this.service.actualizarLogoCliente(
+          idCliente,
+          logo
+        );
+
+      res.status(200).json(cliente);
+    } catch (error) {
+      this.responderError(res, error);
+    }
+  };
+
   public eliminarCliente = async (
     req: Request,
     res: Response

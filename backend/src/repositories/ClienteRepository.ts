@@ -22,6 +22,7 @@ export class ClienteRepository {
         c.ciudad,
         c.estado,
         c.notas,
+        ISNULL(c.logo, '') AS logo,
 
         u.nombreUsuario,
         u.gmail,
@@ -57,6 +58,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
+          ISNULL(c.logo, '') AS logo,
 
           u.nombreUsuario,
           u.gmail,
@@ -87,6 +89,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
+          c.logo,
           u.nombreUsuario,
           u.gmail,
           u.telefono,
@@ -116,6 +119,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
+          ISNULL(c.logo, '') AS logo,
 
           u.nombreUsuario,
           u.gmail,
@@ -532,4 +536,39 @@ export class ClienteRepository {
 
       return resultado.recordset;
     }
+
+    // =========================================================
+// ACTUALIZAR LOGO DEL CLIENTE
+// =========================================================
+
+  public async actualizarLogoCliente(
+    idCliente: number,
+    logo: string
+  ): Promise<Cliente | null> {
+    const pool = await connectDB();
+
+    const resultado = await pool
+      .request()
+      .input(
+        "idCliente",
+        sql.Int,
+        idCliente
+      )
+      .input(
+        "logo",
+        sql.VarChar(255),
+        logo
+      )
+      .query(`
+        UPDATE Cliente
+        SET logo = @logo
+        WHERE id_Cliente = @idCliente
+      `);
+
+    if ((resultado.rowsAffected[0] ?? 0) === 0) {
+      return null;
+    }
+
+    return this.obtenerClientePorId(idCliente);
+  }
 }

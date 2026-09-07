@@ -119,6 +119,32 @@ export class ClienteService {
     return actualizado;
   }
 
+  public async actualizarLogoCliente(
+    idCliente: number,
+    logo: string
+  ): Promise<Cliente> {
+    this.validarId(
+      idCliente,
+      "El identificador del cliente no es válido"
+    );
+
+    if (!logo?.trim()) {
+      throw new Error("No se recibió una imagen válida");
+    }
+
+    const cliente =
+      await this.repository.actualizarLogoCliente(
+        idCliente,
+        logo.trim()
+      );
+
+    if (!cliente) {
+      throw new Error("Cliente no encontrado");
+    }
+
+    return cliente;
+  }
+
   public async eliminarCliente(
     idCliente: number
   ): Promise<void> {
