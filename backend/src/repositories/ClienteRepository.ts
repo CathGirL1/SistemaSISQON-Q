@@ -571,4 +571,133 @@ export class ClienteRepository {
 
     return this.obtenerClientePorId(idCliente);
   }
+
+  public async validarDatosUnicos(
+    idCliente: number | null,
+    gmail: string,
+    nombreUsuario: string,
+    cedula: string,
+    telefono: string | null
+  ): Promise<{
+    gmailExiste: boolean;
+    nombreUsuarioExiste: boolean;
+    cedulaExiste: boolean;
+    telefonoExiste: boolean;
+  }> {
+    const pool = await connectDB();
+
+    const request = pool
+      .request()
+      .input(
+        "gmail",
+        sql.VarChar(150),
+        gmail
+      )
+      .input(
+        "nombreUsuario",
+        sql.VarChar(100),
+        nombreUsuario
+      )
+      .input(
+        "cedula",
+        sql.VarChar(30),
+        cedula
+      )
+      .input(
+        "telefono",
+        sql.VarChar(30),
+        telefono
+      );
+
+    let condicionCliente = "";
+
+    if (idCliente !== null) {
+      request.input(
+        "idCliente",
+        sql.Int,
+        idCliente
+      );
+
+      condicionCliente = `
+        AND c.id_Cliente <> @idCliente
+      `;
+    }
+
+    const resultado = await request.query<{
+      gmailExiste: number;
+      nombreUsuarioExiste: number;
+      cedulaExiste: number;
+      telefonoExiste: number;
+    }>(`
+      SELECT
+
+        CASE
+          WHEN EXISTS (
+            SELECT 1
+            FROM Usuario u
+            INNER JOIN Cliente c
+              ON c.id_Usuario = u.id_Usuario
+            WHERE u.gmail = @gmail
+            ${condicionCliente}
+          )
+          THEN 1
+          ELSE 0
+        END AS gmailExiste,
+
+        CASE
+          WHEN EXISTS (
+            SELECT 1
+            FROM Usuario u
+            INNER JOIN Cliente c
+              ON c.id_Usuario = u.id_Usuario
+            WHERE u.nombreUsuario = @nombreUsuario
+            ${condicionCliente}
+          )
+          THEN 1
+          ELSE 0
+        END AS nombreUsuarioExiste,
+
+        CASE
+          WHEN EXISTS (
+            SELECT 1
+            FROM Cliente c
+            WHERE c.cedula = @cedula
+            ${condicionCliente}
+          )
+          THEN 1
+          ELSE 0
+        END AS cedulaExiste,
+
+        CASE
+          WHEN @telefono IS NOT NULL
+            AND EXISTS (
+              SELECT 1
+              FROM Usuario u
+              INNER JOIN Cliente c
+                ON c.id_Usuario = u.id_Usuario
+              WHERE u.telefono = @telefono
+              ${condicionCliente}
+            )
+          THEN 1
+          ELSE 0
+        END AS telefonoExiste
+
+    `);
+
+    const datos = resultado.recordset[0];
+
+    return {
+      gmailExiste:
+        datos?.gmailExiste === 1,
+
+      nombreUsuarioExiste:
+        datos?.nombreUsuarioExiste === 1,
+
+      cedulaExiste:
+        datos?.cedulaExiste === 1,
+
+      telefonoExiste:
+        datos?.telefonoExiste === 1,
+    };
+  }
 }
