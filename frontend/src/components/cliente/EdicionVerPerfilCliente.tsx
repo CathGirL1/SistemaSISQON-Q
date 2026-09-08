@@ -145,6 +145,8 @@ export default function EdicionPerfilCliente({
               value={datos.nombre}
               onChange={manejarCambio}
               placeholder="Ingresá tu nombre"
+              pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+"
+              title="El nombre solo puede contener letras y espacios"
               required
             />
           </div>
@@ -163,6 +165,8 @@ export default function EdicionPerfilCliente({
               value={datos.apellido}
               onChange={manejarCambio}
               placeholder="Ingresá tu apellido"
+              pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+"
+              title="El apellido solo puede contener letras y espacios"
               required
             />
           </div>
@@ -181,6 +185,9 @@ export default function EdicionPerfilCliente({
               value={datos.cedula}
               onChange={manejarCambio}
               placeholder="Ingresá tu cédula"
+              inputMode="numeric"
+              pattern="[0-9]+"
+              title="La cédula solo puede contener números"
               required
             />
           </div>
@@ -217,6 +224,9 @@ export default function EdicionPerfilCliente({
               value={datos.telefono || ""}
               onChange={manejarCambio}
               placeholder="Ej. 099 123 456"
+              inputMode="tel"
+              pattern="[0-9()+ -]+"
+              title="Ingresá un número de teléfono válido"
             />
           </div>
 
