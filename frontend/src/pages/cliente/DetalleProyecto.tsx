@@ -51,7 +51,7 @@ interface FormularioProyecto {
   alto: string;
   ancho: string;
   largo: string;
-  
+
 }
 
 export interface RespuestaError {
@@ -65,7 +65,7 @@ export default function DetalleProyecto() {
   const navigate = useNavigate();
   const { idProyecto } = useParams();
 
-  const [mensajeExito, setMensajeExito] = useState("");
+  const [mensajeExito] = useState("");
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [proyecto, setProyecto] = useState<Proyecto | null>(null)
@@ -108,7 +108,7 @@ export default function DetalleProyecto() {
       const proyectoRecibido: Proyecto = data;
 
       setProyecto(proyectoRecibido);
-     
+
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -236,7 +236,7 @@ export default function DetalleProyecto() {
       />
 
       <main className="cliente-main">
-        
+
 
         <section className="detalle-proyecto-top">
           <button
@@ -294,95 +294,95 @@ export default function DetalleProyecto() {
         )}
 
         {mensajeExito && (
-            <div className="detalle-proyecto-success">
-                {mensajeExito}
-            </div>
+          <div className="detalle-proyecto-success">
+            {mensajeExito}
+          </div>
         )}
 
-        
-          <section className="detalle-proyecto-content">
-            <article className="detalle-proyecto-card">
-              <CardTitle
-                icon={<FileText size={21} />}
-                title="Información general"
+
+        <section className="detalle-proyecto-content">
+          <article className="detalle-proyecto-card">
+            <CardTitle
+              icon={<FileText size={21} />}
+              title="Información general"
+            />
+
+            <div className="detalle-proyecto-info-grid">
+              <InfoItem
+                label="Nombre"
+                value={proyecto.nombre}
               />
 
-              <div className="detalle-proyecto-info-grid">
-                <InfoItem
-                  label="Nombre"
-                  value={proyecto.nombre}
-                />
-
-                <InfoItem
-                  label="Ubicación"
-                  value={
-                    proyecto.ubicacion ||
-                    "No especificada"
-                  }
-                  icon={<MapPin size={16} />}
-                />
-
-                <InfoItem
-                  label="Tipo de obra"
-                  value={proyecto.tipoObra || "No especificado"}
-                  icon={<Hammer size={16} />}
-                />
-
-                <InfoItem
-                  label="Estado"
-                  value={proyecto.estado}
-                />
-
-                <InfoItem
-                  label="Imagen de proyecto"
-                  value={proyecto.imagenUrl ||
-                    "No especificada"}
-                />
-
-                <div className="detalle-proyecto-description">
-                  <span>Descripción</span>
-
-                  <p>
-                    {proyecto.descripcion ||
-                      "Sin descripción"}
-                  </p>
-                </div>
-              </div>
-            </article>
-
-            <article className="detalle-proyecto-card">
-              <CardTitle
-                icon={<Ruler size={21} />}
-                title="Dimensiones"
+              <InfoItem
+                label="Ubicación"
+                value={
+                  proyecto.ubicacion ||
+                  "No especificada"
+                }
+                icon={<MapPin size={16} />}
               />
 
-              <div className="detalle-proyecto-measures">
-                <MeasureItem
-                  label="Alto"
-                  value={`${proyecto.alto} m`}
-                />
+              <InfoItem
+                label="Tipo de obra"
+                value={proyecto.tipoObra || "No especificado"}
+                icon={<Hammer size={16} />}
+              />
 
-                <MeasureItem
-                  label="Ancho"
-                  value={`${proyecto.ancho} m`}
-                />
+              <InfoItem
+                label="Estado"
+                value={proyecto.estado}
+              />
 
-                <MeasureItem
-                  label="Largo"
-                  value={`${proyecto.largo} m`}
-                />
+              <InfoItem
+                label="Imagen de proyecto"
+                value={proyecto.imagenUrl ||
+                  "No especificada"}
+              />
 
-                <MeasureItem
-                  label="Superficie"
-                  value={`${formatearNumero(superficie)} m²`}
-                />
+              <div className="detalle-proyecto-description">
+                <span>Descripción</span>
+
+                <p>
+                  {proyecto.descripcion ||
+                    "Sin descripción"}
+                </p>
               </div>
-            </article>
-            
-          </section>
-          <MaterialesProyectoDetalle
-            idProyecto={proyecto.idProyecto}
-          />
+            </div>
+          </article>
+
+          <article className="detalle-proyecto-card">
+            <CardTitle
+              icon={<Ruler size={21} />}
+              title="Dimensiones"
+            />
+
+            <div className="detalle-proyecto-measures">
+              <MeasureItem
+                label="Alto"
+                value={`${proyecto.alto} m`}
+              />
+
+              <MeasureItem
+                label="Ancho"
+                value={`${proyecto.ancho} m`}
+              />
+
+              <MeasureItem
+                label="Largo"
+                value={`${proyecto.largo} m`}
+              />
+
+              <MeasureItem
+                label="Superficie"
+                value={`${formatearNumero(superficie)} m²`}
+              />
+            </div>
+          </article>
+
+        </section>
+        <MaterialesProyectoDetalle
+          idProyecto={proyecto.idProyecto}
+        />
       </main>
 
       {mostrarConfirmacion && (

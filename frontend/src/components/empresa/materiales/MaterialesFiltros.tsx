@@ -1,6 +1,6 @@
 import "../../../styles/empresa/materiales/MaterialesFiltros.css";
 import PanelSearchBar from "../../common/PanelSearchBar";
-import { FaFilter, FaSearch } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
 
 type Props = {
   busqueda: string;

@@ -1,7 +1,6 @@
 import "../styles/NavbarEmpresa.css";
 
 import {
-  FaBell,
   FaSearch,
   FaChevronDown,
   FaBars,

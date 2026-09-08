@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { MaterialService } from "../services/materialService";
+import { MaterialService } from "../services/MaterialService";
 
 export class MaterialController {
   private service = new MaterialService();

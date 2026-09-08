@@ -684,8 +684,6 @@
   cursor: pointer;
 }
 
-<<<<<<< HEAD
-=======
 .cliente-header-minimal {
   justify-content: flex-end;
   min-height: 64px;
@@ -695,7 +693,6 @@
   margin-right: auto;
 }
 
->>>>>>> origin/feature/panel-cliente-nicolas
 /* RESPONSIVE */
 
 @media (max-width: 1500px) {
@@ -761,18 +758,12 @@
     grid-template-columns: auto 1fr;
     align-items: center;
   }
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> origin/feature/panel-cliente-nicolas
   .header-actions {
     grid-column: 1 / -1;
     width: 100%;
   }
-<<<<<<< HEAD
-=======
-  
+
   .cliente-header-minimal {
     grid-template-columns: auto 1fr;
   }
@@ -787,8 +778,6 @@
     grid-column: 1;
     margin-right: 0;
   }
-
->>>>>>> origin/feature/panel-cliente-nicolas
 
   .btn-create {
     flex: 1;
@@ -855,8 +844,4 @@
   .btn-create {
     width: 100%;
   }
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/feature/panel-cliente-nicolas
 }

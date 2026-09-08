@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Send, ChevronDown, X } from "lucide-react";
 
 import "../../styles/EnviarCotizacion.css";

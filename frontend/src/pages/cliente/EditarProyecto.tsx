@@ -51,7 +51,7 @@ export default function EditarProyecto() {
   const navigate = useNavigate();
   const { idProyecto } = useParams();
 
-  const [proyecto, setProyecto] =
+  const [, setProyecto] =
     useState<Proyecto | null>(null);
 
   const [formulario, setFormulario] =
@@ -114,7 +114,7 @@ export default function EditarProyecto() {
       if (!responseProyecto.ok) {
         throw new Error(
           dataProyecto.mensaje ||
-            "No se pudo obtener el proyecto"
+          "No se pudo obtener el proyecto"
         );
       }
 
@@ -125,7 +125,7 @@ export default function EditarProyecto() {
       if (!responseTiposObra.ok) {
         throw new Error(
           dataTiposObra.mensaje ||
-            "No se pudieron obtener los tipos de obra"
+          "No se pudieron obtener los tipos de obra"
         );
       }
 
@@ -205,9 +205,9 @@ export default function EditarProyecto() {
     setFormulario((prev) =>
       prev
         ? {
-            ...prev,
-            [name]: value,
-          }
+          ...prev,
+          [name]: value,
+        }
         : prev
     );
   };
@@ -291,7 +291,7 @@ export default function EditarProyecto() {
       if (!response.ok) {
         throw new Error(
           data.mensaje ||
-            "No se pudo actualizar el proyecto"
+          "No se pudo actualizar el proyecto"
         );
       }
 
@@ -510,17 +510,17 @@ export default function EditarProyecto() {
             />
 
             <div className="editar-proyecto-imagen-preview">
-            <img
-              src={
-                formulario.imagenUrl.trim() ||
-                IMAGEN_PREDETERMINADA
-              }
-              alt="Vista previa del proyecto"
-              onError={(e) => {
-                e.currentTarget.src = IMAGEN_PREDETERMINADA;
-              }}
-            />
-          </div>
+              <img
+                src={
+                  formulario.imagenUrl.trim() ||
+                  IMAGEN_PREDETERMINADA
+                }
+                alt="Vista previa del proyecto"
+                onError={(e) => {
+                  e.currentTarget.src = IMAGEN_PREDETERMINADA;
+                }}
+              />
+            </div>
 
           </label>
 
