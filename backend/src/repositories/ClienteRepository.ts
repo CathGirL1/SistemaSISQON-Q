@@ -502,6 +502,101 @@ export class ClienteRepository {
     }
   }
 
+  public async darDeBajaCliente(
+    idCliente: number
+  ): Promise<boolean> {
+    const pool = await connectDB();
+    const transaccion = new sql.Transaction(pool);
+
+    try {
+      await transaccion.begin();
+
+      // Obtener el usuario asociado al cliente
+      const resultadoCliente =
+        await new sql.Request(transaccion)
+          .input("idCliente", sql.Int, idCliente)
+          .query<{ id_Usuario: number }>(`
+            SELECT id_Usuario
+            FROM Cliente
+            WHERE id_Cliente = @idCliente
+          `);
+
+      const cliente =
+        resultadoCliente.recordset[0];
+
+      if (!cliente) {
+        await transaccion.rollback();
+        return false;
+      }
+
+      // 1. Eliminar cotizaciones de los proyectos del cliente
+      await new sql.Request(transaccion)
+        .input("idCliente", sql.Int, idCliente)
+        .query(`
+          DELETE FROM Cotizacion
+          WHERE id_Proyecto IN (
+            SELECT id_Proyecto
+            FROM Proyecto
+            WHERE id_Cliente = @idCliente
+          )
+        `);
+
+      // 2. Eliminar materiales asociados a los proyectos
+      await new sql.Request(transaccion)
+        .input("idCliente", sql.Int, idCliente)
+        .query(`
+          DELETE FROM MaterialProyecto
+          WHERE id_Proyecto IN (
+            SELECT id_Proyecto
+            FROM Proyecto
+            WHERE id_Cliente = @idCliente
+          )
+        `);
+
+      // 3. Eliminar los proyectos del cliente
+      await new sql.Request(transaccion)
+        .input("idCliente", sql.Int, idCliente)
+        .query(`
+          DELETE FROM Proyecto
+          WHERE id_Cliente = @idCliente
+        `);
+
+      // 4. Eliminar el cliente
+      await new sql.Request(transaccion)
+        .input("idCliente", sql.Int, idCliente)
+        .query(`
+          DELETE FROM Cliente
+          WHERE id_Cliente = @idCliente
+        `);
+
+      // 5. Eliminar el usuario asociado
+      await new sql.Request(transaccion)
+        .input(
+          "idUsuario",
+          sql.Int,
+          cliente.id_Usuario
+        )
+        .query(`
+          DELETE FROM Usuario
+          WHERE id_Usuario = @idUsuario
+        `);
+
+      await transaccion.commit();
+
+      return true;
+
+    } catch (error) {
+
+      try {
+        await transaccion.rollback();
+      } catch {
+        // La transacción puede haber finalizado previamente.
+      }
+
+      throw error;
+    }
+  }
+
     public async obtenerHistorialCotizaciones(
       idCliente: number,
       idEmpresa: number

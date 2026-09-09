@@ -249,6 +249,33 @@ export class ClienteService {
     }
   }
 
+  public async darDeBajaCliente(
+    idCliente: number
+  ): Promise<void> {
+    this.validarId(
+      idCliente,
+      "El identificador del cliente no es válido"
+    );
+
+    const cliente =
+      await this.repository.obtenerClientePorId(
+        idCliente
+      );
+
+    if (!cliente) {
+      throw new Error("Cliente no encontrado");
+    }
+
+    const eliminado =
+      await this.repository.darDeBajaCliente(
+        idCliente
+      );
+
+    if (!eliminado) {
+      throw new Error("No se pudo dar de baja el cliente");
+    }
+  }
+
   private validarCliente(
     cliente: CrearClienteDTO | ActualizarClienteDTO,
     requierePassword: boolean

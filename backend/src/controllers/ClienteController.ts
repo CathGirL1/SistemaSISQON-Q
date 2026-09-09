@@ -137,6 +137,24 @@ export class ClienteController {
     }
   };
 
+  public darDeBajaCliente = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idCliente =
+        this.convertirId(req.params.id);
+
+      await this.service.darDeBajaCliente(
+        idCliente
+      );
+
+      res.status(204).send();
+    } catch (error) {
+      this.responderError(res, error);
+    }
+  };
+
   private convertirId(valor: string | string[]): number {
     const valorId = Array.isArray(valor) ? valor[0] : valor;
     const id = Number(valorId);

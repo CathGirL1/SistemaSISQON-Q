@@ -47,4 +47,9 @@ router.delete(
   controller.eliminarCliente
 );
 
+router.delete(
+  "/:id/baja",
+  controller.darDeBajaCliente
+);
+
 export default router;
