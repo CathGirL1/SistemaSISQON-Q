@@ -283,4 +283,74 @@ export class CotizacionController {
       });
     }
   };
+
+    public async actualizarCotizacionDesdeEmpresa(
+    req: Request,
+    res: Response
+  ): Promise<Response> {
+
+    try {
+
+      const idCotizacion =
+        Number(req.params.idCotizacion);
+
+      const resultado =
+        await this.service
+          .actualizarCotizacionDesdeEmpresa(
+            idCotizacion,
+            req.body
+          );
+
+      return res.status(200).json({
+        mensaje:
+          "Cotización actualizada correctamente.",
+        cotizacion: resultado
+      });
+
+    } catch (error) {
+
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Error al actualizar la cotización.";
+
+      return res.status(400).json({
+        mensaje
+      });
+
+    }
+  }
+
+    public async finalizarCotizacion(
+      req: Request,
+      res: Response
+  ): Promise<Response> {
+
+      try {
+
+          const idCotizacion =
+              Number(req.params.idCotizacion);
+
+          await this.service
+              .finalizarCotizacion(
+                  idCotizacion
+              );
+
+          return res.status(200).json({
+              mensaje:
+                  "Cotización finalizada correctamente."
+          });
+
+      } catch (error) {
+
+          const mensaje =
+              error instanceof Error
+                  ? error.message
+                  : "Error al finalizar la cotización.";
+
+          return res.status(400).json({
+              mensaje
+          });
+      }
+  }
 }

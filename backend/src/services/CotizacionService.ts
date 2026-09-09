@@ -6,6 +6,7 @@ import { MonedaService } from "./MonedaService";
 import type {
     CrearCotizacionDTO,
     ActualizarCotizacionDTO,
+    ActualizarCotizacionEmpresaDTO,
 } from "../models/Cotizacion";
 
 const ESTADOS_VALIDOS = [
@@ -14,6 +15,7 @@ const ESTADOS_VALIDOS = [
     "Revisada",
     "Aceptada",
     "Rechazada",
+    "Finalizada",
 ] as const;
 
 export class CotizacionService {
@@ -302,7 +304,7 @@ export class CotizacionService {
         // =========================================
         // 8. Obtener próxima versión
         // =========================================
-
+        
         const version =
             await this.repository.obtenerProximaVersion(
                 idProyecto
@@ -311,11 +313,22 @@ export class CotizacionService {
         // =========================================
         // 9. Crear nueva cotización
         // =========================================
+            
+            const idEmpresa =
+            Number(proyectoCotizacion.idEmpresa);
 
+            if (
+                !Number.isInteger(idEmpresa) ||
+                idEmpresa <= 0
+            ) {
+                throw new Error(
+                    "El proyecto no tiene una empresa asociada válida"
+                );
+            }
         return this.repository.crearCotizacion({
 
             idProyecto,
-
+            idEmpresa,
             estado: "Borrador",
 
              costoMateriales:
@@ -369,6 +382,18 @@ export class CotizacionService {
         if (!cotizacion) {
             throw new Error(
                 "Cotización no encontrada"
+            );
+        }
+
+        if (cotizacion.estado === "Finalizada") {
+            throw new Error(
+                "La cotización está finalizada y no puede ser modificada."
+            );
+        }
+
+        if (data.estado?.trim() === "Finalizada") {
+            throw new Error(
+                "Una cotización solo puede finalizarse mediante la operación de finalización."
             );
         }
 
@@ -911,6 +936,12 @@ export class CotizacionService {
             );
         }
 
+        if (cotizacion.estado === "Finalizada") {
+            throw new Error(
+                "La cotización está finalizada y no puede ser eliminada."
+            );
+        }
+
         const eliminado =
             await this.repository
                 .eliminarCotizacion(
@@ -951,6 +982,12 @@ export class CotizacionService {
             );
         }
 
+        if (cotizacion.estado === "Finalizada") {
+            throw new Error(
+                "La cotización está finalizada y no puede volver a enviarse."
+            );
+        }
+
         const enviada =
             await this.repository
                 .enviarCotizacion(
@@ -965,6 +1002,81 @@ export class CotizacionService {
         }
     }
 
+    public async finalizarCotizacion(
+    idCotizacion: number
+    ): Promise<void> {
+
+        this.validarId(
+            idCotizacion,
+            "El id de la cotización no es válido"
+        );
+
+        const cotizacion =
+            await this.repository
+                .obtenerCotizacionPorId(
+                    idCotizacion
+                );
+
+        if (!cotizacion) {
+            throw new Error(
+                "Cotización no encontrada"
+            );
+        }
+
+        if (cotizacion.estado === "Finalizada") {
+            throw new Error(
+                "La cotización ya se encuentra finalizada."
+            );
+        }
+
+        const idEmpresa =
+            Number(cotizacion.idEmpresa);
+
+        if (
+            !Number.isInteger(idEmpresa) ||
+            idEmpresa <= 0
+        ) {
+            throw new Error(
+                "La cotización no tiene una empresa asociada."
+            );
+        }
+
+        if (
+            cotizacion.precioEstimado === null ||
+            cotizacion.precioEstimado === undefined
+        ) {
+            throw new Error(
+                "La cotización no tiene un precio estimado generado por SISCON-Q."
+            );
+        }
+
+        if (
+            cotizacion.subtotal === null ||
+            cotizacion.subtotal === undefined ||
+            cotizacion.porcentajeIVAAplicado === null ||
+            cotizacion.porcentajeIVAAplicado === undefined ||
+            cotizacion.montoIVA === null ||
+            cotizacion.montoIVA === undefined ||
+            cotizacion.totalCotizacion === null ||
+            cotizacion.totalCotizacion === undefined
+        ) {
+            throw new Error(
+                "La cotización debe ser actualizada por la empresa y tener el IVA aplicado antes de finalizarse."
+            );
+        }
+
+        const finalizada =
+            await this.repository
+                .finalizarCotizacion(
+                    idCotizacion
+                );
+
+        if (!finalizada) {
+            throw new Error(
+                "No se pudo finalizar la cotización."
+            );
+        }
+    }
 
     // =========================================================
     // VALIDAR ESTADO
@@ -1079,5 +1191,240 @@ export class CotizacionService {
         ) {
             throw new Error(mensaje);
         }
+    }
+
+
+    public async actualizarCotizacionDesdeEmpresa(
+    idCotizacion: number,
+    data: ActualizarCotizacionEmpresaDTO
+    ) {
+
+    // ----------------------------------------------------
+    // VALIDAR ID
+    // ----------------------------------------------------
+
+    if (
+        !Number.isInteger(idCotizacion) ||
+        idCotizacion <= 0
+    ) {
+        throw new Error(
+        "El id de la cotización no es válido."
+        );
+    }
+
+
+    // ----------------------------------------------------
+    // OBTENER COTIZACIÓN ACTUAL
+    // ----------------------------------------------------
+
+    const cotizacion =
+        await this.repository.obtenerCotizacionPorId(
+        idCotizacion
+        );
+
+    if (!cotizacion) {
+        throw new Error(
+        "La cotización no existe."
+        );
+    }
+
+
+    // ----------------------------------------------------
+    // BLOQUEAR COTIZACIONES FINALIZADAS
+    // ----------------------------------------------------
+
+    if (cotizacion.estado === "Finalizada") {
+        throw new Error(
+        "La cotización está finalizada y no puede ser modificada."
+        );
+    }
+
+
+    // ----------------------------------------------------
+    // VALIDAR EMPRESA
+    // ----------------------------------------------------
+
+    const idEmpresa =
+        Number(cotizacion.idEmpresa);
+
+    if (
+        !Number.isInteger(idEmpresa) ||
+        idEmpresa <= 0
+    ) {
+        throw new Error(
+        "La cotización no tiene una empresa asociada."
+        );
+    }
+
+
+    // ----------------------------------------------------
+    // VALIDAR PRECIO ORIGINAL
+    // ----------------------------------------------------
+
+    if (
+        cotizacion.precioEstimado === null ||
+        cotizacion.precioEstimado === undefined
+    ) {
+        throw new Error(
+        "La cotización no tiene un precio estimado generado por SISCON-Q."
+        );
+    }
+
+    const precioEstimado =
+        Number(cotizacion.precioEstimado);
+
+    if (
+        !Number.isFinite(precioEstimado) ||
+        precioEstimado < 0
+    ) {
+        throw new Error(
+        "El precio estimado de la cotización no es válido."
+        );
+    }
+
+
+    // ----------------------------------------------------
+    // VALIDAR MANO DE OBRA ADICIONAL
+    // ----------------------------------------------------
+
+    const costoManoObraAdicional =
+        Number(data.costoManoObraAdicional);
+
+    if (
+        !Number.isFinite(costoManoObraAdicional) ||
+        costoManoObraAdicional < 0
+    ) {
+        throw new Error(
+        "El costo de mano de obra adicional debe ser un número mayor o igual a 0."
+        );
+    }
+
+
+    // ----------------------------------------------------
+    // OBTENER IVA DE LA EMPRESA
+    // ----------------------------------------------------
+
+    const porcentajeIVA =
+        await this.repository.obtenerImpuestoEmpresa(
+        idEmpresa
+        );
+
+    if (
+        porcentajeIVA === null ||
+        porcentajeIVA === undefined
+    ) {
+        throw new Error(
+        "La empresa debe configurar el porcentaje de IVA antes de actualizar la cotización."
+        );
+    }
+
+    const porcentajeIVAAplicado =
+        Number(porcentajeIVA);
+
+    if (
+        !Number.isFinite(porcentajeIVAAplicado) ||
+        porcentajeIVAAplicado < 0
+    ) {
+        throw new Error(
+        "El porcentaje de IVA configurado por la empresa no es válido."
+        );
+    }
+
+
+    // ----------------------------------------------------
+    // CALCULAR SUBTOTAL
+    //
+    // precioEstimado ya fue generado por SISCON-Q.
+    // NO se vuelve a ejecutar ninguna Strategy.
+    // ----------------------------------------------------
+
+    const subtotal =
+        precioEstimado +
+        costoManoObraAdicional;
+
+
+    // ----------------------------------------------------
+    // CALCULAR IVA
+    // ----------------------------------------------------
+
+    const montoIVA =
+        subtotal *
+        (porcentajeIVAAplicado / 100);
+
+
+    // ----------------------------------------------------
+    // CALCULAR TOTAL
+    // ----------------------------------------------------
+
+    const totalCotizacion =
+        subtotal +
+        montoIVA;
+
+
+    // ----------------------------------------------------
+    // REDONDEO
+    // ----------------------------------------------------
+
+    const subtotalRedondeado =
+        Number(subtotal.toFixed(2));
+
+    const montoIVARedondeado =
+        Number(montoIVA.toFixed(2));
+
+    const totalCotizacionRedondeado =
+        Number(totalCotizacion.toFixed(2));
+
+
+    // ----------------------------------------------------
+    // ACTUALIZAR MISMA COTIZACIÓN
+    // ----------------------------------------------------
+
+    const actualizado =
+        await this.repository.actualizarCotizacionDesdeEmpresa(
+        idCotizacion,
+        costoManoObraAdicional,
+        subtotalRedondeado,
+        porcentajeIVAAplicado,
+        montoIVARedondeado,
+        totalCotizacionRedondeado,
+        data.observaciones
+        );
+
+    if (!actualizado) {
+        throw new Error(
+        "No se pudo actualizar la cotización. Puede que haya sido finalizada."
+        );
+    }
+
+
+    // ----------------------------------------------------
+    // RESPUESTA
+    // ----------------------------------------------------
+
+    return {
+
+        idCotizacion,
+
+        precioEstimado,
+
+        costoManoObraAdicional,
+
+        subtotal:
+        subtotalRedondeado,
+
+        porcentajeIVAAplicado,
+
+        montoIVA:
+        montoIVARedondeado,
+
+        totalCotizacion:
+        totalCotizacionRedondeado,
+
+        observaciones:
+        data.observaciones !== undefined
+            ? data.observaciones
+            : cotizacion.observaciones,
+
+    };
     }
 }

@@ -54,4 +54,22 @@ router.put(
   controller.enviarCotizacion
 );
 
+router.put(
+  "/:idCotizacion/empresa",
+  (req, res) =>
+    controller.actualizarCotizacionDesdeEmpresa(
+      req,
+      res
+    )
+);
+
+router.put(
+    "/:idCotizacion/finalizar",
+    (req, res) =>
+        controller.finalizarCotizacion(
+            req,
+            res
+        )
+);
+
 export default router;

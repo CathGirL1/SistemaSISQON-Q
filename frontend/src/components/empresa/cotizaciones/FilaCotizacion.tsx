@@ -5,9 +5,12 @@ import type { Cotizacion } from "../../../interfaces/Cotizacion";
 type FilaCotizacionProps = {
   cotizacion: Cotizacion;
   seleccionada: boolean;
+
   onSeleccionar: (id: string) => void;
   onVerDetalle: (cotizacion: Cotizacion) => void;
+  onGestionar: (cotizacion: Cotizacion) => void;
   onEditarEstado: (cotizacion: Cotizacion) => void;
+  onFinalizar: (cotizacion: Cotizacion) => void;
   onEliminar: (cotizacion: Cotizacion) => void;
 };
 
@@ -16,11 +19,18 @@ export default function FilaCotizacion({
   seleccionada,
   onSeleccionar,
   onVerDetalle,
+  onGestionar,
   onEditarEstado,
+  onFinalizar,
   onEliminar,
 }: FilaCotizacionProps) {
+
+  const finalizada =
+    cotizacion.estado === "Finalizada";
+
   return (
     <tr className={seleccionada ? "fila-seleccionada" : ""}>
+
       {/* SELECCIÓN */}
       <td>
         <input
@@ -97,17 +107,30 @@ export default function FilaCotizacion({
       {/* ACCIONES */}
       <td>
         <MenuAccionesCotizacion
+          finalizada={finalizada}
+
           onVer={() =>
             onVerDetalle(cotizacion)
           }
+
+          onGestionar={() =>
+            onGestionar(cotizacion)
+          }
+
           onEditar={() =>
             onEditarEstado(cotizacion)
           }
+
+          onFinalizar={() =>
+            onFinalizar(cotizacion)
+          }
+
           onEliminar={() =>
             onEliminar(cotizacion)
           }
         />
       </td>
+
     </tr>
   );
 }

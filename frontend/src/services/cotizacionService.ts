@@ -22,6 +22,12 @@ interface CotizacionBackend {
 
   costoMateriales: number;
   costoManoObra: number;
+
+  costoManoObraAdicional: number;
+  subtotal: number | null;
+  porcentajeIVAAplicado: number | null;
+  montoIVA: number | null;
+
   totalCotizacion: number;
 
   estado: string;
@@ -203,20 +209,43 @@ export async function obtenerCotizacionesEmpresa(
                 }
             )}`,
 
-            costoMateriales:
-            Number(
-                cotizacion.costoMateriales
-            ),
+              costoMateriales:
+              Number(
+                  cotizacion.costoMateriales
+              ),
 
-            costoManoObra:
-            Number(
-                cotizacion.costoManoObra
-            ),
+              costoManoObra:
+              Number(
+                  cotizacion.costoManoObra
+              ),
 
-            totalCotizacion:
-            Number(
-                cotizacion.totalCotizacion
-            ),
+              costoManoObraAdicional:
+              Number(
+                  cotizacion.costoManoObraAdicional ?? 0
+              ),
+
+              subtotal:
+              cotizacion.subtotal !== null &&
+              cotizacion.subtotal !== undefined
+                  ? Number(cotizacion.subtotal)
+                  : null,
+
+              porcentajeIVAAplicado:
+              cotizacion.porcentajeIVAAplicado !== null &&
+              cotizacion.porcentajeIVAAplicado !== undefined
+                  ? Number(cotizacion.porcentajeIVAAplicado)
+                  : null,
+
+              montoIVA:
+              cotizacion.montoIVA !== null &&
+              cotizacion.montoIVA !== undefined
+                  ? Number(cotizacion.montoIVA)
+                  : null,
+
+              totalCotizacion:
+              Number(
+                  cotizacion.totalCotizacion
+              ),
 
             estado:
             convertirEstado(
@@ -272,3 +301,78 @@ export async function obtenerCotizacionesEmpresa(
         })
         );
     }
+
+    export interface ActualizarCotizacionEmpresaData {
+  costoManoObraAdicional: number;
+  observaciones?: string | null;
+}
+
+export interface ResultadoCotizacionEmpresa {
+  idCotizacion: number;
+  precioEstimado: number;
+  costoManoObraAdicional: number;
+  subtotal: number;
+  porcentajeIVAAplicado: number;
+  montoIVA: number;
+  totalCotizacion: number;
+  observaciones: string | null;
+}
+
+
+// ======================================================
+// ACTUALIZAR COTIZACIÓN DESDE PANEL EMPRESA
+// ======================================================
+
+export async function actualizarCotizacionDesdeEmpresa(
+  idCotizacion: number,
+  data: ActualizarCotizacionEmpresaData
+): Promise<ResultadoCotizacionEmpresa> {
+
+  const response = await fetch(
+    `${API_URL}/api/cotizaciones/${idCotizacion}/empresa`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  const resultado = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      resultado.mensaje ||
+      "No se pudo actualizar la cotización"
+    );
+  }
+
+  return resultado.cotizacion;
+}
+
+
+// ======================================================
+// FINALIZAR COTIZACIÓN
+// ======================================================
+
+export async function finalizarCotizacion(
+  idCotizacion: number
+): Promise<void> {
+
+  const response = await fetch(
+    `${API_URL}/api/cotizaciones/${idCotizacion}/finalizar`,
+    {
+      method: "PUT",
+    }
+  );
+
+  const resultado = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      resultado.mensaje ||
+      "No se pudo finalizar la cotización"
+    );
+  }
+}

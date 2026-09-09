@@ -46,18 +46,34 @@ export interface Cotizacion {
   // COTIZACIÓN
   // ==========================================
 
-  fecha: string;
-  total: string;
+ fecha: string;
 
-  costoMateriales: number;
-  costoManoObra: number;
-  totalCotizacion: number;
+total: string;
 
-  estado: EstadoCotizacion;
+costoMateriales: number;
 
-  precioEstimado: number | null;
-  observaciones: string | null;
-  version: number;
+costoManoObra: number;
+
+// Mano de obra agregada desde Panel Empresa
+costoManoObraAdicional: number;
+
+// Precio original generado por SISCON-Q
+precioEstimado: number | null;
+
+// Cálculo realizado por la empresa
+subtotal: number | null;
+
+porcentajeIVAAplicado: number | null;
+
+montoIVA: number | null;
+
+totalCotizacion: number;
+
+estado: EstadoCotizacion;
+
+observaciones: string | null;
+
+version: number;
 
   // ==========================================
   // MATERIALES

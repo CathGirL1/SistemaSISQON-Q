@@ -2,6 +2,8 @@ import "../../../styles/empresa/cotizaciones/TablaCotizaciones.css";
 
 import { useEffect, useState } from "react";
 
+import GestionarCotizacionModal from "./GestionarCotizacionModal";
+
 import type {
   Cotizacion,
   EstadoCotizacion,
@@ -9,6 +11,7 @@ import type {
 
 import {
   obtenerCotizacionesEmpresa,
+  finalizarCotizacion,
 } from "../../../services/cotizacionService";
 
 import FilaCotizacion from "./FilaCotizacion";
@@ -36,48 +39,48 @@ export default function TablaCotizaciones() {
   // OBTENER COTIZACIONES
   // =====================================================
 
-  useEffect(() => {
-    const cargarCotizaciones = async () => {
-      try {
-        setCargando(true);
-        setError("");
+  const cargarCotizaciones = async () => {
+    try {
+      setCargando(true);
+      setError("");
 
-        const usuarioGuardado =
-          localStorage.getItem("usuario");
+      const usuarioGuardado =
+        localStorage.getItem("usuario");
 
-        if (!usuarioGuardado) {
-          throw new Error(
-            "No hay una sesión iniciada"
-          );
-        }
-
-        const usuario = JSON.parse(usuarioGuardado);
-
-        const idEmpresa = Number(usuario.idEmpresa);
-
-        if (!idEmpresa) {
-          throw new Error(
-            "No se encontró la empresa asociada al usuario"
-          );
-        }
-
-        const datos =
-          await obtenerCotizacionesEmpresa(idEmpresa);
-
-        setCotizaciones(datos);
-      } catch (error: unknown) {
-        console.error(error);
-
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al cargar las cotizaciones"
+      if (!usuarioGuardado) {
+        throw new Error(
+          "No hay una sesión iniciada"
         );
-      } finally {
-        setCargando(false);
       }
-    };
 
+      const usuario = JSON.parse(usuarioGuardado);
+
+      const idEmpresa = Number(usuario.idEmpresa);
+
+      if (!idEmpresa) {
+        throw new Error(
+          "No se encontró la empresa asociada al usuario"
+        );
+      }
+
+      const datos =
+        await obtenerCotizacionesEmpresa(idEmpresa);
+
+      setCotizaciones(datos);
+    } catch (error: unknown) {
+      console.error(error);
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al cargar las cotizaciones"
+      );
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
     cargarCotizaciones();
   }, []);
 
@@ -127,6 +130,13 @@ export default function TablaCotizaciones() {
     setModalDetalle(true);
   };
 
+  const abrirGestionar = (
+    cotizacion: Cotizacion
+  ) => {
+    setCotizacionSeleccionada(cotizacion);
+    setModalGestionar(true);
+  };
+
   const abrirEditar = (
     cotizacion: Cotizacion
   ) => {
@@ -141,8 +151,48 @@ export default function TablaCotizaciones() {
     setModalEliminar(true);
   };
 
+  const finalizarCotizacionSeleccionada = async (
+    cotizacion: Cotizacion
+  ) => {
+    const confirmar = window.confirm(
+      "¿Seguro que querés finalizar esta cotización? Una vez finalizada no podrá volver a modificarse."
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    try {
+      setError("");
+
+      await finalizarCotizacion(
+        cotizacion.idCotizacion
+      );
+
+      await cargarCotizaciones();
+
+      setSeleccionadas(
+        seleccionadas.filter(
+          (id) => id !== cotizacion.id
+        )
+      );
+    } catch (error: unknown) {
+      console.error(error);
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo finalizar la cotización"
+      );
+    }
+  };
+
+  const [modalGestionar, setModalGestionar] =
+  useState(false);
+
   const cerrarModales = () => {
     setModalDetalle(false);
+    setModalGestionar(false);
     setModalEditar(false);
     setModalEliminar(false);
     setCotizacionSeleccionada(null);
@@ -297,33 +347,41 @@ export default function TablaCotizaciones() {
 
             {cotizaciones.map(
               (cotizacion) => (
-                <FilaCotizacion
-                  key={cotizacion.id}
+          <FilaCotizacion
+            key={cotizacion.id}
 
-                  cotizacion={cotizacion}
+            cotizacion={cotizacion}
 
-                  seleccionada={
-                    seleccionadas.includes(
-                      cotizacion.id
-                    )
-                  }
+            seleccionada={
+              seleccionadas.includes(
+                cotizacion.id
+              )
+            }
 
-                  onSeleccionar={
-                    seleccionarCotizacion
-                  }
+            onSeleccionar={
+              seleccionarCotizacion
+            }
 
-                  onVerDetalle={
-                    abrirDetalle
-                  }
+            onVerDetalle={
+              abrirDetalle
+            }
 
-                  onEditarEstado={
-                    abrirEditar
-                  }
+            onGestionar={
+              abrirGestionar
+            }
 
-                  onEliminar={
-                    abrirEliminar
-                  }
-                />
+            onEditarEstado={
+              abrirEditar
+            }
+
+            onFinalizar={
+              finalizarCotizacionSeleccionada
+            }
+
+            onEliminar={
+              abrirEliminar
+            }
+          />
               )
             )}
 
@@ -349,6 +407,13 @@ export default function TablaCotizaciones() {
         onCerrar={cerrarModales}
       />
 
+      <GestionarCotizacionModal
+        abierto={modalGestionar}
+        cotizacion={cotizacionSeleccionada}
+        onCerrar={cerrarModales}
+        onActualizada={cargarCotizaciones}
+      />
+
       <EditarEstadoCotizacionModal
         abierto={modalEditar}
         cotizacion={cotizacionSeleccionada}
@@ -362,6 +427,7 @@ export default function TablaCotizaciones() {
         onCerrar={cerrarModales}
         onConfirmar={eliminarCotizacion}
       />
+
 
     </div>
   );
