@@ -63,7 +63,22 @@
   font-weight: 400;
   line-height: 1.3;
 }
+.amount-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
 
+.amount-box b {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.amount-box .amount-uyu {
+  font-size: 11px;
+  color: #6b7280;
+}
 .cliente-menu {
   display: flex;
   flex-direction: column;

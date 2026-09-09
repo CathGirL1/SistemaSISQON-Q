@@ -14,7 +14,7 @@ import QuoteItem from "./cliente/QuoteItem";
 
 
 import ResponseItem from "./cliente/ResponseItem";
-import {useEffect, useState } from "react";
+import {useEffect, useState, useMemo } from "react";
 
 export default function PanelClienteContenido(){
 
@@ -24,40 +24,122 @@ export default function PanelClienteContenido(){
         apellido: string;
     } | null>(null);
 
-    useEffect(() => {
-        const usuarioGuardado = localStorage.getItem("usuario");
+    const [proyectos, setProyectos] = useState<any[]>([]);
+    const [cotizaciones, setCotizaciones] = useState<any[]>([]);
 
-        if (!usuarioGuardado) return;
+    useEffect(() => {
+        const usuarioGuardado =
+            localStorage.getItem("usuario");
+
+        if (!usuarioGuardado) {
+            return;
+        }
 
         const usuario = JSON.parse(usuarioGuardado);
 
-        if (!usuario.id_Cliente) return;
+        if (!usuario.id_Cliente) {
+            return;
+        }
 
-        const obtenerCliente = async () => {
+        const obtenerDatosDashboard = async () => {
             try {
-                const respuesta = await fetch(
-                    `http://localhost:3000/api/clientes/${usuario.id_Cliente}`
-                );
+            const idCliente = usuario.id_Cliente;
 
-                if (!respuesta.ok) {
-                    throw new Error("No se pudo obtener el cliente");
-                }
+            const [
+                respuestaCliente,
+                respuestaProyectos,
+                respuestaCotizaciones,
+            ] = await Promise.all([
+                fetch(
+                `http://localhost:3000/api/clientes/${idCliente}`
+                ),
 
-                const datosCliente = await respuesta.json();
+                fetch(
+                `http://localhost:3000/api/proyectos/cliente/${idCliente}`
+                ),
 
-                setCliente(datosCliente);
+                fetch(
+                `http://localhost:3000/api/cotizaciones/cliente/${idCliente}`
+                ),
+            ]);
 
-            } catch (error) {
-                console.error(
-                    "Error al obtener datos del cliente:",
-                    error
+            if (!respuestaCliente.ok) {
+                throw new Error(
+                "No se pudo obtener el cliente"
                 );
             }
-        };
 
-        obtenerCliente();
+            if (!respuestaProyectos.ok) {
+                throw new Error(
+                "No se pudieron obtener los proyectos"
+                );
+            }
 
-    }, []);
+            if (!respuestaCotizaciones.ok) {
+                throw new Error(
+                "No se pudieron obtener las cotizaciones"
+                );
+            }
+
+            const datosCliente =
+                await respuestaCliente.json();
+
+            const datosProyectos =
+                await respuestaProyectos.json();
+
+            const datosCotizaciones =
+                await respuestaCotizaciones.json();
+
+            setCliente(datosCliente);
+
+            setProyectos(datosProyectos);
+
+            setCotizaciones(datosCotizaciones);
+
+            } catch (error) {
+            console.error(
+                "Error al obtener datos de la dashboard:",
+                error
+            );
+            }
+    };
+    obtenerDatosDashboard();}, []);
+
+    const proyectosRecientes = useMemo(() => {
+        return [...proyectos]
+            .sort(
+            (a, b) =>
+                new Date(b.fechaCreacion).getTime() -
+                new Date(a.fechaCreacion).getTime()
+            )
+            .slice(0, 4);
+        }, [proyectos]);
+
+    const cotizacionesRecientes = useMemo(() => {
+        return [...cotizaciones]
+            .sort(
+            (a, b) =>
+                new Date(b.fechaCreacion).getTime() -
+                new Date(a.fechaCreacion).getTime()
+            )
+            .slice(0, 4);
+        }, [cotizaciones]);
+
+    function formatearFecha(fecha: string): string {
+        const fechaFormateada = new Date(fecha);
+
+        if (
+            Number.isNaN(fechaFormateada.getTime())
+        ) {
+            return "Fecha no disponible";
+        }
+
+        return new Intl.DateTimeFormat("es-UY", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        }).format(fechaFormateada);
+    }
 
 
     return(
@@ -82,81 +164,81 @@ export default function PanelClienteContenido(){
                 <FlowCliente />
 
                 <section className="content-grid">
-                    <DashboardCard
+                   <DashboardCard
                         title="Mis proyectos recientes"
                         linkText="Ver todos mis proyectos"
-                    >
-                        <ProjectItem
-                            image="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200"
-                            name="Quincho familiar"
-                            location="La Serena, IV Región"
-                            status="Activo"
-                        />
-
-                        <ProjectItem
-                            image="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=200"
-                            name="Ampliación cocina"
-                            location="Coquimbo, IV Región"
-                            status="Activo"
-                        />
-
-                        <ProjectItem
-                            image="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200"
-                            name="Remodelación baño"
-                            location="La Serena, IV Región"
-                            status="Borrador"
-                        />
-
-                        <ProjectItem
-                            image="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200"
-                            name="Terraza y pérgola"
-                            location="Coquimbo, IV Región"
-                            status="Activo"
-                        />
+                        linkTo="/panel-cliente/proyectos"
+                        >
+                        {proyectosRecientes.length > 0 ? (
+                            proyectosRecientes.map((proyecto) => (
+                            <ProjectItem
+                                key={proyecto.idProyecto}
+                                image={
+                                proyecto.imagenUrl?.trim() ||
+                                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500"
+                                }
+                                name={proyecto.nombre}
+                                location={
+                                proyecto.ubicacion ||
+                                "Ubicación no especificada"
+                                }
+                                status={proyecto.estado}
+                                date={formatearFecha(
+                                proyecto.fechaCreacion
+                                )}
+                            />
+                            ))
+                        ) : (
+                            <p className="dashboard-empty">
+                            Todavía no tenés proyectos registrados.
+                            </p>
+                        )}
                     </DashboardCard>
 
+                                        
                     <DashboardCard
                         title="Mis cotizaciones recientes"
                         linkText="Ver todas mis cotizaciones"
+                        linkTo="/panel-cliente/cotizaciones"
                     >
-                    <QuoteItem
-                        code="CTZ-2024-0007"
-                        project="Quincho Familiar"
-                        amount="$ 2.450.000"
-                        date="28/05/2024"
-                        tag="Estándar"
-                    />
-
-                    <QuoteItem
-                        code="CTZ-2024-0006"
-                        project="Ampliación Cocina"
-                        amount="$ 1.780.000"
-                        date="26/05/2024"
-                        tag="Económica"
-                    />
-
-                    <QuoteItem
-                        code="CTZ-2024-0005"
-                        project="Ampliación Cocina"
-                        amount="$ 2.950.000"
-                        date="26/05/2024"
-                        tag="Premium"
-                    />
-
-                    <QuoteItem
-                        code="CTZ-2024-0004"
-                        project="Remodelación Baño"
-                        amount="$ 1.250.000"
-                        date="24/05/2024"
-                        tag="Estándar"
-                    />
-                </DashboardCard>
+                        {cotizacionesRecientes.length > 0 ? (
+                        cotizacionesRecientes.map((cotizacion) => (
+                        <QuoteItem
+                            key={cotizacion.idCotizacion}
+                            code={cotizacion.codigo}
+                            project={cotizacion.nombreProyecto}
+                            amount={
+                                cotizacion.precioEstimado !== null
+                                ? `USD ${Number(
+                                    cotizacion.precioEstimado
+                                    ).toLocaleString("es-UY")}`
+                                : "Sin precio"
+                            }
+                            amountUYU={
+                                cotizacion.precioEstimadoUYU !== null
+                                ? `$ ${Number(
+                                    cotizacion.precioEstimadoUYU
+                                    ).toLocaleString("es-UY")}`
+                                : "Sin precio"
+                            }
+                            date={formatearFecha(
+                                cotizacion.fechaCreacion
+                            )}
+                            tag={cotizacion.estado}
+                        />
+                        ))
+                        ) : (
+                        <p className="dashboard-empty">
+                            Todavía no tenés cotizaciones registradas.
+                        </p>
+                        )}
+                    </DashboardCard>
 
                 
-
-                    <DashboardCard
+                
+                    <section
                         title="Últimas respuestas recibidas"
-                        linkText="Ver todas las respuestas"
+                       
                     >
                         <ResponseItem
                             logo="ABC"
@@ -189,14 +271,10 @@ export default function PanelClienteContenido(){
                             status="Rechazada"
                             time="20/05/2024"
                         />
-                    </DashboardCard>
+                    </section>
                 </section>
 
-    
-
-
-              
-
+                
                 
 
             </main>

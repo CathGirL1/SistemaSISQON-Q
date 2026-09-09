@@ -3,6 +3,7 @@ interface ProjectItemProps {
   name: string;
   location: string;
   status: string;
+  date: string;
 }
 
 export default function ProjectItem({
@@ -10,29 +11,34 @@ export default function ProjectItem({
   name,
   location,
   status,
+  date,
 }: ProjectItemProps) {
   const badgeClass =
-    status === "Borrador" ? "badge-borrador" : "badge-activo";
+    status === "Borrador"
+      ? "badge-borrador"
+      : "badge-activo";
 
   return (
     <div className="list-row project-row">
-      <img className="thumb" src={image} alt={name} />
+      <img
+        className="thumb"
+        src={image}
+        alt={name}
+      />
 
-      <div>
+      <div className="project-info">
         <strong>{name}</strong>
         <span>{location}</span>
       </div>
 
       <div className="row-actions">
-        <em className={badgeClass}>{status}</em>
+        <em className={badgeClass}>
+          {status}
+        </em>
 
-        <button
-          type="button"
-          className="dots-button"
-          aria-label={`Opciones de ${name}`}
-        >
-          ⋮
-        </button>
+        <span className="project-date">
+          {date}
+        </span>
       </div>
     </div>
   );

@@ -1,30 +1,37 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 interface DashboardCardProps {
   title: string;
   linkText: string;
+  linkTo: string;
   children: ReactNode;
 }
 
 export default function DashboardCard({
   title,
   linkText,
+  linkTo,
   children,
 }: DashboardCardProps) {
   return (
     <article className="dashboard-card">
+
       <div className="card-header">
         <h3>{title}</h3>
-        <a>Ver todas</a>
       </div>
 
       <div className="card-body">
         {children}
       </div>
 
-      <button type="button" className="card-link">
+      <Link
+        to={linkTo}
+        className="card-link"
+      >
         {linkText} →
-      </button>
+      </Link>
+
     </article>
   );
 }
