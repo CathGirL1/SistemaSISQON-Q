@@ -237,6 +237,60 @@
     text-decoration:underline;
 }
 
+/* ================================
+   MENSAJE DE ERROR - LOGIN
+================================ */
+
+.mensaje-error-login {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  margin: 12px 0 18px;
+  padding: 12px 16px;
+
+  background-color: #fff1f1;
+  border: 1px solid #e3a0a0;
+  border-left: 4px solid #c62828;
+  border-radius: 8px;
+
+  color: #b71c1c;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+
+  text-align: left;
+
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+  .mensaje-error-login {
+    margin: 10px 0 16px;
+    padding: 11px 14px;
+
+    font-size: 13px;
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 480px) {
+  .mensaje-error-login {
+    margin: 10px 0 14px;
+    padding: 10px 12px;
+
+    font-size: 12px;
+    line-height: 1.4;
+
+    border-radius: 7px;
+  }
+}
+
 @media (max-width: 1024px){
 
     .contenedor-login{

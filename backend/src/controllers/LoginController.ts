@@ -22,15 +22,21 @@ export class LoginController {
                 password
             );
 
-            if (!usuario) {
-
-                return res.status(401).json({
-                    mensaje: "Credenciales incorrectas"
+            if (!usuario.existe) {
+                return res.status(404).json({
+                    mensaje:
+                        "El usuario no existe. ¿Querés registrarte?"
                 });
-
             }
 
-            res.status(200).json(usuario);
+            if (!usuario.usuario) {
+                return res.status(401).json({
+                    mensaje:
+                        "La contraseña es incorrecta."
+                });
+            }
+
+            res.status(200).json(usuario.usuario);
 
         } catch (error) {
 

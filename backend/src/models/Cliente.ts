@@ -20,6 +20,7 @@ export interface Cliente {
   ciudad: string | null;
   estado: EstadoCliente;
   notas: string | null;
+  logo: string | null;
 }
 
 export interface CrearClienteDTO {
@@ -36,6 +37,7 @@ export interface CrearClienteDTO {
   ciudad?: string | null;
   estado?: EstadoCliente;
   notas?: string | null;
+  logo?: string | null;
 }
 
 export interface ActualizarClienteDTO {
@@ -51,4 +53,5 @@ export interface ActualizarClienteDTO {
   ciudad?: string | null;
   estado: EstadoCliente;
   notas?: string | null;
+  logo?: string | null;
 }

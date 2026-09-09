@@ -1,0 +1,73 @@
+.foto-perfil-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.foto-perfil {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  background: linear-gradient(
+    135deg,
+    #00a878,
+    #00c08b
+  );
+
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  font-weight: 800;
+
+  box-shadow: 0 6px 16px rgba(0, 168, 120, 0.20);
+}
+
+.foto-perfil img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.foto-perfil-button {
+  border: none;
+  background: transparent;
+  color: #008a65;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+  padding: 2px 4px;
+
+  transition: color 0.2s ease;
+}
+
+.foto-perfil-button:hover {
+  color: #006b50;
+}
+
+.foto-perfil-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.foto-perfil-error {
+  margin: 2px 0 0;
+
+  max-width: 180px;
+
+  color: #c62828;
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.3;
+}

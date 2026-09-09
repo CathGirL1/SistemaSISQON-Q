@@ -1,0 +1,148 @@
+.baja-cliente {
+  width: 100%;
+  margin-top: 24px;
+  background: #ffffff;
+  border: 1px solid #eadfe1;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(13, 37, 76, 0.04);
+}
+
+.baja-cliente-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee5e7;
+}
+
+.baja-cliente-header h3 {
+  margin: 0;
+  color: var(--azul-texto);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.baja-cliente-header p {
+  margin: 5px 0 0;
+  color: #68758c;
+  font-size: 13px;
+}
+
+.baja-cliente-content {
+  padding: 20px 24px 22px;
+}
+
+.baja-cliente-content > p {
+  margin: 0 0 10px;
+  color: #506381;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.baja-cliente-advertencia {
+  font-weight: 600;
+}
+
+.baja-cliente-button {
+  margin-top: 12px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #d8bfc3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #9a3f4d;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.baja-cliente-button:hover {
+  background: #fff5f6;
+  border-color: #c999a1;
+}
+
+.baja-cliente-confirmacion {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #eadfe1;
+  border-radius: 10px;
+  background: #fffafa;
+}
+
+.baja-cliente-confirmacion p {
+  margin: 0;
+  color: #4f3940;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.baja-cliente-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.baja-cliente-cancelar,
+.baja-cliente-confirmar {
+  min-height: 38px;
+  padding: 0 15px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.baja-cliente-cancelar {
+  border: 1px solid #d7dee8;
+  background: #ffffff;
+  color: #506381;
+}
+
+.baja-cliente-confirmar {
+  border: none;
+  background: #a43d4d;
+  color: #ffffff;
+}
+
+.baja-cliente-confirmar:hover {
+  background: #8f3342;
+}
+
+.baja-cliente-cancelar:disabled,
+.baja-cliente-confirmar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.baja-cliente-error {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid #e7b9c0;
+  border-radius: 8px;
+  background: #fff1f3;
+  color: #9a3040;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .baja-cliente-header {
+    padding: 18px;
+  }
+
+  .baja-cliente-content {
+    padding: 18px;
+  }
+
+  .baja-cliente-actions {
+    flex-direction: column;
+  }
+
+  .baja-cliente-cancelar,
+  .baja-cliente-confirmar {
+    width: 100%;
+  }
+}

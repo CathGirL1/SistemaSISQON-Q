@@ -2,46 +2,43 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-const carpetaLogos = path.resolve(
+import { tiposPermitidos } from "./uploadLogoEmpresa";
+
+const carpetaLogosClientes = path.resolve(
   process.cwd(),
   "uploads",
-  "logos"
+  "logos-clientes"
 );
 
-if (!fs.existsSync(carpetaLogos)) {
-  fs.mkdirSync(carpetaLogos, {
+if (!fs.existsSync(carpetaLogosClientes)) {
+  fs.mkdirSync(carpetaLogosClientes, {
     recursive: true,
   });
 }
 
-const storage = multer.diskStorage({
+
+
+const storageCliente = multer.diskStorage({
   destination: (_req, _file, callback) => {
-    callback(null, carpetaLogos);
+    callback(null, carpetaLogosClientes);
   },
 
   filename: (req, file, callback) => {
-    const idEmpresa = req.params.id;
+    const idCliente = req.params.id;
 
     const extension = path
       .extname(file.originalname)
       .toLowerCase();
 
     const nombreArchivo =
-      `empresa-${idEmpresa}-${Date.now()}${extension}`;
+      `cliente-${idCliente}-${Date.now()}${extension}`;
 
     callback(null, nombreArchivo);
   },
 });
 
-export const tiposPermitidos = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/svg+xml",
-];
-
-export const uploadLogoEmpresa = multer({
-  storage,
+export const uploadFotoCliente = multer({
+  storage: storageCliente,
 
   limits: {
     fileSize: 2 * 1024 * 1024,
@@ -51,10 +48,9 @@ export const uploadLogoEmpresa = multer({
     if (!tiposPermitidos.includes(file.mimetype)) {
       callback(
         new Error(
-          "El logo debe ser una imagen JPG, PNG, WEBP o SVG."
+          "La foto debe ser una imagen JPG, PNG, WEBP o SVG."
         )
       );
-
       return;
     }
 

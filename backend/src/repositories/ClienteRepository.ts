@@ -22,6 +22,7 @@ export class ClienteRepository {
         c.ciudad,
         c.estado,
         c.notas,
+        ISNULL(c.logo, '') AS logo,
 
         u.nombreUsuario,
         u.gmail,
@@ -57,6 +58,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
+          ISNULL(c.logo, '') AS logo,
 
           u.nombreUsuario,
           u.gmail,
@@ -87,6 +89,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
+          c.logo,
           u.nombreUsuario,
           u.gmail,
           u.telefono,
@@ -116,6 +119,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
+          ISNULL(c.logo, '') AS logo,
 
           u.nombreUsuario,
           u.gmail,
@@ -498,6 +502,101 @@ export class ClienteRepository {
     }
   }
 
+  public async darDeBajaCliente(
+    idCliente: number
+  ): Promise<boolean> {
+    const pool = await connectDB();
+    const transaccion = new sql.Transaction(pool);
+
+    try {
+      await transaccion.begin();
+
+      // Obtener el usuario asociado al cliente
+      const resultadoCliente =
+        await new sql.Request(transaccion)
+          .input("idCliente", sql.Int, idCliente)
+          .query<{ id_Usuario: number }>(`
+            SELECT id_Usuario
+            FROM Cliente
+            WHERE id_Cliente = @idCliente
+          `);
+
+      const cliente =
+        resultadoCliente.recordset[0];
+
+      if (!cliente) {
+        await transaccion.rollback();
+        return false;
+      }
+
+      // 1. Eliminar cotizaciones de los proyectos del cliente
+      await new sql.Request(transaccion)
+        .input("idCliente", sql.Int, idCliente)
+        .query(`
+          DELETE FROM Cotizacion
+          WHERE id_Proyecto IN (
+            SELECT id_Proyecto
+            FROM Proyecto
+            WHERE id_Cliente = @idCliente
+          )
+        `);
+
+      // 2. Eliminar materiales asociados a los proyectos
+      await new sql.Request(transaccion)
+        .input("idCliente", sql.Int, idCliente)
+        .query(`
+          DELETE FROM MaterialProyecto
+          WHERE id_Proyecto IN (
+            SELECT id_Proyecto
+            FROM Proyecto
+            WHERE id_Cliente = @idCliente
+          )
+        `);
+
+      // 3. Eliminar los proyectos del cliente
+      await new sql.Request(transaccion)
+        .input("idCliente", sql.Int, idCliente)
+        .query(`
+          DELETE FROM Proyecto
+          WHERE id_Cliente = @idCliente
+        `);
+
+      // 4. Eliminar el cliente
+      await new sql.Request(transaccion)
+        .input("idCliente", sql.Int, idCliente)
+        .query(`
+          DELETE FROM Cliente
+          WHERE id_Cliente = @idCliente
+        `);
+
+      // 5. Eliminar el usuario asociado
+      await new sql.Request(transaccion)
+        .input(
+          "idUsuario",
+          sql.Int,
+          cliente.id_Usuario
+        )
+        .query(`
+          DELETE FROM Usuario
+          WHERE id_Usuario = @idUsuario
+        `);
+
+      await transaccion.commit();
+
+      return true;
+
+    } catch (error) {
+
+      try {
+        await transaccion.rollback();
+      } catch {
+        // La transacción puede haber finalizado previamente.
+      }
+
+      throw error;
+    }
+  }
+
     public async obtenerHistorialCotizaciones(
       idCliente: number,
       idEmpresa: number
@@ -532,4 +631,168 @@ export class ClienteRepository {
 
       return resultado.recordset;
     }
+
+    // =========================================================
+// ACTUALIZAR LOGO DEL CLIENTE
+// =========================================================
+
+  public async actualizarLogoCliente(
+    idCliente: number,
+    logo: string
+  ): Promise<Cliente | null> {
+    const pool = await connectDB();
+
+    const resultado = await pool
+      .request()
+      .input(
+        "idCliente",
+        sql.Int,
+        idCliente
+      )
+      .input(
+        "logo",
+        sql.VarChar(255),
+        logo
+      )
+      .query(`
+        UPDATE Cliente
+        SET logo = @logo
+        WHERE id_Cliente = @idCliente
+      `);
+
+    if ((resultado.rowsAffected[0] ?? 0) === 0) {
+      return null;
+    }
+
+    return this.obtenerClientePorId(idCliente);
+  }
+
+  public async validarDatosUnicos(
+    idCliente: number | null,
+    gmail: string,
+    nombreUsuario: string,
+    cedula: string,
+    telefono: string | null
+  ): Promise<{
+    gmailExiste: boolean;
+    nombreUsuarioExiste: boolean;
+    cedulaExiste: boolean;
+    telefonoExiste: boolean;
+  }> {
+    const pool = await connectDB();
+
+    const request = pool
+      .request()
+      .input(
+        "gmail",
+        sql.VarChar(150),
+        gmail
+      )
+      .input(
+        "nombreUsuario",
+        sql.VarChar(100),
+        nombreUsuario
+      )
+      .input(
+        "cedula",
+        sql.VarChar(30),
+        cedula
+      )
+      .input(
+        "telefono",
+        sql.VarChar(30),
+        telefono
+      );
+
+    let condicionCliente = "";
+
+    if (idCliente !== null) {
+      request.input(
+        "idCliente",
+        sql.Int,
+        idCliente
+      );
+
+      condicionCliente = `
+        AND c.id_Cliente <> @idCliente
+      `;
+    }
+
+    const resultado = await request.query<{
+      gmailExiste: number;
+      nombreUsuarioExiste: number;
+      cedulaExiste: number;
+      telefonoExiste: number;
+    }>(`
+      SELECT
+
+        CASE
+          WHEN EXISTS (
+            SELECT 1
+            FROM Usuario u
+            INNER JOIN Cliente c
+              ON c.id_Usuario = u.id_Usuario
+            WHERE u.gmail = @gmail
+            ${condicionCliente}
+          )
+          THEN 1
+          ELSE 0
+        END AS gmailExiste,
+
+        CASE
+          WHEN EXISTS (
+            SELECT 1
+            FROM Usuario u
+            INNER JOIN Cliente c
+              ON c.id_Usuario = u.id_Usuario
+            WHERE u.nombreUsuario = @nombreUsuario
+            ${condicionCliente}
+          )
+          THEN 1
+          ELSE 0
+        END AS nombreUsuarioExiste,
+
+        CASE
+          WHEN EXISTS (
+            SELECT 1
+            FROM Cliente c
+            WHERE c.cedula = @cedula
+            ${condicionCliente}
+          )
+          THEN 1
+          ELSE 0
+        END AS cedulaExiste,
+
+        CASE
+          WHEN @telefono IS NOT NULL
+            AND EXISTS (
+              SELECT 1
+              FROM Usuario u
+              INNER JOIN Cliente c
+                ON c.id_Usuario = u.id_Usuario
+              WHERE u.telefono = @telefono
+              ${condicionCliente}
+            )
+          THEN 1
+          ELSE 0
+        END AS telefonoExiste
+
+    `);
+
+    const datos = resultado.recordset[0];
+
+    return {
+      gmailExiste:
+        datos?.gmailExiste === 1,
+
+      nombreUsuarioExiste:
+        datos?.nombreUsuarioExiste === 1,
+
+      cedulaExiste:
+        datos?.cedulaExiste === 1,
+
+      telefonoExiste:
+        datos?.telefonoExiste === 1,
+    };
+  }
 }

@@ -2,14 +2,16 @@ interface QuoteItemProps {
   code: string;
   project: string;
   amount: string;
+  amountUYU: string;
   date: string;
-  tag: "Premium" | "Económica" | "Estándar";
+  tag: string;
 }
 
 export default function QuoteItem({
   code,
   project,
   amount,
+  amountUYU,
   date,
   tag,
 }: QuoteItemProps) {
@@ -31,6 +33,11 @@ export default function QuoteItem({
 
       <div className="amount-box">
         <b>{amount}</b>
+
+        <span className="amount-uyu">
+          ({amountUYU})
+        </span>
+
         <span>{date}</span>
       </div>
     </div>

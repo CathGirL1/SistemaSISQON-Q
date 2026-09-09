@@ -401,6 +401,63 @@ export class CotizacionService {
       );
     }
 
+    const soloEdicion =
+      (data.estado !== undefined ||
+        data.observaciones !== undefined) &&
+      Object.keys(data).every(
+        campo =>
+          campo === "estado" ||
+          campo === "observaciones"
+      );
+
+      if (soloEdicion) {
+
+        const nuevoEstado = data.estado;
+
+        if (!nuevoEstado) {
+          throw new Error(
+            "El estado de la cotización es obligatorio"
+          );
+        }
+
+        this.validarEstado(nuevoEstado);
+
+        if (cotizacion.estado === "Enviada") {
+          throw new Error(
+            "No se puede modificar una cotización que ya fue enviada"
+          );
+        }
+
+        if (nuevoEstado.trim() === "Enviada") {
+          throw new Error(
+            "La cotización debe enviarse mediante la opción Enviar cotización"
+          );
+        }
+
+        const actualizado =
+          await this.repository.actualizarCotizacion(
+          idCotizacion,
+          {
+            ...(data.estado !== undefined && {
+              estado: data.estado.trim()
+            }),
+
+            ...(data.observaciones != null && {
+              observaciones:
+                data.observaciones.trim() || null
+            })
+          }
+        );
+
+        if (!actualizado) {
+          throw new Error(
+            "No se pudo actualizar el estado de la cotización"
+          );
+        }
+
+      return idCotizacion;
+    }
+
     // =========================================
     // 2. Obtener proyecto asociado
     // =========================================
@@ -985,6 +1042,15 @@ export class CotizacionService {
     if (!cotizacion) {
       throw new Error(
         "Cotización no encontrada"
+      );
+    }
+
+    if (
+      cotizacion.estado !== "Revisada" &&
+      cotizacion.estado !== "Aceptada"
+    ) {
+      throw new Error(
+        "Solo se puede enviar una cotización que esté en estado Revisada o Aceptada"
       );
     }
 

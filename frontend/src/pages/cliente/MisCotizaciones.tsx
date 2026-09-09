@@ -74,7 +74,6 @@ interface CotizacionAPI {
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-const ID_CLIENTE_TEMPORAL = 1;
 
 export default function MisCotizaciones() {
   const navigate = useNavigate();
@@ -112,20 +111,37 @@ export default function MisCotizaciones() {
       // 1. OBTENER COTIZACIONES
       // -----------------------------------------
 
-      const response = await fetch(
-        `${API_URL}/api/cotizaciones/cliente/${ID_CLIENTE_TEMPORAL}`
-      );
+     const usuarioGuardado = localStorage.getItem("usuario");
 
-      const data: CotizacionAPI[] =
-        await response.json();
+        if (!usuarioGuardado) {
+          throw new Error("No se encontró una sesión activa");
+        }
 
-      if (!response.ok) {
-        throw new Error(
-          "No se pudieron obtener las cotizaciones"
+        const usuario = JSON.parse(usuarioGuardado);
+
+        if (!usuario.id_Cliente) {
+          throw new Error(
+            "No se encontró el identificador del cliente"
+          );
+        }
+
+        // -----------------------------------------
+        // 1. OBTENER COTIZACIONES
+        // -----------------------------------------
+        const response = await fetch(
+          `${API_URL}/api/cotizaciones/cliente/${usuario.id_Cliente}`
         );
-      }
 
-      setCotizaciones(data);
+        const data: CotizacionAPI[] =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            "No se pudieron obtener las cotizaciones"
+          );
+        }
+
+        setCotizaciones(data);
 
       // -----------------------------------------
       // 2. OBTENER IDS DE PROYECTOS

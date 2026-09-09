@@ -175,7 +175,7 @@ export default function EnviarCotizacion({
         type="button"
         className="enviar-cotizacion-trigger"
         onClick={abrirEnvio}
-        disabled={estado !== "Borrador"}
+        disabled={estado !== "Revisada" && estado !== "Aceptada"}
       >
         <Send size={16} />
         Enviar

@@ -13,59 +13,80 @@ import { useNavigate } from "react-router-dom";
 export default function LoginContenido() {
   const [gmail, setGmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mensajeError, setMensajeError] = useState("");
 
   const navigate = useNavigate();
 
-    const iniciarSesion = async (
-      e: React.FormEvent) => {
-
+    const iniciarSesion = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      try {
+      setMensajeError("");
 
+      try {
         const respuesta = await fetch(
-            "http://localhost:3000/api/login/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    gmail,
-                    password
-                })
-            }
+          "http://localhost:3000/api/login/login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              gmail,
+              password,
+            }),
+          }
         );
 
-         const usuarioAutenticado =
-          await respuesta.json();
+        const datos = await respuesta.json();
 
-          /* console.log(usuarioAutenticado); */
-          console.log(JSON.stringify(usuarioAutenticado, null, 2));
+        console.log("Respuesta del servidor:", datos);
 
-          // Guardar la sesión
-          localStorage.setItem(
-              "usuario",
-              JSON.stringify(usuarioAutenticado)
+        // ❌ Gmail inexistente o contraseña incorrecta
+        if (!respuesta.ok) {
+          setMensajeError(
+            datos.mensaje ||
+              "El correo electrónico o la contraseña son incorrectos."
           );
 
-          if (usuarioAutenticado.rol === "cliente") {
+          return;
+        }
 
-              navigate("/panel-cliente");
+        // ✅ Login correcto
+        const usuarioAutenticado = datos;
 
-          }
+        console.log(
+          JSON.stringify(usuarioAutenticado, null, 2)
+        );
 
-          if (usuarioAutenticado.rol === "empresa") {
+        // Guardar la sesión
+        localStorage.setItem(
+          "usuario",
+          JSON.stringify(usuarioAutenticado)
+        );
 
-              navigate("/panel-empresa");
+        if (usuarioAutenticado.rol === "cliente") {
+          navigate("/panel-cliente");
+          return;
+        }
 
-          }
+        if (usuarioAutenticado.rol === "empresa") {
+          navigate("/panel-empresa");
+          return;
+        }
 
+        setMensajeError(
+          "El tipo de usuario no es válido."
+        );
 
       } catch (error) {
+        console.error(
+          "Error al iniciar sesión:",
+          error
+        );
 
-        console.error(error);
-
+        setMensajeError(
+          "No se pudo conectar con el servidor. Intentá nuevamente."
+        );
       }
     };
   
@@ -179,12 +200,18 @@ export default function LoginContenido() {
 
                 </div>
 
-              <button
-                type="submit"
-                className="boton-ingresar-login"
-              >
-                Ingresar
-              </button>
+              {mensajeError && (
+                  <div className="mensaje-error-login">
+                    {mensajeError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="boton-ingresar-login"
+                >
+                  Ingresar
+                </button>
 
             </form>
 
