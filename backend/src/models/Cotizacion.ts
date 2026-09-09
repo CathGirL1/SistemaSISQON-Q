@@ -1,3 +1,6 @@
+import type {
+  ManoObraCotizacionInput,
+} from "./CotizacionManoObra";
 
 export type EstadoCotizacion =
   | "Borrador"
@@ -407,10 +410,9 @@ export interface ActualizarCotizacionDTO {
 }
 
 export interface ActualizarCotizacionEmpresaDTO {
-  costoManoObraAdicional: number;
+  manosObra: ManoObraCotizacionInput[];
   observaciones?: string | null;
 }
-
 
 // ======================================================
 // RESULTADO DEL CÁLCULO DESDE PANEL EMPRESA

@@ -1,7 +1,10 @@
+
 import { CotizacionRepository } from "../repositories/CotizacionRepository";
 import { ProyectoRepository } from "../repositories/ProyectoRepository";
 import { TipoObraStrategyFactory } from "../models/TipoObraStrategyFactory";
 import { MonedaService } from "./MonedaService";
+import { ManoObraService } from "./ManoObraService";
+import { CotizacionManoObraRepository } from "../repositories/CotizacionManoObraRepository";
 
 import type {
     CrearCotizacionDTO,
@@ -27,6 +30,12 @@ export class CotizacionService {
 
     private proyectoRepository =
         new ProyectoRepository();
+
+    private manoObraService =
+        new ManoObraService();
+
+    private cotizacionManoObraRepository =
+        new CotizacionManoObraRepository();
 
 
     // =========================================================
@@ -786,13 +795,19 @@ export class CotizacionService {
                 proyecto,
                 materialesParaCotizacion
             );
-
+        
+        const manosObra =
+            await this.cotizacionManoObraRepository
+                .obtenerPorCotizacion(
+                    idCotizacion
+            );
         // =====================================================
         // RESULTADO
         // =====================================================
 
         return {
             ...cotizacionFinal,
+            manosObra,
 
             ...(proyectoCotizacion.codigoTipoObra === "OBR-000003"
                 ? {
@@ -1195,236 +1210,419 @@ export class CotizacionService {
 
 
     public async actualizarCotizacionDesdeEmpresa(
-    idCotizacion: number,
-    data: ActualizarCotizacionEmpresaDTO
+        idCotizacion: number,
+        data: ActualizarCotizacionEmpresaDTO
     ) {
 
-    // ----------------------------------------------------
-    // VALIDAR ID
-    // ----------------------------------------------------
+        // ----------------------------------------------------
+        // VALIDAR ID
+        // ----------------------------------------------------
 
-    if (
-        !Number.isInteger(idCotizacion) ||
-        idCotizacion <= 0
-    ) {
-        throw new Error(
-        "El id de la cotización no es válido."
-        );
-    }
-
-
-    // ----------------------------------------------------
-    // OBTENER COTIZACIÓN ACTUAL
-    // ----------------------------------------------------
-
-    const cotizacion =
-        await this.repository.obtenerCotizacionPorId(
-        idCotizacion
-        );
-
-    if (!cotizacion) {
-        throw new Error(
-        "La cotización no existe."
-        );
-    }
+        if (
+            !Number.isInteger(idCotizacion) ||
+            idCotizacion <= 0
+        ) {
+            throw new Error(
+                "El id de la cotización no es válido."
+            );
+        }
 
 
-    // ----------------------------------------------------
-    // BLOQUEAR COTIZACIONES FINALIZADAS
-    // ----------------------------------------------------
+        // ----------------------------------------------------
+        // OBTENER COTIZACIÓN ACTUAL
+        // ----------------------------------------------------
 
-    if (cotizacion.estado === "Finalizada") {
-        throw new Error(
-        "La cotización está finalizada y no puede ser modificada."
-        );
-    }
+        const cotizacion =
+            await this.repository.obtenerCotizacionPorId(
+                idCotizacion
+            );
 
-
-    // ----------------------------------------------------
-    // VALIDAR EMPRESA
-    // ----------------------------------------------------
-
-    const idEmpresa =
-        Number(cotizacion.idEmpresa);
-
-    if (
-        !Number.isInteger(idEmpresa) ||
-        idEmpresa <= 0
-    ) {
-        throw new Error(
-        "La cotización no tiene una empresa asociada."
-        );
-    }
+        if (!cotizacion) {
+            throw new Error(
+                "La cotización no existe."
+            );
+        }
 
 
-    // ----------------------------------------------------
-    // VALIDAR PRECIO ORIGINAL
-    // ----------------------------------------------------
+        // ----------------------------------------------------
+        // BLOQUEAR COTIZACIONES FINALIZADAS
+        // ----------------------------------------------------
 
-    if (
-        cotizacion.precioEstimado === null ||
-        cotizacion.precioEstimado === undefined
-    ) {
-        throw new Error(
-        "La cotización no tiene un precio estimado generado por SISCON-Q."
-        );
-    }
-
-    const precioEstimado =
-        Number(cotizacion.precioEstimado);
-
-    if (
-        !Number.isFinite(precioEstimado) ||
-        precioEstimado < 0
-    ) {
-        throw new Error(
-        "El precio estimado de la cotización no es válido."
-        );
-    }
+        if (cotizacion.estado === "Finalizada") {
+            throw new Error(
+                "La cotización está finalizada y no puede ser modificada."
+            );
+        }
 
 
-    // ----------------------------------------------------
-    // VALIDAR MANO DE OBRA ADICIONAL
-    // ----------------------------------------------------
+        // ----------------------------------------------------
+        // VALIDAR EMPRESA
+        // ----------------------------------------------------
 
-    const costoManoObraAdicional =
-        Number(data.costoManoObraAdicional);
+        const idEmpresa =
+            Number(cotizacion.idEmpresa);
 
-    if (
-        !Number.isFinite(costoManoObraAdicional) ||
-        costoManoObraAdicional < 0
-    ) {
-        throw new Error(
-        "El costo de mano de obra adicional debe ser un número mayor o igual a 0."
-        );
-    }
-
-
-    // ----------------------------------------------------
-    // OBTENER IVA DE LA EMPRESA
-    // ----------------------------------------------------
-
-    const porcentajeIVA =
-        await this.repository.obtenerImpuestoEmpresa(
-        idEmpresa
-        );
-
-    if (
-        porcentajeIVA === null ||
-        porcentajeIVA === undefined
-    ) {
-        throw new Error(
-        "La empresa debe configurar el porcentaje de IVA antes de actualizar la cotización."
-        );
-    }
-
-    const porcentajeIVAAplicado =
-        Number(porcentajeIVA);
-
-    if (
-        !Number.isFinite(porcentajeIVAAplicado) ||
-        porcentajeIVAAplicado < 0
-    ) {
-        throw new Error(
-        "El porcentaje de IVA configurado por la empresa no es válido."
-        );
-    }
+        if (
+            !Number.isInteger(idEmpresa) ||
+            idEmpresa <= 0
+        ) {
+            throw new Error(
+                "La cotización no tiene una empresa asociada."
+            );
+        }
 
 
-    // ----------------------------------------------------
-    // CALCULAR SUBTOTAL
-    //
-    // precioEstimado ya fue generado por SISCON-Q.
-    // NO se vuelve a ejecutar ninguna Strategy.
-    // ----------------------------------------------------
+        // ----------------------------------------------------
+        // VALIDAR PRECIO ORIGINAL
+        // ----------------------------------------------------
 
-    const subtotal =
-        precioEstimado +
-        costoManoObraAdicional;
+        if (
+            cotizacion.precioEstimado === null ||
+            cotizacion.precioEstimado === undefined
+        ) {
+            throw new Error(
+                "La cotización no tiene un precio estimado generado por SISCON-Q."
+            );
+        }
 
+        const precioEstimado =
+            Number(cotizacion.precioEstimado);
 
-    // ----------------------------------------------------
-    // CALCULAR IVA
-    // ----------------------------------------------------
-
-    const montoIVA =
-        subtotal *
-        (porcentajeIVAAplicado / 100);
-
-
-    // ----------------------------------------------------
-    // CALCULAR TOTAL
-    // ----------------------------------------------------
-
-    const totalCotizacion =
-        subtotal +
-        montoIVA;
+        if (
+            !Number.isFinite(precioEstimado) ||
+            precioEstimado < 0
+        ) {
+            throw new Error(
+                "El precio estimado de la cotización no es válido."
+            );
+        }
 
 
-    // ----------------------------------------------------
-    // REDONDEO
-    // ----------------------------------------------------
+        // ----------------------------------------------------
+        // VALIDAR OBSERVACIONES
+        // ----------------------------------------------------
 
-    const subtotalRedondeado =
-        Number(subtotal.toFixed(2));
-
-    const montoIVARedondeado =
-        Number(montoIVA.toFixed(2));
-
-    const totalCotizacionRedondeado =
-        Number(totalCotizacion.toFixed(2));
+        if (data.observaciones !== undefined) {
+            this.validarObservaciones(
+                data.observaciones
+            );
+        }
 
 
-    // ----------------------------------------------------
-    // ACTUALIZAR MISMA COTIZACIÓN
-    // ----------------------------------------------------
+        // ----------------------------------------------------
+        // VALIDAR MANOS DE OBRA RECIBIDAS
+        // ----------------------------------------------------
 
-    const actualizado =
-        await this.repository.actualizarCotizacionDesdeEmpresa(
-        idCotizacion,
-        costoManoObraAdicional,
-        subtotalRedondeado,
-        porcentajeIVAAplicado,
-        montoIVARedondeado,
-        totalCotizacionRedondeado,
-        data.observaciones
-        );
-
-    if (!actualizado) {
-        throw new Error(
-        "No se pudo actualizar la cotización. Puede que haya sido finalizada."
-        );
-    }
+        if (!Array.isArray(data.manosObra)) {
+            throw new Error(
+                "La lista de manos de obra no es válida."
+            );
+        }
 
 
-    // ----------------------------------------------------
-    // RESPUESTA
-    // ----------------------------------------------------
+        // ----------------------------------------------------
+        // CALCULAR MANO DE OBRA ADICIONAL
+        //
+        // El frontend solamente envía:
+        // - idManoObra
+        // - cantidad
+        //
+        // El precio, unidad y nombre se obtienen desde
+        // la configuración de ManoObra de la empresa.
+        // ----------------------------------------------------
 
-    return {
+        const manosObraCalculadas: {
+            idManoObra: number;
+            nombre: string;
+            unidad: string | null;
+            cantidad: number;
+            costoUnitario: number;
+            subtotal: number;
+        }[] = [];
 
-        idCotizacion,
+        let costoManoObraAdicional = 0;
 
-        precioEstimado,
+        for (const item of data.manosObra) {
 
-        costoManoObraAdicional,
+            const idManoObra =
+                Number(item.idManoObra);
 
-        subtotal:
-        subtotalRedondeado,
+            const cantidad =
+                Number(item.cantidad);
 
-        porcentajeIVAAplicado,
+            if (
+                !Number.isInteger(idManoObra) ||
+                idManoObra <= 0
+            ) {
+                throw new Error(
+                    "Una de las manos de obra seleccionadas no es válida."
+                );
+            }
 
-        montoIVA:
-        montoIVARedondeado,
+            if (
+                !Number.isFinite(cantidad) ||
+                cantidad <= 0
+            ) {
+                throw new Error(
+                    "La cantidad de la mano de obra debe ser mayor a cero."
+                );
+            }
 
-        totalCotizacion:
-        totalCotizacionRedondeado,
 
-        observaciones:
-        data.observaciones !== undefined
-            ? data.observaciones
-            : cotizacion.observaciones,
+            // ------------------------------------------------
+            // BUSCAR MANO DE OBRA DE ESA EMPRESA
+            // ------------------------------------------------
 
-    };
+            const manoObra =
+                await this.manoObraService
+                    .obtenerManoObraPorId(
+                        idManoObra,
+                        idEmpresa
+                    );
+
+
+            // ------------------------------------------------
+            // SOLO MANOS DE OBRA ACTIVAS
+            // ------------------------------------------------
+
+            if (manoObra.estado !== "Activo") {
+                throw new Error(
+                    `La mano de obra "${manoObra.nombre}" no se encuentra activa.`
+                );
+            }
+
+
+            // ------------------------------------------------
+            // VALIDAR COSTO UNITARIO
+            // ------------------------------------------------
+
+            const costoUnitario =
+                Number(manoObra.costoUnitario);
+
+            if (
+                !Number.isFinite(costoUnitario) ||
+                costoUnitario < 0
+            ) {
+                throw new Error(
+                    `El costo unitario de "${manoObra.nombre}" no es válido.`
+                );
+            }
+
+
+            // ------------------------------------------------
+            // CALCULAR SUBTOTAL DE ESTA MANO DE OBRA
+            // ------------------------------------------------
+
+            const subtotalManoObra =
+                Number(
+                    (
+                        cantidad *
+                        costoUnitario
+                    ).toFixed(2)
+                );
+
+
+            // ------------------------------------------------
+            // ACUMULAR
+            // ------------------------------------------------
+
+            costoManoObraAdicional +=
+                subtotalManoObra;
+
+
+            // ------------------------------------------------
+            // PREPARAR SNAPSHOT PARA COTIZACIONMANOOBRA
+            // ------------------------------------------------
+
+            manosObraCalculadas.push({
+                idManoObra:
+                    manoObra.id_ManoObra,
+
+                nombre:
+                    manoObra.nombre,
+
+                unidad:
+                    manoObra.unidad,
+
+                cantidad,
+
+                costoUnitario,
+
+                subtotal:
+                    subtotalManoObra,
+            });
+        }
+
+
+        costoManoObraAdicional =
+            Number(
+                costoManoObraAdicional.toFixed(2)
+            );
+
+
+        // ----------------------------------------------------
+        // OBTENER IVA DE LA EMPRESA
+        // ----------------------------------------------------
+
+        const porcentajeIVA =
+            await this.repository.obtenerImpuestoEmpresa(
+                idEmpresa
+            );
+
+        if (
+            porcentajeIVA === null ||
+            porcentajeIVA === undefined
+        ) {
+            throw new Error(
+                "La empresa debe configurar el porcentaje de IVA antes de actualizar la cotización."
+            );
+        }
+
+        const porcentajeIVAAplicado =
+            Number(porcentajeIVA);
+
+        if (
+            !Number.isFinite(porcentajeIVAAplicado) ||
+            porcentajeIVAAplicado < 0
+        ) {
+            throw new Error(
+                "El porcentaje de IVA configurado por la empresa no es válido."
+            );
+        }
+
+
+        // ----------------------------------------------------
+        // CALCULAR SUBTOTAL GENERAL
+        //
+        // precioEstimado ya fue generado por SISCON-Q.
+        // NO se vuelve a ejecutar ninguna Strategy.
+        // ----------------------------------------------------
+
+        const subtotal =
+            precioEstimado +
+            costoManoObraAdicional;
+
+
+        // ----------------------------------------------------
+        // CALCULAR IVA
+        // ----------------------------------------------------
+
+        const montoIVA =
+            subtotal *
+            (porcentajeIVAAplicado / 100);
+
+
+        // ----------------------------------------------------
+        // CALCULAR TOTAL
+        // ----------------------------------------------------
+
+        const totalCotizacion =
+            subtotal +
+            montoIVA;
+
+
+        // ----------------------------------------------------
+        // REDONDEO
+        // ----------------------------------------------------
+
+        const subtotalRedondeado =
+            Number(subtotal.toFixed(2));
+
+        const montoIVARedondeado =
+            Number(montoIVA.toFixed(2));
+
+        const totalCotizacionRedondeado =
+            Number(totalCotizacion.toFixed(2));
+
+
+        // ----------------------------------------------------
+        // ACTUALIZAR COTIZACIÓN
+        // ----------------------------------------------------
+
+        const actualizado =
+            await this.repository
+                .actualizarCotizacionDesdeEmpresa(
+                    idCotizacion,
+                    costoManoObraAdicional,
+                    subtotalRedondeado,
+                    porcentajeIVAAplicado,
+                    montoIVARedondeado,
+                    totalCotizacionRedondeado,
+                    data.observaciones
+                );
+
+        if (!actualizado) {
+            throw new Error(
+                "No se pudo actualizar la cotización. Puede que haya sido finalizada."
+            );
+        }
+
+
+        // ----------------------------------------------------
+        // REEMPLAZAR DETALLE DE MANO DE OBRA
+        // ----------------------------------------------------
+
+        await this.cotizacionManoObraRepository
+            .eliminarPorCotizacion(
+                idCotizacion
+            );
+
+        for (const manoObra of manosObraCalculadas) {
+
+            await this.cotizacionManoObraRepository
+                .crear({
+                    idCotizacion,
+
+                    idManoObra:
+                        manoObra.idManoObra,
+
+                    cantidad:
+                        manoObra.cantidad,
+
+                    nombre:
+                        manoObra.nombre,
+
+                    unidad:
+                        manoObra.unidad,
+
+                    costoUnitario:
+                        manoObra.costoUnitario,
+
+                    subtotal:
+                        manoObra.subtotal,
+                });
+        }
+
+
+        // ----------------------------------------------------
+        // RESPUESTA
+        // ----------------------------------------------------
+
+        return {
+            idCotizacion,
+
+            precioEstimado,
+
+            costoManoObraAdicional,
+
+            manosObra:
+                manosObraCalculadas,
+
+            subtotal:
+                subtotalRedondeado,
+
+            porcentajeIVAAplicado,
+
+            montoIVA:
+                montoIVARedondeado,
+
+            totalCotizacion:
+                totalCotizacionRedondeado,
+
+            observaciones:
+                data.observaciones !== undefined
+                    ? data.observaciones
+                    : cotizacion.observaciones,
+        };
     }
 }

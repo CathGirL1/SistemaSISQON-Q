@@ -1,0 +1,626 @@
+/* =========================================================
+   MODAL GESTIONAR COTIZACIÓN
+   ========================================================= */
+
+.gestionar-cotizacion-modal {
+  width: min(760px, calc(100vw - 32px));
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gestionar-cotizacion-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  padding: 20px 18px;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.gestionar-cotizacion-modal .modal-header {
+  flex-shrink: 0;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.gestionar-cotizacion-modal .modal-header h2 {
+  margin: 0;
+  color: #0f3460;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.gestionar-cotizacion-modal .modal-header p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.gestionar-cotizacion-modal .modal-header > button {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #f1f5f9;
+  color: #64748b;
+
+  font-size: 22px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.gestionar-cotizacion-modal .modal-header > button:hover:not(:disabled) {
+  background: #e2e8f0;
+  color: #0f3460;
+}
+
+.gestionar-cotizacion-modal .modal-header {
+  flex-shrink: 0;
+
+  padding: 20px 24px 18px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* =========================================================
+   CONTENIDO / SCROLL
+   ========================================================= */
+
+.gestionar-cotizacion-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+
+  padding-top: 20px;
+  padding-right: 5px;
+}
+
+
+/* =========================================================
+   RESUMEN
+   ========================================================= */
+
+.gestion-cotizacion-resumen {
+  margin-bottom: 20px;
+  padding: 15px 17px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+}
+
+.gestion-cotizacion-resumen > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.gestion-cotizacion-resumen span {
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.gestion-cotizacion-resumen strong {
+  color: #0f3460;
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   CAMPOS
+   ========================================================= */
+
+.gestionar-cotizacion-modal .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-bottom: 20px;
+}
+
+.gestionar-cotizacion-modal .form-group > label {
+  color: #0f3460;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gestionar-cotizacion-modal select,
+.gestionar-cotizacion-modal input,
+.gestionar-cotizacion-modal textarea {
+  box-sizing: border-box;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #334155;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.gestionar-cotizacion-modal select:focus,
+.gestionar-cotizacion-modal input:focus,
+.gestionar-cotizacion-modal textarea:focus {
+  border-color: #0f4fa8;
+  box-shadow: 0 0 0 3px rgba(15, 79, 168, 0.1);
+}
+
+.gestionar-cotizacion-modal select,
+.gestionar-cotizacion-modal input {
+  height: 44px;
+  padding: 0 12px;
+}
+
+.gestionar-cotizacion-modal textarea {
+  width: 100%;
+  min-height: 105px;
+
+  padding: 12px;
+
+  line-height: 1.5;
+  resize: vertical;
+}
+
+
+/* =========================================================
+   SELECTOR MANO DE OBRA
+   ========================================================= */
+
+.gestion-mano-obra-selector {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.gestion-mano-obra-selector select {
+  width: 100%;
+  min-width: 0;
+}
+
+.gestion-mano-obra-selector > button {
+  min-width: 105px;
+  height: 44px;
+
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #0f4fa8;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.gestion-mano-obra-selector > button:hover:not(:disabled) {
+  background: #0b3f87;
+}
+
+
+/* =========================================================
+   LISTA DE MANO DE OBRA
+   ========================================================= */
+
+.gestion-manos-obra-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.gestion-mano-obra-item {
+  display: grid;
+
+  grid-template-columns:
+    minmax(170px, 1.5fr)
+    105px
+    minmax(120px, 0.8fr)
+    auto;
+
+  align-items: end;
+  gap: 14px;
+
+  padding: 15px 16px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+}
+
+
+/* Nombre y precio */
+
+.gestion-mano-obra-item > div:first-child {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.gestion-mano-obra-item > div:first-child strong {
+  color: #0f3460;
+  font-size: 14px;
+  font-weight: 700;
+
+  overflow-wrap: anywhere;
+}
+
+.gestion-mano-obra-item > div:first-child span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+
+/* Cantidad */
+
+.gestion-mano-obra-item > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gestion-mano-obra-item > div:nth-child(2) label {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gestion-mano-obra-item > div:nth-child(2) input {
+  width: 100%;
+}
+
+
+/* Subtotal individual */
+
+.gestion-mano-obra-item > div:nth-child(3) {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  padding-bottom: 5px;
+}
+
+.gestion-mano-obra-item > div:nth-child(3) span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gestion-mano-obra-item > div:nth-child(3) strong {
+  color: #0f3460;
+  font-size: 14px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+
+/* Botón quitar */
+
+.gestion-mano-obra-item > button {
+  height: 40px;
+
+  padding: 0 13px;
+
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  border-radius: 9px;
+
+  background: rgba(239, 68, 68, 0.07);
+  color: #ef4444;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.gestion-mano-obra-item > button:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.14);
+}
+
+
+/* =========================================================
+   RESUMEN DEL CÁLCULO
+   ========================================================= */
+
+.gestion-cotizacion-calculo {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 20px;
+  padding: 7px 17px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+}
+
+.gestion-cotizacion-calculo > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 11px 0;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.gestion-cotizacion-calculo > div:last-child {
+  border-bottom: none;
+}
+
+.gestion-cotizacion-calculo span {
+  color: #475569;
+  font-size: 14px;
+}
+
+.gestion-cotizacion-calculo strong {
+  color: #0f3460;
+  font-size: 14px;
+  font-weight: 700;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   TOTAL
+   ========================================================= */
+
+.gestion-cotizacion-calculo .gestion-cotizacion-total {
+  padding-top: 14px;
+  padding-bottom: 13px;
+}
+
+.gestion-cotizacion-total span {
+  color: #0f3460;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.gestion-cotizacion-total strong {
+  color: #0f3460;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.gestionar-cotizacion-modal .modal-error {
+  margin: 0 0 16px;
+
+  padding: 11px 13px;
+
+  background: rgba(239, 68, 68, 0.07);
+
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 9px;
+
+  color: #dc2626;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.gestionar-cotizacion-modal .modal-footer {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 16px 24px;
+
+  background: #ffffff;
+
+  border-top: 1px solid #e2e8f0;
+}   
+.gestionar-cotizacion-modal .modal-footer {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding-top: 16px;
+
+  border-top: 1px solid #e2e8f0;
+}
+
+.gestionar-cotizacion-modal .modal-footer button {
+  min-width: 120px;
+
+  padding: 11px 18px;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.gestionar-cotizacion-modal .modal-footer button:first-child {
+  background: #f1f5f9;
+  color: #0f3460;
+}
+
+.gestionar-cotizacion-modal
+  .modal-footer
+  button:first-child:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.gestionar-cotizacion-modal .modal-footer button:last-child {
+  background: #0f4fa8;
+  color: white;
+}
+
+.gestionar-cotizacion-modal
+  .modal-footer
+  button:last-child:hover:not(:disabled) {
+  background: #0b3f87;
+}
+
+
+/* =========================================================
+   DISABLED
+   ========================================================= */
+
+.gestionar-cotizacion-modal button:disabled,
+.gestionar-cotizacion-modal select:disabled,
+.gestionar-cotizacion-modal input:disabled,
+.gestionar-cotizacion-modal textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   SCROLL
+   ========================================================= */
+
+.gestionar-cotizacion-modal .modal-body::-webkit-scrollbar {
+  width: 7px;
+}
+
+.gestionar-cotizacion-modal .modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gestionar-cotizacion-modal .modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.gestionar-cotizacion-modal .modal-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .gestion-mano-obra-item {
+    grid-template-columns:
+      minmax(0, 1fr)
+      110px;
+  }
+
+  .gestion-mano-obra-item > div:nth-child(3) {
+    align-self: center;
+  }
+
+  .gestion-mano-obra-item > button {
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 520px) {
+  .gestionar-cotizacion-modal {
+    width: calc(100vw - 20px);
+    max-height: 94vh;
+  }
+
+  .gestion-mano-obra-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .gestion-mano-obra-selector > button {
+    width: 100%;
+  }
+
+  .gestion-mano-obra-item {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .gestion-mano-obra-item > div:nth-child(3) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-bottom: 0;
+  }
+
+  .gestion-mano-obra-item > button {
+    width: 100%;
+  }
+
+  .gestion-cotizacion-resumen > div,
+  .gestion-cotizacion-calculo > div {
+    gap: 12px;
+  }
+
+  .gestion-cotizacion-resumen strong {
+    font-size: 15px;
+  }
+
+  .gestion-cotizacion-total strong {
+    font-size: 18px;
+  }
+
+  .gestionar-cotizacion-modal .modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .gestionar-cotizacion-modal .modal-footer button {
+    width: 100%;
+  }
+}

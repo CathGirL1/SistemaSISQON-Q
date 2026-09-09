@@ -77,6 +77,21 @@ interface CotizacionBackend {
   precioEstimadoUYU: number | null;
 }
 
+export interface ManoObraCotizacionDetalle {
+  idCotizacionManoObra: number;
+  idCotizacion: number;
+  idManoObra: number;
+  nombre: string;
+  unidad: string | null;
+  cantidad: number;
+  costoUnitario: number;
+  subtotal: number;
+}
+
+export interface DetalleCotizacionEmpresa {
+  manosObra: ManoObraCotizacionDetalle[];
+}
+
 function convertirEstado(
   estado: string
 ): EstadoCotizacion {
@@ -302,8 +317,13 @@ export async function obtenerCotizacionesEmpresa(
         );
     }
 
-    export interface ActualizarCotizacionEmpresaData {
-  costoManoObraAdicional: number;
+export interface ManoObraCotizacionData {
+  idManoObra: number;
+  cantidad: number;
+}
+
+export interface ActualizarCotizacionEmpresaData {
+  manosObra: ManoObraCotizacionData[];
   observaciones?: string | null;
 }
 
@@ -311,6 +331,16 @@ export interface ResultadoCotizacionEmpresa {
   idCotizacion: number;
   precioEstimado: number;
   costoManoObraAdicional: number;
+
+  manosObra: {
+    idManoObra: number;
+    nombre: string;
+    unidad: string | null;
+    cantidad: number;
+    costoUnitario: number;
+    subtotal: number;
+  }[];
+
   subtotal: number;
   porcentajeIVAAplicado: number;
   montoIVA: number;
@@ -375,4 +405,49 @@ export async function finalizarCotizacion(
       "No se pudo finalizar la cotización"
     );
   }
+}
+
+export async function obtenerDetalleCotizacion(
+  idCotizacion: number
+): Promise<DetalleCotizacionEmpresa> {
+
+  const response = await fetch(
+    `${API_URL}/api/cotizaciones/${idCotizacion}`
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.mensaje ||
+      "No se pudo obtener el detalle de la cotización"
+    );
+  }
+
+  return {
+    manosObra:
+      (data.manosObra ?? []).map(
+        (item: ManoObraCotizacionDetalle) => ({
+          ...item,
+
+          idCotizacionManoObra:
+            Number(item.idCotizacionManoObra),
+
+          idCotizacion:
+            Number(item.idCotizacion),
+
+          idManoObra:
+            Number(item.idManoObra),
+
+          cantidad:
+            Number(item.cantidad),
+
+          costoUnitario:
+            Number(item.costoUnitario),
+
+          subtotal:
+            Number(item.subtotal),
+        })
+      ),
+  };
 }
