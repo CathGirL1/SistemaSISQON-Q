@@ -5,6 +5,7 @@ import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
 import VerDetallePerfilCliente from "../../components/cliente/VerDetallePerfilCliente";
 import EdicionPerfilCliente from "../../components/cliente/EdicionVerPerfilCliente";
+import DarDeBajaPerfilCliente from "../../components/cliente/DarDeBajaPerfilCliente";
 
 import "../../styles/VerPerfilCliente.css";
 
@@ -314,17 +315,27 @@ export default function VerPerfilCliente() {
 
             ) : (
 
-              <VerDetallePerfilCliente
-                cliente={cliente}
-                onEditar={() => {
-                  setMensaje("");
-                  setError("");
-                  setEditando(true);
-                }}
-                onLogoActualizado={actualizarLogo}
-              />
+              <>
+                {/* Información del perfil */}
+                <VerDetallePerfilCliente
+                  cliente={cliente}
+                  onEditar={() => {
+                    setMensaje("");
+                    setError("");
+                    setEditando(true);
+                  }}
+                  onLogoActualizado={actualizarLogo}
+                />
 
-            )
+                {/* Dar de baja la cuenta */}
+                <DarDeBajaPerfilCliente
+                  idCliente={cliente.id_Cliente}
+                />
+            </>
+
+              
+
+          )
 
           )}
 

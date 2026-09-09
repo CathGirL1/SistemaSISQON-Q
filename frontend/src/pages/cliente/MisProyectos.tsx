@@ -60,7 +60,7 @@ export interface ProyectoAPI {
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-const ID_CLIENTE_TEMPORAL = 1;
+
 
 const PROYECTOS_POR_PAGINA = 3;
 
@@ -97,8 +97,22 @@ const IMAGEN_PROYECTO =
       setCargando(true);
       setError("");
 
+      const usuarioGuardado = localStorage.getItem("usuario");
+
+      if (!usuarioGuardado) {
+        throw new Error("No se encontró una sesión activa");
+      }
+
+      const usuario = JSON.parse(usuarioGuardado);
+
+      if (!usuario.id_Cliente) {
+        throw new Error(
+          "No se encontró el identificador del cliente"
+        );
+      }
+
       const response = await fetch(
-        `${API_URL}/api/proyectos/cliente/${ID_CLIENTE_TEMPORAL}`
+        `${API_URL}/api/proyectos/cliente/${usuario.id_Cliente}`
       );
 
       if (!response.ok) {
