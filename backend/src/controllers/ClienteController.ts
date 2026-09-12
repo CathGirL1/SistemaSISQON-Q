@@ -128,8 +128,9 @@ export class ClienteController {
   ): Promise<void> => {
     try {
       const idCliente = this.convertirId(req.params.id);
+      const idEmpresa = this.convertirId(req.params.idEmpresa);
 
-      await this.service.eliminarCliente(idCliente);
+      await this.service.eliminarCliente(idCliente, idEmpresa);
 
       res.status(204).send();
     } catch (error) {

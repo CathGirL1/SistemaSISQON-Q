@@ -49,7 +49,9 @@ export const obtenerClientesPorEmpresa = async (
   const clientes: ClienteApi[] =
     await respuesta.json();
 
-  return clientes.map(transformarCliente);
+  return clientes.map((cliente) =>
+    transformarCliente(cliente, idEmpresa)
+  );
 };
 
 export type CrearClienteRequest = {
@@ -86,10 +88,12 @@ const obtenerIniciales = (
   `${nombre.trim().charAt(0)}${apellido.trim().charAt(0)}`.toUpperCase();
 
 const transformarCliente = (
-  cliente: ClienteApi
+  cliente: ClienteApi,
+  idEmpresa: number
 ): ClienteEmpresa => ({
   id: cliente.id_Cliente,
   idUsuario: cliente.id_Usuario,
+  idEmpresa: idEmpresa,
   cedula: cliente.cedula,
   nombreUsuario: cliente.nombreUsuario,
 
@@ -157,7 +161,8 @@ export const obtenerClientes = async (): Promise<
 };
 
 export const crearCliente = async (
-  datos: CrearClienteRequest
+  datos: CrearClienteRequest,
+  idEmpresa: number
 ): Promise<ClienteEmpresa> => {
   const respuesta = await fetch(API_URL, {
     method: "POST",
@@ -178,11 +183,12 @@ export const crearCliente = async (
 
   const cliente: ClienteApi = await respuesta.json();
 
-  return transformarCliente(cliente);
+  return transformarCliente(cliente, idEmpresa);
 };
 
 export const actualizarCliente = async (
   idCliente: number,
+  idEmpresa: number,
   datos: ActualizarClienteRequest
 ): Promise<ClienteEmpresa> => {
   const respuesta = await fetch(`${API_URL}/${idCliente}`, {
@@ -204,15 +210,19 @@ export const actualizarCliente = async (
 
   const cliente: ClienteApi = await respuesta.json();
 
-  return transformarCliente(cliente);
+  return transformarCliente(cliente, idEmpresa);
 };
 
 export const eliminarCliente = async (
-  idCliente: number
+  idCliente: number,
+  idEmpresa: number
 ): Promise<void> => {
-  const respuesta = await fetch(`${API_URL}/${idCliente}`, {
-    method: "DELETE",
-  });
+  const respuesta = await fetch(
+    `${API_URL}/${idCliente}/empresa/${idEmpresa}`,
+    {
+      method: "DELETE",
+    }
+  );
 
   if (!respuesta.ok) {
     throw new Error(

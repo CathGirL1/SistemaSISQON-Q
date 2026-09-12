@@ -302,7 +302,18 @@ export default function ClientesEmpresaContenido() {
   const guardarNuevoCliente = async (
     datos: CrearClienteRequest
   ) => {
-    const clienteCreado = await crearCliente(datos);
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario") || "{}"
+    );
+
+    const idEmpresa = usuario.idEmpresa;
+
+    if (!idEmpresa) {
+      throw new Error(
+        "No se pudo identificar la empresa autenticada."
+      );
+    }
+    const clienteCreado = await crearCliente(datos, idEmpresa);
 
     setClientes((listaActual) => [
       clienteCreado,
@@ -322,8 +333,23 @@ export default function ClientesEmpresaContenido() {
       );
     }
 
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario") || "{}"
+    );
+
+    const idEmpresa = usuario.idEmpresa;
+
+    if (!idEmpresa) {
+      throw new Error(
+        "No se pudo identificar la empresa autenticada."
+      );
+    }
+
+    
+
     const clienteActualizado = await actualizarCliente(
       clienteAccion.id,
+      idEmpresa, 
       datos
     );
 
@@ -344,7 +370,21 @@ export default function ClientesEmpresaContenido() {
     cerrarModales();
   };
 
+  
+
   const guardarNotaCliente = async (nota: string) => {
+
+    const usuario = JSON.parse(
+      localStorage.getItem("usuario") || "{}"
+    );
+
+    const idEmpresa = usuario.idEmpresa;
+
+    if (!idEmpresa) {
+      throw new Error(
+        "No se pudo identificar la empresa autenticada."
+      );
+    }
     if (!clienteAccion) {
       throw new Error(
         "No se pudo identificar el cliente."
@@ -366,6 +406,7 @@ export default function ClientesEmpresaContenido() {
 
     const clienteActualizado = await actualizarCliente(
       clienteAccion.id,
+      idEmpresa, 
       datos
     );
 
@@ -393,7 +434,7 @@ export default function ClientesEmpresaContenido() {
       );
     }
 
-    await eliminarCliente(clienteAccion.id);
+    await eliminarCliente(clienteAccion.id, clienteAccion.idEmpresa);
 
     const nuevaLista = clientes.filter(
       (cliente) => cliente.id !== clienteAccion.id
