@@ -439,22 +439,25 @@ export class ClienteRepository {
   }
 
   public async eliminarCliente(
-    idCliente: number
+    idCliente: number,
+    idEmpresa: number
   ): Promise<boolean> {
     const pool = await connectDB();
+
     const transaccion = new sql.Transaction(pool);
 
     try {
       await transaccion.begin();
 
+      // Verificar que el cliente exista
       const resultado = await new sql.Request(transaccion)
         .input(
           "idCliente",
           sql.Int,
           idCliente
         )
-        .query<{ id_Usuario: number }>(`
-          SELECT id_Usuario
+        .query<{ id_Cliente: number }>(`
+          SELECT id_Cliente
           FROM Cliente
           WHERE id_Cliente = @idCliente
         `);
@@ -466,32 +469,41 @@ export class ClienteRepository {
         return false;
       }
 
+      // Eliminar únicamente las cotizaciones
+      // de este cliente correspondientes a esta empresa.
+      const resultadoEliminacion =
       await new sql.Request(transaccion)
         .input(
           "idCliente",
           sql.Int,
           idCliente
         )
-        .query(`
-          DELETE FROM Cliente
-          WHERE id_Cliente = @idCliente
-        `);
-
-      await new sql.Request(transaccion)
         .input(
-          "idUsuario",
+          "idEmpresa",
           sql.Int,
-          cliente.id_Usuario
+          idEmpresa
         )
         .query(`
-          DELETE FROM Usuario
-          WHERE id_Usuario = @idUsuario
+          DELETE FROM Cotizacion
+          WHERE id_Empresa = @idEmpresa
+            AND id_Proyecto IN (
+              SELECT id_Proyecto
+              FROM Proyecto
+              WHERE id_Cliente = @idCliente
+            )
         `);
 
-      await transaccion.commit();
+    if ((resultadoEliminacion.rowsAffected[0] ?? 0) === 0) {
+      await transaccion.rollback();
+      return false;
+    }
 
-      return true;
+    await transaccion.commit();
+
+    return true;
+
     } catch (error) {
+
       try {
         await transaccion.rollback();
       } catch {

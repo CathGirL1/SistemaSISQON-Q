@@ -43,7 +43,7 @@ router.put(
 );
 
 router.delete(
-  "/:id",
+  "/:id/empresa/:idEmpresa",
   controller.eliminarCliente
 );
 
