@@ -83,11 +83,6 @@ export default function SidebarEmpresa() {
 
         <p className="sidebar-section-title">Administración</p>
 
-        <NavLink to="/empresa/reportes" className="sidebar-link">
-          <FaChartBar />
-          <span>Reportes</span>
-        </NavLink>
-
         <NavLink to="/empresa/perfil" className="sidebar-link">
           <FaUserCircle />
           <span>Mi perfil</span>
