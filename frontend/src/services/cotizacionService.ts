@@ -209,9 +209,11 @@ export async function obtenerCotizacionesEmpresa(
             // ==========================================
 
             fecha:
-            new Date(
-                cotizacion.fechaCreacion
-            ).toLocaleDateString("es-UY"),
+            cotizacion.fechaCreacion
+              ? new Date(
+                  cotizacion.fechaCreacion
+                ).toLocaleDateString("es-UY")
+              : "Sin fecha",
 
             total:
             `$ ${Number(

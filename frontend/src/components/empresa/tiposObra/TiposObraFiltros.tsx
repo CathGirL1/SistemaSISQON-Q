@@ -44,13 +44,6 @@ export default function TiposObraFiltros({
         </option>
       </select>
 
-      <button
-        className="tipos-obra-filtros-btn"
-        type="button"
-      >
-        <FaFilter />
-        Filtros
-      </button>
     </div>
   );
 }

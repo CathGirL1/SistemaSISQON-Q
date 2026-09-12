@@ -11,12 +11,6 @@ export default function EmpresaHeader() {
         <p>Resumen general de cotizaciones, clientes y proyectos.</p>
       </div>
 
-      <button
-        className="dashboard-btn"
-        onClick={() => navigate("/empresa/cotizaciones")}
-      >
-        Nueva cotización
-      </button>
     </div>
   );
 }

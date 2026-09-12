@@ -81,13 +81,7 @@ export default function ManoObraFiltros({
         <option value="Inactivo">Inactivo</option>
       </select>
 
-      <button
-        type="button"
-        className="mano-obra-filtros-btn"
-      >
-        <FaFilter />
-        Filtros
-      </button>
+
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import "../../../styles/empresa/cotizaciones/TablaCotizaciones.css";
 
-import { useEffect, useState } from "react";
+import {
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 
 import GestionarCotizacionModal from "./GestionarCotizacionModal";
 
@@ -10,7 +14,6 @@ import type {
 } from "../../../interfaces/Cotizacion";
 
 import {
-  obtenerCotizacionesEmpresa,
   finalizarCotizacion,
 } from "../../../services/cotizacionService";
 
@@ -19,70 +22,64 @@ import DetalleCotizacionModal from "./DetalleCotizacionModal";
 import EditarEstadoCotizacionModal from "./EditarEstadoCotizacionModal";
 import ConfirmEliminarCotizacionModal from "./ConfirmEliminarCotizacionModal";
 
-export default function TablaCotizaciones() {
-  const [cotizaciones, setCotizaciones] = useState<Cotizacion[]>([]);
+
+// =====================================================
+// PROPS
+// =====================================================
+
+type Props = {
+  cotizaciones: Cotizacion[];
+
+  setCotizaciones: Dispatch<
+    SetStateAction<Cotizacion[]>
+  >;
+
+  cargando: boolean;
+  error: string;
+
+  onActualizada: () => Promise<void>;
+
+  paginaActual: number;
+  porPagina: number;
+  totalCotizaciones: number;
+};
+
+
+// =====================================================
+// COMPONENTE
+// =====================================================
+
+export default function TablaCotizaciones({
+  cotizaciones,
+  setCotizaciones,
+  cargando,
+  error,
+  onActualizada,
+  paginaActual,
+  porPagina,
+  totalCotizaciones,
+}: Props) {
 
   const [seleccionadas, setSeleccionadas] =
     useState<string[]>([]);
 
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState("");
+  const [modalDetalle, setModalDetalle] =
+    useState(false);
 
-  const [modalDetalle, setModalDetalle] = useState(false);
-  const [modalEditar, setModalEditar] = useState(false);
-  const [modalEliminar, setModalEliminar] = useState(false);
+  const [modalGestionar, setModalGestionar] =
+    useState(false);
 
-  const [cotizacionSeleccionada, setCotizacionSeleccionada] =
-    useState<Cotizacion | null>(null);
+  const [modalEditar, setModalEditar] =
+    useState(false);
 
-  // =====================================================
-  // OBTENER COTIZACIONES
-  // =====================================================
+  const [modalEliminar, setModalEliminar] =
+    useState(false);
 
-  const cargarCotizaciones = async () => {
-    try {
-      setCargando(true);
-      setError("");
+  const [
+    cotizacionSeleccionada,
+    setCotizacionSeleccionada,
+  ] = useState<Cotizacion | null>(null);
 
-      const usuarioGuardado =
-        localStorage.getItem("usuario");
-
-      if (!usuarioGuardado) {
-        throw new Error(
-          "No hay una sesión iniciada"
-        );
-      }
-
-      const usuario = JSON.parse(usuarioGuardado);
-
-      const idEmpresa = Number(usuario.idEmpresa);
-
-      if (!idEmpresa) {
-        throw new Error(
-          "No se encontró la empresa asociada al usuario"
-        );
-      }
-
-      const datos =
-        await obtenerCotizacionesEmpresa(idEmpresa);
-
-      setCotizaciones(datos);
-    } catch (error: unknown) {
-      console.error(error);
-
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Ocurrió un error al cargar las cotizaciones"
-      );
-    } finally {
-      setCargando(false);
-    }
-  };
-
-  useEffect(() => {
-    cargarCotizaciones();
-  }, []);
 
   // =====================================================
   // SELECCIÓN
@@ -92,111 +89,168 @@ export default function TablaCotizaciones() {
     cotizaciones.length > 0 &&
     seleccionadas.length === cotizaciones.length;
 
+
   const seleccionarTodas = () => {
+
     if (todasSeleccionadas) {
+
       setSeleccionadas([]);
+
     } else {
+
       setSeleccionadas(
         cotizaciones.map(
           (cotizacion) => cotizacion.id
         )
       );
+
     }
   };
 
-  const seleccionarCotizacion = (id: string) => {
+
+  const seleccionarCotizacion = (
+    id: string
+  ) => {
+
     if (seleccionadas.includes(id)) {
+
       setSeleccionadas(
         seleccionadas.filter(
           (item) => item !== id
         )
       );
+
     } else {
+
       setSeleccionadas([
         ...seleccionadas,
         id,
       ]);
+
     }
   };
 
+
   // =====================================================
-  // MODALES
+  // ABRIR MODALES
   // =====================================================
 
   const abrirDetalle = (
     cotizacion: Cotizacion
   ) => {
-    setCotizacionSeleccionada(cotizacion);
+
+    setCotizacionSeleccionada(
+      cotizacion
+    );
+
     setModalDetalle(true);
   };
+
 
   const abrirGestionar = (
     cotizacion: Cotizacion
   ) => {
-    setCotizacionSeleccionada(cotizacion);
+
+    setCotizacionSeleccionada(
+      cotizacion
+    );
+
     setModalGestionar(true);
   };
+
 
   const abrirEditar = (
     cotizacion: Cotizacion
   ) => {
-    setCotizacionSeleccionada(cotizacion);
+
+    setCotizacionSeleccionada(
+      cotizacion
+    );
+
     setModalEditar(true);
   };
+
 
   const abrirEliminar = (
     cotizacion: Cotizacion
   ) => {
-    setCotizacionSeleccionada(cotizacion);
+
+    setCotizacionSeleccionada(
+      cotizacion
+    );
+
     setModalEliminar(true);
   };
 
-  const finalizarCotizacionSeleccionada = async (
-    cotizacion: Cotizacion
-  ) => {
-    const confirmar = window.confirm(
-      "¿Seguro que querés finalizar esta cotización? Una vez finalizada no podrá volver a modificarse."
-    );
 
-    if (!confirmar) {
-      return;
-    }
-
-    try {
-      setError("");
-
-      await finalizarCotizacion(
-        cotizacion.idCotizacion
-      );
-
-      await cargarCotizaciones();
-
-      setSeleccionadas(
-        seleccionadas.filter(
-          (id) => id !== cotizacion.id
-        )
-      );
-    } catch (error: unknown) {
-      console.error(error);
-
-      setError(
-        error instanceof Error
-          ? error.message
-          : "No se pudo finalizar la cotización"
-      );
-    }
-  };
-
-  const [modalGestionar, setModalGestionar] =
-  useState(false);
+  // =====================================================
+  // CERRAR MODALES
+  // =====================================================
 
   const cerrarModales = () => {
+
     setModalDetalle(false);
+
     setModalGestionar(false);
+
     setModalEditar(false);
+
     setModalEliminar(false);
+
     setCotizacionSeleccionada(null);
   };
+
+
+  // =====================================================
+  // FINALIZAR COTIZACIÓN
+  // =====================================================
+
+  const finalizarCotizacionSeleccionada =
+    async (
+      cotizacion: Cotizacion
+    ) => {
+
+      const confirmar =
+        window.confirm(
+          "¿Seguro que querés finalizar esta cotización? Una vez finalizada no podrá volver a modificarse."
+        );
+
+      if (!confirmar) {
+        return;
+      }
+
+      try {
+
+        await finalizarCotizacion(
+          cotizacion.idCotizacion
+        );
+
+        // Recarga las cotizaciones desde la BDD.
+        // Al estar en el componente padre,
+        // también actualiza automáticamente los KPIs.
+        await onActualizada();
+
+        setSeleccionadas(
+          (anteriores) =>
+            anteriores.filter(
+              (id) =>
+                id !== cotizacion.id
+            )
+        );
+
+      } catch (error: unknown) {
+
+        console.error(error);
+
+        const mensaje =
+          error instanceof Error
+            ? error.message
+            : "No se pudo finalizar la cotización";
+
+        window.alert(mensaje);
+      }
+    };
+
 
   // =====================================================
   // CAMBIAR ESTADO
@@ -205,74 +259,97 @@ export default function TablaCotizaciones() {
   const guardarEstado = (
     estado: EstadoCotizacion
   ) => {
+
     if (!cotizacionSeleccionada) {
       return;
     }
 
     setCotizaciones(
-      cotizaciones.map(
-        (cotizacion) =>
-          cotizacion.id === cotizacionSeleccionada.id
-            ? {
-                ...cotizacion,
-                estado,
-              }
-            : cotizacion
-      )
+      (anteriores) =>
+        anteriores.map(
+          (cotizacion) =>
+            cotizacion.id ===
+            cotizacionSeleccionada.id
+              ? {
+                  ...cotizacion,
+                  estado,
+                }
+              : cotizacion
+        )
     );
 
     cerrarModales();
   };
+
 
   // =====================================================
   // ELIMINAR
   // =====================================================
 
   const eliminarCotizacion = () => {
+
     if (!cotizacionSeleccionada) {
       return;
     }
 
+    const id =
+      cotizacionSeleccionada.id;
+
     setCotizaciones(
-      cotizaciones.filter(
-        (cotizacion) =>
-          cotizacion.id !== cotizacionSeleccionada.id
-      )
+      (anteriores) =>
+        anteriores.filter(
+          (cotizacion) =>
+            cotizacion.id !== id
+        )
     );
 
     setSeleccionadas(
-      seleccionadas.filter(
-        (id) =>
-          id !== cotizacionSeleccionada.id
-      )
+      (anteriores) =>
+        anteriores.filter(
+          (idSeleccionado) =>
+            idSeleccionado !== id
+        )
     );
 
     cerrarModales();
   };
+
 
   // =====================================================
   // CARGANDO
   // =====================================================
 
   if (cargando) {
+
     return (
       <div className="tabla-cotizaciones-card">
-        <p>Cargando cotizaciones...</p>
+
+        <p>
+          Cargando cotizaciones...
+        </p>
+
       </div>
     );
   }
+
 
   // =====================================================
   // ERROR
   // =====================================================
 
   if (error) {
+
     return (
       <div className="tabla-cotizaciones-card">
-        <p>{error}</p>
+
+        <p>
+          {error}
+        </p>
+
       </div>
     );
   }
+
 
   // =====================================================
   // VISTA
@@ -281,9 +358,14 @@ export default function TablaCotizaciones() {
   return (
     <div className="tabla-cotizaciones-card">
 
+      {/* =================================================
+          ENCABEZADO
+          ================================================= */}
+
       <div className="tabla-cotizaciones-header">
 
         <div>
+
           <h2>
             Listado de cotizaciones
           </h2>
@@ -291,97 +373,128 @@ export default function TablaCotizaciones() {
           <p>
             Visualizá y gestioná las solicitudes recibidas.
           </p>
+
         </div>
 
+
+        {/* ===============================================
+            ACCIONES MASIVAS
+            =============================================== */}
+
         {seleccionadas.length > 0 && (
+
           <div className="acciones-masivas">
 
             <span>
               {seleccionadas.length} seleccionada(s)
             </span>
 
-            <button>
+            <button type="button">
               Cambiar estado
             </button>
 
-            <button>
+            <button type="button">
               Exportar
             </button>
 
-            <button className="danger">
+            <button
+              type="button"
+              className="danger"
+            >
               Eliminar
             </button>
 
           </div>
+
         )}
 
       </div>
+
+
+      {/* =================================================
+          TABLA
+          ================================================= */}
 
       <div className="tabla-cotizaciones-wrapper">
 
         <table className="tabla-cotizaciones">
 
           <thead>
+
             <tr>
 
               <th>
+
                 <input
                   type="checkbox"
                   checked={todasSeleccionadas}
                   onChange={seleccionarTodas}
                 />
+
               </th>
 
               <th>ID ↕</th>
+
               <th>Cliente ↕</th>
+
               <th>Tipo de obra ↕</th>
+
               <th>Fecha ↕</th>
+
               <th>Total estimado ↕</th>
+
               <th>Estado ↕</th>
+
               <th>Acciones</th>
 
             </tr>
+
           </thead>
+
 
           <tbody>
 
             {cotizaciones.map(
               (cotizacion) => (
-          <FilaCotizacion
-            key={cotizacion.id}
 
-            cotizacion={cotizacion}
+                <FilaCotizacion
+                  key={cotizacion.id}
 
-            seleccionada={
-              seleccionadas.includes(
-                cotizacion.id
-              )
-            }
+                  cotizacion={
+                    cotizacion
+                  }
 
-            onSeleccionar={
-              seleccionarCotizacion
-            }
+                  seleccionada={
+                    seleccionadas.includes(
+                      cotizacion.id
+                    )
+                  }
 
-            onVerDetalle={
-              abrirDetalle
-            }
+                  onSeleccionar={
+                    seleccionarCotizacion
+                  }
 
-            onGestionar={
-              abrirGestionar
-            }
+                  onVerDetalle={
+                    abrirDetalle
+                  }
 
-            onEditarEstado={
-              abrirEditar
-            }
+                  onGestionar={
+                    abrirGestionar
+                  }
 
-            onFinalizar={
-              finalizarCotizacionSeleccionada
-            }
+                  onEditarEstado={
+                    abrirEditar
+                  }
 
-            onEliminar={
-              abrirEliminar
-            }
-          />
+                  onFinalizar={
+                    finalizarCotizacionSeleccionada
+                  }
+
+                  onEliminar={
+                    abrirEliminar
+                  }
+                />
+
               )
             )}
 
@@ -391,43 +504,101 @@ export default function TablaCotizaciones() {
 
       </div>
 
+
+      {/* =================================================
+          INFORMACIÓN INFERIOR
+          ================================================= */}
       <div className="tabla-footer-info">
 
-        Mostrando 1-
-        {cotizaciones.length}
-        {" "}de{" "}
-        {cotizaciones.length}
-        {" "}cotizaciones
+        {totalCotizaciones === 0 ? (
+          <>
+            No hay cotizaciones que coincidan con los filtros
+          </>
+        ) : (
+          <>
+            Mostrando{" "}
+            {(paginaActual - 1) * porPagina + 1}
+            -
+            {Math.min(
+              paginaActual * porPagina,
+              totalCotizaciones
+            )}
+            {" "}de{" "}
+            {totalCotizaciones}
+            {" "}cotizaciones
+          </>
+        )}
 
       </div>
 
+
+      {/* =================================================
+          MODAL DETALLE
+          ================================================= */}
+
       <DetalleCotizacionModal
         abierto={modalDetalle}
-        cotizacion={cotizacionSeleccionada}
-        onCerrar={cerrarModales}
+        cotizacion={
+          cotizacionSeleccionada
+        }
+        onCerrar={
+          cerrarModales
+        }
       />
+
+
+      {/* =================================================
+          MODAL GESTIONAR
+          ================================================= */}
 
       <GestionarCotizacionModal
         abierto={modalGestionar}
-        cotizacion={cotizacionSeleccionada}
-        onCerrar={cerrarModales}
-        onActualizada={cargarCotizaciones}
+        cotizacion={
+          cotizacionSeleccionada
+        }
+        onCerrar={
+          cerrarModales
+        }
+        onActualizada={
+          onActualizada
+        }
       />
+
+
+      {/* =================================================
+          MODAL EDITAR ESTADO
+          ================================================= */}
 
       <EditarEstadoCotizacionModal
         abierto={modalEditar}
-        cotizacion={cotizacionSeleccionada}
-        onCerrar={cerrarModales}
-        onGuardar={guardarEstado}
+        cotizacion={
+          cotizacionSeleccionada
+        }
+        onCerrar={
+          cerrarModales
+        }
+        onGuardar={
+          guardarEstado
+        }
       />
+
+
+      {/* =================================================
+          MODAL ELIMINAR
+          ================================================= */}
 
       <ConfirmEliminarCotizacionModal
         abierto={modalEliminar}
-        cotizacion={cotizacionSeleccionada}
-        onCerrar={cerrarModales}
-        onConfirmar={eliminarCotizacion}
+        cotizacion={
+          cotizacionSeleccionada
+        }
+        onCerrar={
+          cerrarModales
+        }
+        onConfirmar={
+          eliminarCotizacion
+        }
       />
-
 
     </div>
   );

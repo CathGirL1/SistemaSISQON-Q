@@ -1,41 +1,108 @@
 import "../../../styles/empresa/cotizaciones/CotizacionesFiltros.css";
 
-import { FaFilter, FaCalendarAlt } from "react-icons/fa";
-import PanelSearchBar from "../../common/PanelSearchBar";
+import type {
+  EstadoCotizacion,
+} from "../../../interfaces/Cotizacion";
 
-export default function CotizacionesFiltros() {
+type Props = {
+  busqueda: string;
+  onBusquedaChange: (valor: string) => void;
+
+  tipoObra: string;
+  onTipoObraChange: (valor: string) => void;
+
+  estado: string;
+  onEstadoChange: (valor: string) => void;
+
+  tiposObra: string[];
+};
+
+export default function CotizacionesFiltros({
+  busqueda,
+  onBusquedaChange,
+  tipoObra,
+  onTipoObraChange,
+  estado,
+  onEstadoChange,
+  tiposObra,
+}: Props) {
+
+  const estados: EstadoCotizacion[] = [
+    "Nueva",
+    "En revisión",
+    "Contactado",
+    "Aprobada",
+    "Rechazada",
+    "Finalizada",
+  ];
+
   return (
     <div className="cotizaciones-filtros">
-      <PanelSearchBar placeholder="Buscar por cliente, email o ID..." />
 
-      <select>
-        <option>Todos los tipos de obra</option>
-        <option>Quincho</option>
-        <option>Reforma</option>
-        <option>Construcción general</option>
+      {/* =========================================
+          BUSCADOR
+          ========================================= */}
+
+      <input
+        type="text"
+        className="cotizaciones-buscador"
+        placeholder="Buscar por cliente, email o ID..."
+        value={busqueda}
+        onChange={(event) =>
+          onBusquedaChange(event.target.value)
+        }
+      />
+
+
+      {/* =========================================
+          TIPO DE OBRA
+          ========================================= */}
+
+      <select
+        value={tipoObra}
+        onChange={(event) =>
+          onTipoObraChange(event.target.value)
+        }
+      >
+        <option value="">
+          Todos los tipos de obra
+        </option>
+
+        {tiposObra.map((tipo) => (
+          <option
+            key={tipo}
+            value={tipo}
+          >
+            {tipo}
+          </option>
+        ))}
       </select>
 
-      <select>
-        <option>Todos los estados</option>
-        <option>Nueva</option>
-        <option>En revisión</option>
-        <option>Contactado</option>
-        <option>Aprobada</option>
-        <option>Rechazada</option>
-        <option>Finalizada</option>
+
+      {/* =========================================
+          ESTADO
+          ========================================= */}
+
+      <select
+        value={estado}
+        onChange={(event) =>
+          onEstadoChange(event.target.value)
+        }
+      >
+        <option value="">
+          Todos los estados
+        </option>
+
+        {estados.map((estadoCotizacion) => (
+          <option
+            key={estadoCotizacion}
+            value={estadoCotizacion}
+          >
+            {estadoCotizacion}
+          </option>
+        ))}
       </select>
 
-      <div className="fecha-filtro">
-        <span>Desde</span>
-        <span>-</span>
-        <span>Hasta</span>
-        <FaCalendarAlt />
-      </div>
-
-      <button className="filtros-btn">
-        <FaFilter />
-        Filtros
-      </button>
     </div>
   );
 }

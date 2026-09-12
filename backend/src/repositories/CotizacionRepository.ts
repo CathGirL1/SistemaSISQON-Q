@@ -177,6 +177,10 @@ export class CotizacionRepository {
           c.id_Cotizacion AS idCotizacion,
           c.id_Proyecto AS idProyecto,
           c.id_Empresa AS idEmpresa,
+          c.fechaRealizada,
+          c.fechaCreacion,
+          c.fechaActualizacion,
+          c.version,
 
           CONCAT(
             'COT-',
