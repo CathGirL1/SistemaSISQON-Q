@@ -32,7 +32,6 @@ type ErroresFormulario = {
   nombre?: string;
   descripcion?: string;
   tiempoAproximado?: string;
-  formulaCalculo?: string;
   manoObra?: string;
   extras?: string;
   observaciones?: string;
@@ -128,9 +127,6 @@ export default function TipoObraModal({
     const tiempo =
       formulario.tiempoAproximado.trim();
 
-    const formulaCalculo =
-      formulario.formulaCalculo.trim();
-
     const manoObra =
       formulario.manoObra.trim();
 
@@ -159,11 +155,6 @@ export default function TipoObraModal({
     ) {
       nuevosErrores.tiempoAproximado =
         "Ingresá un valor como “10 días” o “10 a 20 días”.";
-    }
-
-    if (formulaCalculo.length > 1000) {
-      nuevosErrores.formulaCalculo =
-        "La fórmula no puede superar los 1000 caracteres.";
     }
 
     if (manoObra.length > 500) {
@@ -417,42 +408,6 @@ export default function TipoObraModal({
               Inactivo
             </option>
           </select>
-        </div>
-
-        <div className="full">
-          <label htmlFor="formulaTipoObra">
-            Fórmula de cálculo
-          </label>
-
-          <textarea
-            id="formulaTipoObra"
-            value={
-              formulario.formulaCalculo
-            }
-            maxLength={1000}
-            disabled={guardando}
-            placeholder="Describe cómo se calcula el costo de este tipo de obra."
-            onChange={(event) =>
-              actualizarCampo(
-                "formulaCalculo",
-                event.target.value
-              )
-            }
-          />
-
-          <div className="campo-contador">
-            {
-              formulario.formulaCalculo
-                .length
-            }
-            /1000
-          </div>
-
-          {errores.formulaCalculo && (
-            <small className="campo-error">
-              {errores.formulaCalculo}
-            </small>
-          )}
         </div>
 
         <div className="full">
