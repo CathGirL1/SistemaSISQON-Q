@@ -14,7 +14,7 @@ import type { MaterialEmpresa } from "../../../interfaces/MaterialEmpresa";
 
 import {
   crearMaterial,
-  obtenerMateriales,
+  obtenerMaterialesPorEmpresa,
 } from "../../../services/materialService";
 
 import type { MaterialFormulario } from "../../../services/materialService";
@@ -43,8 +43,20 @@ export default function MaterialesEmpresaContenido() {
       setCargando(true);
       setError("");
 
+        const usuario = JSON.parse(
+          localStorage.getItem("usuario") || "{}"
+        );
+
+    const idEmpresa = usuario.idEmpresa;
+
+    if (!idEmpresa) {
+      throw new Error(
+        "No se pudo identificar la empresa autenticada."
+      );
+    }
+
       const materialesObtenidos =
-        await obtenerMateriales();
+        await obtenerMaterialesPorEmpresa(idEmpresa);
 
       setMateriales(materialesObtenidos);
     } catch (errorDesconocido) {

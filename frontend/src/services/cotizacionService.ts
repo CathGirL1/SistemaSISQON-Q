@@ -51,16 +51,7 @@ interface CotizacionBackend {
 
   // MATERIALES
   resumenMateriales: string;
-    materiales: {
-    idMaterialProyecto: number;
-    idProyecto: number;
-    idMaterial: number;
-    cantidad: number;
-    nombre: string;
-    costoUnitario: number;
-    unidad: string;
-    subtotal: number;
-  }[];
+  materiales: string | null;
 
   // EMPRESA
   nombreEmpresa: string;
@@ -100,6 +91,22 @@ function convertirEstado(
   }
 }
 
+const formatearUSD = (valor: number): string => {
+  return new Intl.NumberFormat("es-UY", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(valor);
+};
+
+const formatearUYU = (valor: number): string => {
+  return `UYU ${new Intl.NumberFormat("es-UY", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(valor)}`;
+};
+
 export async function obtenerCotizacionesEmpresa(
   idEmpresa: number
 ): Promise<Cotizacion[]> {
@@ -118,6 +125,8 @@ export async function obtenerCotizacionesEmpresa(
   }
 
     const cotizaciones: CotizacionBackend[] = data;
+
+        
 
         return cotizaciones.map(
         (cotizacion) => ({
@@ -192,16 +201,22 @@ export async function obtenerCotizacionesEmpresa(
                 cotizacion.fechaCreacion
             ).toLocaleDateString("es-UY"),
 
-            total:
-            `$ ${Number(
+            total: (() => {
+              const totalUYU = Number(
                 cotizacion.totalCotizacion
-            ).toLocaleString(
-                "es-UY",
-                {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-                }
-            )}`,
+              );
+
+              const tipoCambio = Number(
+                cotizacion.tipoCambio
+              );
+
+              const totalUSD =
+                tipoCambio > 0
+                  ? totalUYU / tipoCambio
+                  : 0;
+
+              return `${formatearUSD(totalUSD)} (${formatearUYU(totalUYU)})`;
+            })(),
 
             costoMateriales:
             Number(
@@ -238,15 +253,29 @@ export async function obtenerCotizacionesEmpresa(
             // MATERIALES
             // ==========================================
 
-            resumenMateriales:
+          resumenMateriales:
             cotizacion.resumenMateriales,
-            materiales:
-            (cotizacion.materiales ?? []).map((material) => ({
-              ...material,
-              cantidad: Number(material.cantidad),
-              costoUnitario: Number(material.costoUnitario),
-              subtotal: Number(material.subtotal),
-            })),
+
+          materiales:
+            cotizacion.materiales
+              ? JSON.parse(cotizacion.materiales).map(
+                  (material: {
+                    idMaterialProyecto: number;
+                    idProyecto: number;
+                    idMaterial: number;
+                    cantidad: number;
+                    nombre: string;
+                    costoUnitario: number;
+                    unidad: string | null;
+                    subtotal: number;
+                  }) => ({
+                    ...material,
+                    cantidad: Number(material.cantidad),
+                    costoUnitario: Number(material.costoUnitario),
+                    subtotal: Number(material.subtotal),
+                  })
+                )
+              : [],
 
             // ==========================================
             // EMPRESA

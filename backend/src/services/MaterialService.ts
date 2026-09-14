@@ -55,6 +55,34 @@ export class MaterialService {
     }));
   }
 
+  public async obtenerMaterialesPorEmpresa(
+    idEmpresa: number
+  ): Promise<Material[]> {
+    if (!Number.isInteger(idEmpresa) || idEmpresa <= 0) {
+      throw new Error(
+        "El identificador de la empresa no es válido"
+      );
+    }
+
+    const materiales =
+      await this.repository.obtenerMaterialesPorEmpresa(
+        idEmpresa
+      );
+
+    const tipoCambio =
+      await this.monedaService
+        .obtenerDolarAPesoUruguayo();
+
+    return materiales.map((material) => ({
+      ...material,
+      moneda: "USD" as const,
+      tipoCambio,
+      costoUnitarioUYU:
+        Number(material.costoUnitario) *
+        tipoCambio,
+    }));
+  }
+
   public async obtenerMaterialPorId(
     idMaterial: number
   ): Promise<Material> {

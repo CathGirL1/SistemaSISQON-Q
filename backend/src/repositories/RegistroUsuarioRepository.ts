@@ -79,26 +79,36 @@ export class AuthRepository {
 
 
         if (rol === "empresa") {
-
             await pool.request()
                 .input("idUsuario", sql.Int, idUsuario)
                 .input("nombreEmpresa", sql.VarChar, nombreEmpresa)
+                .input("nombreComercial", sql.VarChar, nombreEmpresa)
                 .input("rut", sql.VarChar, rut)
+                .input("email", sql.VarChar, gmail)
+                .input("telefono", sql.VarChar, telefono)
+                .input("direccion", sql.VarChar, direccion)
                 .query(`
                     INSERT INTO Empresa
                     (
                         id_Usuario,
                         nombreEmpresa,
-                        rut
+                        nombreComercial,
+                        rut,
+                        email,
+                        telefono,
+                        direccion
                     )
                     VALUES
                     (
                         @idUsuario,
                         @nombreEmpresa,
-                        @rut
+                        @nombreComercial,
+                        @rut,
+                        @email,
+                        @telefono,
+                        @direccion
                     )
                 `);
-
         }
 
         return idUsuario;

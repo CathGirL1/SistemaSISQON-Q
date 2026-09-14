@@ -90,7 +90,7 @@ const transformarMaterial = (
     imagenUrl: material.imagenUrl ?? "",
 
     precioActual: formatearPrecio(
-      Number(material.costoUnitarioUYU)
+      Number(material.costoUnitario)
     ),
 
     precioDetalle: `por ${unidad.toLowerCase()}`,
@@ -129,6 +129,28 @@ const obtenerMensajeError = async (
   }
 
   return mensajePredeterminado;
+};
+
+export const obtenerMaterialesPorEmpresa = async (
+  idEmpresa: number
+): Promise<MaterialEmpresa[]> => {
+  const respuesta = await fetch(
+    `${API_URL}/empresa/${idEmpresa}`
+  );
+
+  if (!respuesta.ok) {
+    throw new Error(
+      await obtenerMensajeError(
+        respuesta,
+        "No se pudieron obtener los materiales de la empresa."
+      )
+    );
+  }
+
+  const materialesApi: MaterialApi[] =
+    await respuesta.json();
+
+  return materialesApi.map(transformarMaterial);
 };
 
 export const obtenerMateriales = async (): Promise<

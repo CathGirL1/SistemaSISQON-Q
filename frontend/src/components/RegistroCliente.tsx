@@ -226,11 +226,7 @@ export default function RegistroCliente(){
 
             console.log(datos);
 
-            if (respuesta.ok) {
-
-                navigate("/panel-cliente");
-
-            }
+            navigate("/login");
 
         } catch (error) {
 

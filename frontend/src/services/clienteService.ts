@@ -254,22 +254,60 @@ export const obtenerHistorialCotizacionesCliente = async (
   const historial: HistorialCotizacionApi[] =
     await respuesta.json();
 
-  return historial.map((cotizacion) => ({
-    id: `COT-${String(cotizacion.idCotizacion).padStart(
-      3,
-      "0"
-    )}`,
+  const respuestaTipoCambio = await fetch(
+    "https://open.er-api.com/v6/latest/USD"
+  );
 
-    fecha: new Date(
-      cotizacion.fechaRealizada
-    ).toLocaleDateString("es-UY"),
+  if (!respuestaTipoCambio.ok) {
+    throw new Error(
+      "No se pudo obtener el tipo de cambio."
+    );
+  }
 
-    total: Number(
+  const datosTipoCambio = await respuestaTipoCambio.json();
+
+  const tipoCambio = Number(
+    datosTipoCambio.rates?.UYU
+  );
+
+  if (!Number.isFinite(tipoCambio) || tipoCambio <= 0) {
+    throw new Error(
+      "El tipo de cambio USD/UYU no es válido."
+    );
+  }
+
+  return historial.map((cotizacion) => {
+    const totalUYU = Number(
       cotizacion.totalCotizacion
-    ).toLocaleString("es-UY", {
+    );
+
+    const totalUSD = totalUYU / tipoCambio;
+
+    const precioUSD = new Intl.NumberFormat("es-UY", {
       style: "currency",
-      currency: "UYU",
-      maximumFractionDigits: 0,
-    }),
-  }));
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(totalUSD);
+
+    const precioUYU = `UYU ${new Intl.NumberFormat(
+      "es-UY",
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }
+    ).format(totalUYU)}`;
+
+    return {
+      id: `COT-${String(
+        cotizacion.idCotizacion
+      ).padStart(3, "0")}`,
+
+      fecha: new Date(
+        cotizacion.fechaRealizada
+      ).toLocaleDateString("es-UY"),
+
+      total: `${precioUSD} (${precioUYU})`,
+    };
+  });
 };

@@ -10,6 +10,24 @@ type Props = {
   onEliminar: (material: MaterialEmpresa) => void;
 };
 
+const formatearPrecioUSD = (precio: number): string => {
+  return new Intl.NumberFormat("es-UY", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(precio);
+};
+
+const formatearPrecioUYU = (precio: number): string => {
+  return new Intl.NumberFormat("es-UY", {
+    style: "currency",
+    currency: "UYU",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(precio);
+};
+
 export default function FilaMaterial({
   material,
   onEditar,
@@ -46,7 +64,15 @@ export default function FilaMaterial({
       <td>{material.unidad}</td>
 
       <td>
-        <strong>{material.precioActual}</strong>
+        <strong>
+          {formatearPrecioUSD(material.costoUnitario)}
+        </strong>
+
+        <span className="precio-pesos">
+          {" "}
+          ({formatearPrecioUYU(material.costoUnitarioUYU)})
+        </span>
+
         <p>{material.precioDetalle}</p>
       </td>
 
