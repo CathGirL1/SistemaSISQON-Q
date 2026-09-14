@@ -118,9 +118,22 @@
 }
 
 .costo-cell {
-  color: #08255b !important;
-  font-weight: 800;
   white-space: nowrap;
+}
+
+.costo-cell strong {
+  display: block;
+  color: #0f3460;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.costo-cell .precio-pesos {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .actualizacion-cell {
@@ -341,6 +354,20 @@
   background: #42b48a;
   color: white;
 }
+
+.tabla-mano-obra-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabla-mano-obra {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+}
+
+
 
 @media (max-width: 768px) {
   .tabla-mano-obra-card {
