@@ -10,6 +10,34 @@ type Props = {
   onCerrar: () => void;
 };
 
+const formatearUSD = (valor: number): string => {
+  return new Intl.NumberFormat("es-UY", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(valor);
+};
+
+const formatearUYU = (valor: number): string => {
+  return `UYU ${new Intl.NumberFormat("es-UY", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(valor)}`;
+};
+
+const formatearMoneda = (
+  valorUYU: number,
+  tipoCambio: number
+): string => {
+  const valorUSD =
+    tipoCambio > 0
+      ? valorUYU / tipoCambio
+      : 0;
+
+  return `${formatearUSD(valorUSD)} (${formatearUYU(valorUYU)})`;
+};
+
 export default function DetalleCotizacionModal({
   abierto,
   cotizacion,
@@ -222,25 +250,17 @@ export default function DetalleCotizacionModal({
                         </td>
 
                         <td>
-                          ${" "}
-                          {material.costoUnitario.toLocaleString(
-                            "es-UY",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            }
+                          {formatearMoneda(
+                            material.costoUnitario,
+                            cotizacion.tipoCambio
                           )}
                         </td>
 
                         <td>
                           <strong>
-                            ${" "}
-                            {material.subtotal.toLocaleString(
-                              "es-UY",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
+                            {formatearMoneda(
+                              material.subtotal,
+                              cotizacion.tipoCambio
                             )}
                           </strong>
                         </td>
@@ -289,13 +309,9 @@ export default function DetalleCotizacionModal({
               </span>
 
               <strong>
-                ${" "}
-                {cotizacion.costoMateriales.toLocaleString(
-                  "es-UY",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
+                {formatearMoneda(
+                  cotizacion.costoMateriales,
+                  cotizacion.tipoCambio
                 )}
               </strong>
 
@@ -309,13 +325,9 @@ export default function DetalleCotizacionModal({
               </span>
 
               <strong>
-                ${" "}
-                {cotizacion.costoManoObra.toLocaleString(
-                  "es-UY",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
+                {formatearMoneda(
+                  cotizacion.costoManoObra,
+                  cotizacion.tipoCambio
                 )}
               </strong>
 
@@ -329,13 +341,9 @@ export default function DetalleCotizacionModal({
               </span>
 
               <strong>
-                ${" "}
-                {cotizacion.totalCotizacion.toLocaleString(
-                  "es-UY",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
+                {formatearMoneda(
+                  cotizacion.totalCotizacion,
+                  cotizacion.tipoCambio
                 )}
               </strong>
 
@@ -406,13 +414,9 @@ export default function DetalleCotizacionModal({
                 </strong>
 
                 <p>
-                  ${" "}
-                  {cotizacion.precioEstimado.toLocaleString(
-                    "es-UY",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
+                  {formatearMoneda(
+                    cotizacion.precioEstimado,
+                    cotizacion.tipoCambio
                   )}
                 </p>
 
