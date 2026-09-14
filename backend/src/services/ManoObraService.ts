@@ -1,4 +1,5 @@
 import { ManoObraRepository } from "../repositories/ManoObraRepository";
+import { MonedaService } from "./MonedaService";
 
 import type {
   ActualizarManoObraDTO,
@@ -8,15 +9,27 @@ import type {
 
 export class ManoObraService {
   private repository = new ManoObraRepository();
+  private monedaService = new MonedaService();
 
   public async obtenerManoObraPorEmpresa(
     idEmpresa: number
   ): Promise<ManoObra[]> {
     this.validarIdEmpresa(idEmpresa);
 
-    return this.repository.obtenerManoObraPorEmpresa(
-      idEmpresa
-    );
+    const manoObra =
+      await this.repository.obtenerManoObraPorEmpresa(
+        idEmpresa
+      );
+
+    const tipoCambio =
+      await this.monedaService.obtenerDolarAPesoUruguayo();
+
+    return manoObra.map((trabajo) => ({
+      ...trabajo,
+      tipoCambio,
+      costoUnitarioUSD:
+        Number(trabajo.costoUnitario) / tipoCambio,
+    }));
   }
 
   public async obtenerManoObraPorId(

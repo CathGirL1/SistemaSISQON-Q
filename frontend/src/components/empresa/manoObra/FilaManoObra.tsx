@@ -44,11 +44,21 @@ export default function FilaManoObra({
   onCambiarEstado,
   onEliminar,
 }: Props) {
-  const formatoMoneda = new Intl.NumberFormat("es-UY", {
-    style: "currency",
-    currency: "UYU",
-    maximumFractionDigits: 0,
-  });
+  const formatearUSD = (valor: number): string => {
+    return new Intl.NumberFormat("es-UY", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(valor);
+  };
+
+  const formatearUYU = (valor: number): string => {
+    return `UYU ${new Intl.NumberFormat("es-UY", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(valor)}`;
+  };
 
   return (
     <tr>
@@ -76,7 +86,13 @@ export default function FilaManoObra({
       </td>
 
       <td className="costo-cell">
-        {formatoMoneda.format(trabajo.costoUnitario)}
+        <strong>
+          {formatearUSD(trabajo.costoUnitarioUSD)}
+        </strong>
+
+        <span className="precio-pesos">
+          ({formatearUYU(trabajo.costoUnitario)})
+        </span>
       </td>
 
       <td>{trabajo.ultimaActualizacion}</td>
