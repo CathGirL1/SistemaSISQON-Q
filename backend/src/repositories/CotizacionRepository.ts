@@ -271,6 +271,22 @@ export class CotizacionRepository {
             'Sin materiales agregados'
           ) AS resumenMateriales,
 
+          (
+            SELECT
+              mp.idMaterialProyecto AS idMaterialProyecto,
+              mp.id_Proyecto AS idProyecto,
+              mp.id_Material AS idMaterial,
+              mp.cantidad,
+              m.nombre,
+              m.costoUnitario,
+              m.unidad,
+              mp.cantidad * m.costoUnitario AS subtotal
+            FROM MaterialProyecto mp
+            INNER JOIN Material m
+              ON m.id_Material = mp.id_Material
+            WHERE mp.id_Proyecto = p.id_Proyecto
+            FOR JSON PATH
+          ) AS materiales,
 
           e.nombreEmpresa AS nombreEmpresa
 
