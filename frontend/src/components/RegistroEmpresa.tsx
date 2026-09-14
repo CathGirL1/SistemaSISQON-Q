@@ -191,12 +191,8 @@ export default function RegistroEmpresa(){
             }
 
             console.log(datos);
-
-            if (respuesta.ok) {
-
-                navigate("/panel-empresa");
-
-            }
+            navigate("/login");
+           
 
         } catch (error) {
 

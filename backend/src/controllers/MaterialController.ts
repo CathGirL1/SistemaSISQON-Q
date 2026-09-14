@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { MaterialService } from "../services/materialService";
+import { MaterialService } from "../services/MaterialService";
 
 export class MaterialController {
   private service = new MaterialService();
@@ -20,6 +20,28 @@ export class MaterialController {
       res.status(500).json({
         mensaje: "Error al obtener los materiales",
       });
+    }
+  };
+
+  public obtenerMaterialesPorEmpresa = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idEmpresa = this.convertirIdEmpresa(
+        req.params.idEmpresa
+      );
+
+      const materiales =
+        await this.service.obtenerMaterialesPorEmpresa(
+          idEmpresa
+        );
+
+      res.status(200).json(materiales);
+    } catch (error) {
+      const mensaje = this.obtenerMensajeError(error);
+
+      res.status(400).json({ mensaje });
     }
   };
 
@@ -113,6 +135,24 @@ export class MaterialController {
     if (!Number.isInteger(id) || id <= 0) {
       throw new Error(
         "El identificador del material no es válido"
+      );
+    }
+
+    return id;
+  }
+
+  private convertirIdEmpresa(
+    valor: string | string[]
+  ): number {
+    const valorId = Array.isArray(valor)
+      ? valor[0]
+      : valor;
+
+    const id = Number(valorId);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error(
+        "El identificador de la empresa no es válido"
       );
     }
 

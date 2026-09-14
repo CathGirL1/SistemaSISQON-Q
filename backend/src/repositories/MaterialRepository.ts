@@ -68,6 +68,39 @@ export class MaterialRepository {
     return resultado.recordset[0] ?? null;
   }
 
+  public async obtenerMaterialesPorEmpresa(
+    idEmpresa: number
+  ): Promise<Material[]> {
+    const pool = await connectDB();
+
+    const resultado = await pool
+      .request()
+      .input("idEmpresa", sql.Int, idEmpresa)
+      .query<Material>(`
+        SELECT
+            m.id_Material,
+            m.id_Empresa AS idEmpresa,
+            e.nombreEmpresa AS nombreEmpresa,
+            m.nombre,
+            m.descripcion,
+            m.stock,
+            m.costoUnitario,
+            m.categoria,
+            m.unidad,
+            m.ultimaActualizacion,
+            m.disponibilidad,
+            m.estado,
+            m.imagenUrl
+        FROM Material m
+        INNER JOIN Empresa e
+            ON m.id_Empresa = e.id_Empresa
+        WHERE m.id_Empresa = @idEmpresa
+        ORDER BY m.id_Material DESC
+      `);
+
+    return resultado.recordset;
+  }
+
   public async crearMaterial( material: CrearMaterialDTO ): Promise<Material> {
     const pool = await connectDB();
 
