@@ -277,10 +277,35 @@ export default function GestionarCotizacionModal({
       : null;
 
   // =====================================================
+  // PREVISUALIZACIÓN EN PESOS URUGUAYOS
+  // =====================================================
+
+  const tipoCambio =
+    Number(cotizacion.tipoCambio) || 0;
+
+  const totalPreviewUYU =
+    totalPreview !== null &&
+    tipoCambio > 0
+      ? totalPreview * tipoCambio
+      : null;
+
+  // =====================================================
   // FORMATO MONEDA
   // =====================================================
 
-  const formatearMoneda = (
+  const formatearUSD = (
+    valor: number
+  ) => {
+    return `US$ ${valor.toLocaleString(
+      "es-UY",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )}`;
+  };
+
+  const formatearUYU = (
     valor: number
   ) => {
     return `$ ${valor.toLocaleString(
@@ -291,7 +316,6 @@ export default function GestionarCotizacionModal({
       }
     )}`;
   };
-
   // =====================================================
   // GUARDAR
   // =====================================================
@@ -398,7 +422,7 @@ export default function GestionarCotizacionModal({
               </span>
 
               <strong>
-                {formatearMoneda(
+                {formatearUSD(
                   precioEstimado
                 )}
               </strong>
@@ -445,7 +469,7 @@ export default function GestionarCotizacionModal({
                     >
                       {manoObra.nombre}
                       {" - "}
-                      {formatearMoneda(
+                      {formatearUSD(
                         manoObra.costoUnitario
                       )}
                       {manoObra.unidad
@@ -505,7 +529,7 @@ export default function GestionarCotizacionModal({
                         </strong>
 
                         <span>
-                          {formatearMoneda(
+                          {formatearUSD(
                             item.costoUnitario
                           )}
                           {item.unidad
@@ -547,7 +571,7 @@ export default function GestionarCotizacionModal({
                         </span>
 
                         <strong>
-                          {formatearMoneda(
+                          {formatearUSD(
                             subtotal
                           )}
                         </strong>
@@ -587,7 +611,7 @@ export default function GestionarCotizacionModal({
               </span>
 
               <strong>
-                {formatearMoneda(
+                {formatearUSD(
                   costoManoObraAdicional
                 )}
               </strong>
@@ -605,7 +629,7 @@ export default function GestionarCotizacionModal({
               <span>Subtotal</span>
 
               <strong>
-                {formatearMoneda(
+                {formatearUSD(
                   subtotalPreview
                 )}
               </strong>
@@ -621,24 +645,47 @@ export default function GestionarCotizacionModal({
 
               <strong>
                 {montoIVAPreview !== null
-                  ? formatearMoneda(
+                  ? formatearUSD(
                       montoIVAPreview
                     )
                   : "Se calculará al guardar"}
               </strong>
             </div>
-
             <div className="gestion-cotizacion-total">
               <span>Total</span>
 
               <strong>
-                {totalPreview !== null
-                  ? formatearMoneda(
-                      totalPreview
-                    )
-                  : "Se calculará al guardar"}
+                {totalPreview !== null ? (
+                  <div className="gestion-total-monedas">
+
+                    <span>
+                      {formatearUSD(
+                        totalPreview
+                      )}
+                    </span>
+
+                    {totalPreviewUYU !== null && (
+                      <small>
+                        {formatearUYU(
+                          totalPreviewUYU
+                        )}{" "}
+                        UYU
+                      </small>
+                    )}
+
+                  </div>
+                ) : (
+                  "Se calculará al guardar"
+                )}
               </strong>
             </div>
+
+            {tipoCambio > 0 && (
+              <div className="gestion-tipo-cambio">
+                Tipo de cambio actual: 1 USD ={" "}
+                {formatearUYU(tipoCambio)} UYU
+              </div>
+            )}
 
           </div>
 

@@ -92,9 +92,34 @@ export default function FilaCotizacion({
 
       {/* TOTAL */}
       <td>
-        <strong className="cotizacion-total">
-          {cotizacion.total}
-        </strong>
+        <div className="cotizacion-total-monedas">
+
+          <strong>
+            US${" "}
+            {cotizacion.totalCotizacion.toLocaleString(
+              "es-UY",
+              {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }
+            )}
+          </strong>
+
+          {cotizacion.totalCotizacionUYU > 0 && (
+            <span>
+              ${" "}
+              {cotizacion.totalCotizacionUYU.toLocaleString(
+                "es-UY",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}{" "}
+              UYU
+            </span>
+          )}
+
+        </div>
       </td>
 
       {/* ESTADO */}

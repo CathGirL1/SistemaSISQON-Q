@@ -441,7 +441,7 @@ export default function TablaCotizaciones({
 
               <th>Fecha ↕</th>
 
-              <th>Total estimado ↕</th>
+              <th>Total ↕</th>
 
               <th>Estado ↕</th>
 

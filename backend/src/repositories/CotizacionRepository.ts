@@ -205,6 +205,9 @@ export class CotizacionRepository {
 
             c.totalCotizacion,
 
+            c.tipoCambioUSD,
+            c.totalUYU,
+
             c.estado,
             c.precioEstimado,
             c.observaciones,
@@ -499,6 +502,9 @@ export class CotizacionRepository {
             c.costoManoObra,
             c.totalCotizacion,
 
+            c.tipoCambioUSD,
+            c.totalUYU,
+
             c.estado,
             c.precioEstimado,
             c.observaciones,
@@ -631,6 +637,9 @@ export class CotizacionRepository {
           c.costoManoObra,
           c.totalCotizacion,
 
+          c.tipoCambioUSD,
+          c.totalUYU,
+
           c.estado,
           c.precioEstimado,
           c.observaciones,
@@ -721,6 +730,9 @@ export class CotizacionRepository {
           c.montoIVA,
 
           c.totalCotizacion,
+
+          c.tipoCambioUSD,
+          c.totalUYU,
 
           c.estado,
           c.precioEstimado,
@@ -1015,7 +1027,9 @@ export class CotizacionRepository {
   }
 
   public async finalizarCotizacion(
-    idCotizacion: number
+    idCotizacion: number,
+    tipoCambioUSD: number,
+    totalUYU: number
   ): Promise<boolean> {
 
     const pool = await connectDB();
@@ -1029,10 +1043,24 @@ export class CotizacionRepository {
         idCotizacion
       )
 
+      .input(
+        "tipoCambioUSD",
+        sql.Decimal(18, 6),
+        tipoCambioUSD
+      )
+
+      .input(
+        "totalUYU",
+        sql.Decimal(18, 2),
+        totalUYU
+      )
+
       .query(`
         UPDATE Cotizacion
 
         SET
+          tipoCambioUSD = @tipoCambioUSD,
+          totalUYU = @totalUYU,
           estado = 'Finalizada',
           fechaActualizacion = GETDATE()
 

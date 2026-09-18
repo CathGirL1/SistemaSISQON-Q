@@ -17,6 +17,26 @@ export default function DetalleCotizacionModal({
 }: Props) {
   if (!cotizacion) return null;
 
+  const formatearUSD = (valor: number) => {
+  return `US$ ${Number(valor).toLocaleString(
+    "es-UY",
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+    )}`;
+  };
+
+  const formatearUYU = (valor: number) => {
+    return `$ ${Number(valor).toLocaleString(
+      "es-UY",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )}`;
+  };
+
   return (
     <ModalBase
       abierto={abierto}
@@ -220,27 +240,16 @@ export default function DetalleCotizacionModal({
                           {material.cantidad}{" "}
                           {material.unidad}
                         </td>
-
                         <td>
-                          ${" "}
-                          {material.costoUnitario.toLocaleString(
-                            "es-UY",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            }
+                          {formatearUSD(
+                            material.costoUnitario
                           )}
                         </td>
 
                         <td>
                           <strong>
-                            ${" "}
-                            {material.subtotal.toLocaleString(
-                              "es-UY",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
+                            {formatearUSD(
+                              material.subtotal
                             )}
                           </strong>
                         </td>
@@ -283,44 +292,73 @@ export default function DetalleCotizacionModal({
           <div className="costos-cotizacion">
 
             <div className="costo-item">
-
               <span>
                 Materiales
               </span>
 
               <strong>
-                ${" "}
-                {cotizacion.costoMateriales.toLocaleString(
-                  "es-UY",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
+                {formatearUSD(
+                  cotizacion.costoMateriales
                 )}
               </strong>
-
             </div>
 
-
             <div className="costo-item">
-
               <span>
                 Mano de obra
               </span>
 
               <strong>
-                ${" "}
-                {cotizacion.costoManoObra.toLocaleString(
-                  "es-UY",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
+                {formatearUSD(
+                  cotizacion.costoManoObra
                 )}
               </strong>
-
             </div>
 
+            {cotizacion.costoManoObraAdicional > 0 && (
+              <div className="costo-item">
+                <span>
+                  Mano de obra adicional
+                </span>
+
+                <strong>
+                  {formatearUSD(
+                    cotizacion.costoManoObraAdicional
+                  )}
+                </strong>
+              </div>
+            )}
+
+            {cotizacion.subtotal !== null && (
+              <div className="costo-item">
+                <span>
+                  Subtotal
+                </span>
+
+                <strong>
+                  {formatearUSD(
+                    cotizacion.subtotal
+                  )}
+                </strong>
+              </div>
+            )}
+
+            {cotizacion.montoIVA !== null && (
+              <div className="costo-item">
+                <span>
+                  IVA
+                  {cotizacion.porcentajeIVAAplicado !== null
+                    ? ` (${cotizacion.porcentajeIVAAplicado}%)`
+                    : ""}
+                </span>
+
+                <strong>
+                  {formatearUSD(
+                    cotizacion.montoIVA
+                  )}
+                </strong>
+              </div>
+            )}
 
             <div className="costo-item costo-total">
 
@@ -328,18 +366,43 @@ export default function DetalleCotizacionModal({
                 Total
               </span>
 
-              <strong>
-                ${" "}
-                {cotizacion.totalCotizacion.toLocaleString(
-                  "es-UY",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
+              <strong className="detalle-total-monedas">
+
+                <span>
+                  {formatearUSD(
+                    cotizacion.totalCotizacion
+                  )}
+                </span>
+
+                {cotizacion.totalCotizacionUYU > 0 && (
+                  <small>
+                    {formatearUYU(
+                      cotizacion.totalCotizacionUYU
+                    )}{" "}
+                    UYU
+                  </small>
                 )}
+
               </strong>
 
             </div>
+
+            {cotizacion.tipoCambio > 0 && (
+              <div className="detalle-tipo-cambio">
+
+                {cotizacion.conversionHistorica
+                  ? "Tipo de cambio al finalizar"
+                  : "Tipo de cambio actual"}
+
+                : 1 USD ={" "}
+
+                {formatearUYU(
+                  cotizacion.tipoCambio
+                )}{" "}
+                UYU
+
+              </div>
+            )}
 
           </div>
 
@@ -397,27 +460,21 @@ export default function DetalleCotizacionModal({
             </div>
 
 
-            {cotizacion.precioEstimado !==
-              null && (
-              <div className="detalle-item">
+              {cotizacion.precioEstimado !== null && (
+                <div className="detalle-item">
 
-                <strong>
-                  Precio estimado
-                </strong>
+                  <strong>
+                    Precio estimado
+                  </strong>
 
-                <p>
-                  ${" "}
-                  {cotizacion.precioEstimado.toLocaleString(
-                    "es-UY",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  )}
-                </p>
+                  <p>
+                    {formatearUSD(
+                      cotizacion.precioEstimado
+                    )}
+                  </p>
 
-              </div>
-            )}
+                </div>
+              )}
 
           </div>
 

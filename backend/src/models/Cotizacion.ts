@@ -54,6 +54,13 @@ export class Cotizacion {
     private _totalCotizacion: number,
 
     // ==================================================
+    // CONVERSIÓN HISTÓRICA A USD
+    // ==================================================
+
+    private _tipoCambioUSD: number | null,
+    private _totalUYU: number | null,
+
+    // ==================================================
     // FECHAS Y ESTADO
     // ==================================================
 
@@ -277,6 +284,26 @@ export class Cotizacion {
 
   }
 
+  public get tipoCambioUSD(): number | null {
+      return this._tipoCambioUSD;
+  }
+
+  public set tipoCambioUSD(
+      value: number | null
+  ) {
+      this._tipoCambioUSD = value;
+  }
+
+
+  public get totalUYU(): number | null {
+      return this._totalUYU;
+  }
+
+  public set totalUYU(
+      value: number | null
+  ) {
+      this._totalUYU = value;
+  }
 
 
   public get fechaCreacion(): Date | null {

@@ -101,7 +101,29 @@ version: number;
   // MONEDA
   // ==========================================
 
+  // Moneda base de la cotización
   moneda: string;
+
+  // Tipo de cambio utilizado para mostrar la conversión.
+  // Si está Finalizada, corresponde al histórico.
+  // Si no está Finalizada, corresponde al actual.
   tipoCambio: number;
+
+  // Tipo de cambio histórico guardado al finalizar.
+  // NULL mientras la cotización no esté finalizada.
+  tipoCambioUSD: number | null;
+
+  // Precio estimado convertido a pesos uruguayos.
   precioEstimadoUYU: number | null;
+
+  // Total convertido a pesos.
+  // Si está Finalizada, este valor es el snapshot histórico.
+  totalUYU: number | null;
+
+  // Total UYU que entrega el backend para mostrar.
+  // Histórico si está Finalizada, actual si todavía no lo está.
+  totalCotizacionUYU: number;
+
+  // Indica si la conversión quedó congelada al finalizar.
+  conversionHistorica: boolean;
 }

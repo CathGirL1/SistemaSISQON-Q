@@ -657,7 +657,7 @@ export class CotizacionService {
     // OBTENER POR PROYECTO
     // =========================================================
 
-    public async obtenerCotizacionesPorProyecto(
+        public async obtenerCotizacionesPorProyecto(
         idProyecto: number
     ) {
 
@@ -684,28 +684,9 @@ export class CotizacionService {
                     idProyecto
                 );
 
-        const tipoCambio =
-            await this.monedaService
-                .obtenerDolarAPesoUruguayo();
-
-        return cotizaciones.map((cotizacion) => {
-
-            const precioEstimadoUYU =
-                cotizacion.precioEstimado !== null
-                    ? Number(cotizacion.precioEstimado) *
-                      tipoCambio
-                    : null;
-
-            return {
-                ...cotizacion,
-
-                moneda: "USD",
-
-                tipoCambio,
-
-                precioEstimadoUYU,
-            };
-        });
+        return this.agregarConversionMonetaria(
+            cotizaciones
+        );
     }
 
 
@@ -851,31 +832,9 @@ export class CotizacionService {
                     idEmpresa
                 );
 
-        const tipoCambio =
-            await this.monedaService
-                .obtenerDolarAPesoUruguayo();
-
-        return cotizaciones.map((cotizacion) => {
-
-            const precioEstimadoUYU =
-                cotizacion.precioEstimado !== null
-                    ? Number(cotizacion.precioEstimado) *
-                    tipoCambio
-                    : null;
-
-            return {
-
-                ...cotizacion,
-
-                moneda: "USD",
-
-                tipoCambio,
-
-                precioEstimadoUYU,
-
-            };
-
-        });
+        return this.agregarConversionMonetaria(
+            cotizaciones
+        );
     }
 
 
@@ -891,38 +850,102 @@ export class CotizacionService {
             return [];
         }
 
-        const tipoCambio =
+        // Se obtiene el cambio actual una sola vez.
+        // Solo será utilizado por cotizaciones no finalizadas.
+        const tipoCambioActual =
             await this.monedaService
                 .obtenerDolarAPesoUruguayo();
 
-        return cotizaciones.map(
-            cotizacion => ({
+        return cotizaciones.map((cotizacion) => {
 
+            const esFinalizada =
+                cotizacion.estado === "Finalizada";
+
+            // =================================================
+            // COTIZACIÓN FINALIZADA
+            // =================================================
+            //
+            // Utiliza exclusivamente el snapshot histórico
+            // guardado al momento de finalizar.
+            // =================================================
+
+            if (
+                esFinalizada &&
+                cotizacion.tipoCambioUSD !== null &&
+                cotizacion.tipoCambioUSD !== undefined &&
+                cotizacion.totalUYU !== null &&
+                cotizacion.totalUYU !== undefined
+            ) {
+
+                const tipoCambioHistorico =
+                    Number(cotizacion.tipoCambioUSD);
+
+                return {
+                    ...cotizacion,
+
+                    moneda: "USD",
+
+                    tipoCambio:
+                        tipoCambioHistorico,
+
+                    costoMaterialesUYU:
+                        Number(cotizacion.costoMateriales) *
+                        tipoCambioHistorico,
+
+                    costoManoObraUYU:
+                        Number(cotizacion.costoManoObra) *
+                        tipoCambioHistorico,
+
+                    precioEstimadoUYU:
+                        cotizacion.precioEstimado !== null
+                            ? Number(cotizacion.precioEstimado) *
+                            tipoCambioHistorico
+                            : null,
+
+                    totalCotizacionUYU:
+                        Number(cotizacion.totalUYU),
+
+                    conversionHistorica: true
+                };
+            }
+
+            // =================================================
+            // COTIZACIÓN NO FINALIZADA
+            // =================================================
+            //
+            // Se utiliza el tipo de cambio actual.
+            // Esta conversión todavía puede variar.
+            // =================================================
+
+            return {
                 ...cotizacion,
 
                 moneda: "USD",
 
-                tipoCambio,
+                tipoCambio:
+                    tipoCambioActual,
 
                 costoMaterialesUYU:
                     Number(cotizacion.costoMateriales) *
-                    tipoCambio,
+                    tipoCambioActual,
 
                 costoManoObraUYU:
                     Number(cotizacion.costoManoObra) *
-                    tipoCambio,
+                    tipoCambioActual,
 
                 totalCotizacionUYU:
                     Number(cotizacion.totalCotizacion) *
-                    tipoCambio,
+                    tipoCambioActual,
 
                 precioEstimadoUYU:
                     cotizacion.precioEstimado !== null
                         ? Number(cotizacion.precioEstimado) *
-                          tipoCambio
-                        : null
-            })
-        );
+                        tipoCambioActual
+                        : null,
+
+                conversionHistorica: false
+            };
+        });
     }
 
 
@@ -1018,13 +1041,17 @@ export class CotizacionService {
     }
 
     public async finalizarCotizacion(
-    idCotizacion: number
+        idCotizacion: number
     ): Promise<void> {
 
         this.validarId(
             idCotizacion,
             "El id de la cotización no es válido"
         );
+
+        // =====================================================
+        // 1. OBTENER COTIZACIÓN
+        // =====================================================
 
         const cotizacion =
             await this.repository
@@ -1038,11 +1065,19 @@ export class CotizacionService {
             );
         }
 
+        // =====================================================
+        // 2. VERIFICAR QUE NO ESTÉ FINALIZADA
+        // =====================================================
+
         if (cotizacion.estado === "Finalizada") {
             throw new Error(
                 "La cotización ya se encuentra finalizada."
             );
         }
+
+        // =====================================================
+        // 3. VALIDAR EMPRESA
+        // =====================================================
 
         const idEmpresa =
             Number(cotizacion.idEmpresa);
@@ -1056,6 +1091,10 @@ export class CotizacionService {
             );
         }
 
+        // =====================================================
+        // 4. VALIDAR PRECIO ORIGINAL
+        // =====================================================
+
         if (
             cotizacion.precioEstimado === null ||
             cotizacion.precioEstimado === undefined
@@ -1064,6 +1103,10 @@ export class CotizacionService {
                 "La cotización no tiene un precio estimado generado por SISCON-Q."
             );
         }
+
+        // =====================================================
+        // 5. VALIDAR CÁLCULO FINAL
+        // =====================================================
 
         if (
             cotizacion.subtotal === null ||
@@ -1080,10 +1123,58 @@ export class CotizacionService {
             );
         }
 
+        const totalCotizacion =
+            Number(cotizacion.totalCotizacion);
+
+        if (
+            !Number.isFinite(totalCotizacion) ||
+            totalCotizacion < 0
+        ) {
+            throw new Error(
+                "El total de la cotización no es válido."
+            );
+        }
+
+        // =====================================================
+        // 6. OBTENER TIPO DE CAMBIO ACTUAL
+        // =====================================================
+
+        const tipoCambioUSD =
+            await this.monedaService
+                .obtenerDolarAPesoUruguayo();
+
+        if (
+            !Number.isFinite(tipoCambioUSD) ||
+            tipoCambioUSD <= 0
+        ) {
+            throw new Error(
+                "No se pudo obtener un tipo de cambio USD/UYU válido."
+            );
+        }
+
+        // =====================================================
+        // 7. CALCULAR TOTAL HISTÓRICO EN USD
+        //
+        // 1 USD = tipoCambioUSD UYU
+        // =====================================================
+
+        const totalUYU =
+            Number(
+                (
+                    totalCotizacion *
+                    tipoCambioUSD
+                ).toFixed(2)
+            );
+        // =====================================================
+        // 8. FINALIZAR Y GUARDAR CONVERSIÓN HISTÓRICA
+        // =====================================================
+
         const finalizada =
             await this.repository
                 .finalizarCotizacion(
-                    idCotizacion
+                    idCotizacion,
+                    tipoCambioUSD,
+                    totalUYU
                 );
 
         if (!finalizada) {

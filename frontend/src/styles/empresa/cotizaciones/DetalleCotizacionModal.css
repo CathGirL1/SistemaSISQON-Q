@@ -393,3 +393,28 @@
   }
 
 }
+
+.detalle-total-monedas {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.detalle-total-monedas > span {
+  font-weight: 700;
+}
+
+.detalle-total-monedas > small {
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.detalle-tipo-cambio {
+  margin-top: 10px;
+  padding-top: 10px;
+  font-size: 0.8rem;
+  opacity: 0.75;
+  text-align: right;
+}

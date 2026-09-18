@@ -73,8 +73,19 @@ interface CotizacionBackend {
 
   // MONEDA
   moneda: string;
+
   tipoCambio: number;
+
   precioEstimadoUYU: number | null;
+
+  // Snapshot histórico
+  tipoCambioUSD: number | null;
+  totalUYU: number | null;
+
+  // Conversión preparada por backend
+  totalCotizacionUYU: number;
+
+  conversionHistorica: boolean;
 }
 
 export interface ManoObraCotizacionDetalle {
@@ -300,7 +311,7 @@ export async function obtenerCotizacionesEmpresa(
 
             nombreEmpresa:
             cotizacion.nombreEmpresa,
-
+            
             // ==========================================
             // MONEDA
             // ==========================================
@@ -312,9 +323,28 @@ export async function obtenerCotizacionesEmpresa(
             Number(cotizacion.tipoCambio),
 
             precioEstimadoUYU:
-            cotizacion.precioEstimadoUYU !== null
+            cotizacion.precioEstimadoUYU !== null &&
+            cotizacion.precioEstimadoUYU !== undefined
                 ? Number(cotizacion.precioEstimadoUYU)
                 : null,
+
+            tipoCambioUSD:
+            cotizacion.tipoCambioUSD !== null &&
+            cotizacion.tipoCambioUSD !== undefined
+                ? Number(cotizacion.tipoCambioUSD)
+                : null,
+
+            totalUYU:
+            cotizacion.totalUYU !== null &&
+            cotizacion.totalUYU !== undefined
+                ? Number(cotizacion.totalUYU)
+                : null,
+
+            totalCotizacionUYU:
+            Number(cotizacion.totalCotizacionUYU),
+
+            conversionHistorica:
+            Boolean(cotizacion.conversionHistorica),
         })
         );
     }
