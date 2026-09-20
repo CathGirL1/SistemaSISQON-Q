@@ -1,4 +1,10 @@
-import type { CotizacionReciente } from "../../../interfaces/Dashboard";
+import type {
+  CotizacionReciente,
+} from "../../../interfaces/Dashboard";
+
+import EstadoBadge, {
+  type EstadoCotizacion,
+} from "../../common/EstadoBadge";
 
 interface Props {
   cotizaciones: CotizacionReciente[];
@@ -24,29 +30,38 @@ export default function EmpresaCotizacionesRecientes({
           <span>Estado</span>
         </div>
 
-        {cotizaciones.map((cotizacion) => (
-          <div
-            className="table-row"
-            key={cotizacion.id_Cotizacion}
-          >
-            <span>{cotizacion.cliente}</span>
-
-            <span>{cotizacion.proyecto}</span>
-
-            <span>
-              {new Intl.NumberFormat("es-UY", {
-                style: "currency",
-                currency: "UYU",
-              }).format(cotizacion.totalCotizacion)}
-            </span>
-
-            <span
-              className={`estado ${cotizacion.estado.toLowerCase()}`}
+        {cotizaciones.length === 0 ? (
+          <p className="dashboard-empty">
+            No hay cotizaciones registradas.
+          </p>
+        ) : (
+          cotizaciones.map((cotizacion) => (
+            <div
+              className="table-row"
+              key={cotizacion.id_Cotizacion}
             >
-              {cotizacion.estado}
-            </span>
-          </div>
-        ))}
+              <span>{cotizacion.cliente}</span>
+
+              <span>{cotizacion.proyecto}</span>
+
+              <span>
+                US${" "}
+                {Number(
+                  cotizacion.totalCotizacion
+                ).toLocaleString("es-UY", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+
+              <EstadoBadge
+                estado={
+                  cotizacion.estado as EstadoCotizacion
+                }
+              />
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

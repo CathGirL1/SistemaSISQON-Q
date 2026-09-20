@@ -1,3 +1,7 @@
+import type {
+  EstadoCotizacion,
+} from "../components/common/EstadoBadge";
+
 export interface EmpresaDashboard {
   nombreEmpresa: string;
   rubro: string;
@@ -19,7 +23,7 @@ export interface CotizacionReciente {
   cliente: string;
   proyecto: string;
   totalCotizacion: number;
-  estado: string;
+  estado: EstadoCotizacion;
   fechaRealizada: string;
 }
 
