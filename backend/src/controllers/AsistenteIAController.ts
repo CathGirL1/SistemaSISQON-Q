@@ -12,18 +12,22 @@ export class AsistenteIAController {
 
         try {
 
-            const {
+          const {
+            pregunta,
+            idProyecto,
+            idConversacion
+        } = req.body;
+
+        const respuesta =
+            await this.asistente.preguntar(
                 pregunta,
                 idProyecto
-            } = req.body;
-
-            const respuesta =
-                await this.asistente.preguntar(
-                    pregunta,
-                    idProyecto
-                        ? Number(idProyecto)
-                        : undefined
-                );
+                    ? Number(idProyecto)
+                    : undefined,
+                idConversacion
+                    ? Number(idConversacion)
+                    : undefined
+            );
 
             res.status(200).json({
                 respuesta

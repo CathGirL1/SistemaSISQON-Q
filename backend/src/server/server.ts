@@ -22,6 +22,7 @@ import cotizacionRoutes from "../routes/CotizacionRoutes";
 import materialProyectoRoutes from "../routes/MaterialProyectoRoutes";
 import monedaRoutes from "../routes/monedaRoutes";
 import asistenteIARoutes from "../routes/AsistenteIARoutes";
+import conversacion from "../routes/ConversacionIARoutes"
 
 
 import { connectDB } from "./database";
@@ -59,6 +60,7 @@ servidor.use("/api/cotizaciones", cotizacionRoutes);
 servidor.use("/api/materiales-proyecto",materialProyectoRoutes);
 servidor.use("/api/moneda", monedaRoutes);
 servidor.use("/api/asistente-ia", asistenteIARoutes);
+servidor.use("/api/conversacion-ia", conversacion);
 
 
 const puerto = Number(process.env.PORT) || 3000;

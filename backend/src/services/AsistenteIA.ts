@@ -1,6 +1,8 @@
 import { ProyectoService } from "./ProyectoService";
 import { MaterialService } from "./MaterialService";
-
+import { CotizacionService } from "./CotizacionService";
+import { ConversacionIAService } from "./ConversacionIAService";
+import { MensajeIAService } from "./MensajeIAService";
 import { Ollama } from "ollama";
 
 
@@ -9,6 +11,9 @@ export class AsistenteIA {
     private static instancia: AsistenteIA;
     private proyectoService = new ProyectoService();
     private materialService = new MaterialService();
+    private cotizacionService = new CotizacionService();
+    private conversacionService = new ConversacionIAService();
+    private mensajeService = new MensajeIAService();
 
     private ollama: Ollama;
 
@@ -25,12 +30,72 @@ export class AsistenteIA {
         return AsistenteIA.instancia;
     }
 
-    public async preguntar(pregunta: string, idProyecto?: number): Promise<string> {
+    private async obtenerHistorialConversacion(
+        idConversacion?: number
+    ): Promise<string> {
+
+        if (!idConversacion) {
+            return "";
+        }
+
+        const mensajes =
+            await this.mensajeService
+                .obtenerMensajesPorConversacion(
+                    idConversacion
+                );
+
+        if (mensajes.length === 0) {
+            return "";
+        }
+
+        return mensajes
+            .map(
+                (mensaje) =>
+                    `${mensaje.tipo === "usuario" ? "Usuario" : "Asistente"}: ${mensaje.contenido}`
+            )
+            .join("\n");
+    }
+
+    private async guardarRespuestaConversacion(
+        idConversacion: number | undefined,
+        respuesta: string
+    ): Promise<string> {
+
+        if (idConversacion) {
+            await this.mensajeService.crearMensaje({
+                idConversacion,
+                tipo: "asistente",
+                contenido: respuesta
+            });
+
+            await this.conversacionService
+                .actualizarFechaUltimoMensaje(
+                    idConversacion
+                );
+        }
+
+        return respuesta;
+    }
+
+    public async preguntar(pregunta: string, idProyecto?: number, idConversacion?: number): Promise<string> {
 
         const preguntaNormalizada =
             pregunta
                 .toLowerCase()
                 .trim();
+
+         const historialConversacion =
+            await this.obtenerHistorialConversacion(
+                idConversacion
+            );
+
+        if (idConversacion) {
+            await this.mensajeService.crearMensaje({
+                idConversacion,
+                tipo: "usuario",
+                contenido: pregunta
+            });
+        }
 
         let contextoProyecto = "";
 
@@ -97,13 +162,110 @@ export class AsistenteIA {
                 }
             }
 
+        let contextoCotizacion = "";
+
+        if (idProyecto) {
+
+            const cotizaciones =
+                await this.cotizacionService
+                    .obtenerCotizacionesPorProyecto(idProyecto);
+
+            if (cotizaciones.length > 0) {
+
+                const cotizacionMasReciente =
+                    cotizaciones[0];
+
+                if (cotizacionMasReciente.idCotizacion) {
+
+                    const detalleCotizacion =
+                        await this.cotizacionService
+                            .obtenerCotizacionPorId(
+                                Number(
+                                    cotizacionMasReciente.idCotizacion
+                                )
+                            );
+
+                    contextoCotizacion = `
+                        COTIZACIÓN ESTIMADA DEL PROYECTO
+
+                        Código: ${detalleCotizacion.codigo}
+                        Estado: ${detalleCotizacion.estado}
+                        Versión: ${detalleCotizacion.version}
+                        Proyecto:
+                        ${detalleCotizacion.nombreProyecto}
+
+                        Tipo de obra:
+                        ${detalleCotizacion.tipoObra}
+
+                        Superficie:
+                        ${detalleCotizacion.superficie} m²
+
+                        Costo de materiales:
+                        USD ${Number(
+                            detalleCotizacion.costoMateriales
+                        ).toFixed(2)}
+
+                        Costo de mano de obra:
+                        USD ${Number(
+                            detalleCotizacion.costoManoObra
+                        ).toFixed(2)}
+
+                        Costo de construcción:
+                        ${
+                            detalleCotizacion.monedaCalculo === "UYU"
+                                ? `UYU ${Number(
+                                    detalleCotizacion.costoConstruccion
+                                ).toFixed(2)}`
+                                : `USD ${Number(
+                                    detalleCotizacion.costoConstruccion
+                                ).toFixed(2)}`
+                        }
+
+                        Total estimado:
+                        USD ${Number(
+                            detalleCotizacion.totalCotizacion
+                        ).toFixed(2)}
+
+                        Total estimado en pesos uruguayos:
+                        UYU ${Number(
+                            detalleCotizacion.totalCotizacionUYU
+                        ).toFixed(2)}
+
+                        Tipo de cambio utilizado:
+                        ${Number(
+                            detalleCotizacion.tipoCambio
+                        ).toFixed(2)}
+
+                        Moneda utilizada para el cálculo:
+                        ${detalleCotizacion.monedaCalculo ?? "USD"}
+
+                        Materiales del proyecto:
+                        ${
+                            detalleCotizacion.materiales
+                                ?.map(
+                                    (material: any) =>
+                                        `- ${material.nombre}: ${material.cantidad} ${material.unidad ?? ""} — USD ${Number(material.costoUnitario).toFixed(2)}`
+                                )
+                                .join("\n")
+                            ?? "Sin materiales registrados"
+                        }
+                    `;
+                }
+            }
+        }
+
         if (
             preguntaNormalizada.includes("qué es siscon-q") ||
             preguntaNormalizada.includes("que es siscon-q") ||
             preguntaNormalizada.includes("qué es sisqon-q") ||
             preguntaNormalizada.includes("que es sisqon-q")
         ) {
-            return this.responderQueEsSISCONQ();
+            const respuesta = this.responderQueEsSISCONQ();
+
+            return await this.guardarRespuestaConversacion(
+                idConversacion,
+                respuesta
+            );
         }
 
         if (
@@ -112,7 +274,12 @@ export class AsistenteIA {
             preguntaNormalizada.includes("cómo funciona sisqon-q") ||
             preguntaNormalizada.includes("como funciona sisqon-q")
         ) {
-            return this.responderComoFuncionaSISCONQ();
+            const respuesta = this.responderComoFuncionaSISCONQ();
+
+            return await this.guardarRespuestaConversacion(
+                idConversacion,
+                respuesta
+            );
         }
 
         if (
@@ -120,7 +287,12 @@ export class AsistenteIA {
             preguntaNormalizada.includes("qué obras maneja") ||
             preguntaNormalizada.includes("que obras maneja")
         ) {
-            return this.responderTiposDeObra();
+            const respuesta = this.responderTiposDeObra();
+
+            return await this.guardarRespuestaConversacion(
+                idConversacion,
+                respuesta
+            );
         }
 
         if (
@@ -129,10 +301,48 @@ export class AsistenteIA {
             preguntaNormalizada.includes("qué puedo hacer en siscon-q") ||
             preguntaNormalizada.includes("que puedo hacer en siscon-q")
         ) {
-            return this.responderQuePuedoHacer();
+            const respuesta = this.responderQuePuedoHacer();
+
+            return await this.guardarRespuestaConversacion(
+                idConversacion,
+                respuesta
+            );
         }
 
-        return await this.responderConIA(pregunta, contextoProyecto,  contextoMateriales);
+        if (
+            preguntaNormalizada.includes("qué es un jornal") ||
+            preguntaNormalizada.includes("que es un jornal")
+        ) {
+            const respuesta = this.responderQueEsUnJornal();
+
+            return await this.guardarRespuestaConversacion(
+                idConversacion,
+                respuesta
+            );
+        }
+
+        const respuesta = await this.responderConIA(
+            pregunta,
+            contextoProyecto,
+            contextoMateriales,
+            contextoCotizacion,
+            historialConversacion
+        );
+
+        if (idConversacion) {
+            await this.mensajeService.crearMensaje({
+                idConversacion,
+                tipo: "asistente",
+                contenido: respuesta
+            });
+
+            await this.conversacionService
+                .actualizarFechaUltimoMensaje(
+                    idConversacion
+                );
+        }
+
+        return respuesta;
     }
 
     private responderQueEsSISCONQ(): string {
@@ -192,10 +402,27 @@ export class AsistenteIA {
                     `.trim();
     }
 
+    private responderQueEsUnJornal(): string {
+        return `
+            Un jornal es una unidad utilizada para representar una jornada de trabajo.
+
+            En el contexto de una obra, un jornal permite expresar aproximadamente
+            cuánto trabajo puede realizar una persona durante una jornada laboral.
+
+            Por ejemplo, si una tarea requiere varios jornales, significa que se
+            necesitan varias jornadas de trabajo para realizarla.
+
+            La cantidad de jornales puede depender del tipo de trabajo, la superficie
+            y las tareas que se deban realizar.
+        `.trim();
+    }
+
     private async responderConIA(
         pregunta: string,
         contextoProyecto: string,
-        contextoMateriales: string
+        contextoMateriales: string,
+        contextoCotizacion: string,
+        historialConversacion: string
     ): Promise<string> {
 
         const contexto = `
@@ -206,7 +433,12 @@ export class AsistenteIA {
 
         ${contextoProyecto}
         ${contextoMateriales}
+        ${contextoCotizacion}
+        ${contextoCotizacion}
 
+        HISTORIAL DE LA CONVERSACIÓN
+        ${historialConversacion || "No existen mensajes anteriores."}
+        
         El asistente puede responder preguntas técnicas generales
         relacionadas con construcción y quinchos.
 
@@ -270,6 +502,55 @@ export class AsistenteIA {
         una opción concreta, indicá esa limitación.
 
         - No modifiques ni calcules la cotización del proyecto.
+        - Cuando el usuario consulte sobre los costos,
+        la cotización o el precio estimado de su proyecto,
+        utilizá únicamente los datos de la cotización
+        proporcionados en el contexto.
+
+        - Explicá los costos de forma clara, detallada
+        y fácil de entender para un cliente.
+
+        - Podés explicar el significado de los diferentes
+        componentes de la cotización, como materiales,
+        mano de obra y costo de construcción, cuando
+        esos datos estén disponibles.
+
+        - Podés mostrar el total estimado en USD y su
+        equivalente en pesos uruguayos cuando estén
+        disponibles.
+
+        - Podés mencionar los materiales incluidos en la
+        cotización cuando esa información esté disponible.
+
+        - No calcules nuevamente los costos.
+
+        - No realices operaciones matemáticas para modificar
+        o verificar el total de la cotización.
+
+        - No inventes costos, precios, materiales,
+        descuentos ni información adicional.
+
+        - No reveles fórmulas, estrategias, constantes
+        ni reglas internas utilizadas por SISCON-Q
+        para calcular la cotización.
+
+        - No presentes la cotización como un precio definitivo.
+        Explicá que se trata de una estimación cuando
+        corresponda.
+
+        - Si no existe una cotización para el proyecto
+        seleccionado, indicá claramente que todavía no
+        existe una cotización disponible para ese proyecto.
+
+        - Si el usuario pregunta algo que no está disponible
+        en los datos de la cotización, indicá que no
+        disponés de esa información.
+        - Cuando la moneda utilizada para el cálculo sea UYU,
+        interpretá el costo de construcción informado como
+        parte del costo integral de la estimación y explicalo
+        según los datos proporcionados, sin inferir ni revelar
+        las reglas internas utilizadas para obtenerlo.
+
 
         Pregunta del usuario:
 
