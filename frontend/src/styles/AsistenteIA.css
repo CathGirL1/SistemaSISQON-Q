@@ -43,6 +43,22 @@
     0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
+.assistant-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.assistant-new-conversation {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.assistant-new-conversation button {
+    width: auto;
+    min-width: 170px;
+}
+
 
 /* =========================================================
    HEADER DEL CHAT
@@ -320,6 +336,175 @@
   cursor: not-allowed;
 }
 
+/* =====================================================
+   HISTORIAL DE CONVERSACIONES
+   ===================================================== */
+
+.historial-conversaciones {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.historial-conversaciones-header {
+    margin-bottom: 12px;
+}
+
+.historial-conversaciones-header span {
+    display: block;
+    margin-bottom: 4px;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+
+    color: #8a919b;
+}
+
+.historial-conversaciones-header h3 {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    color: #2f343b;
+}
+
+.historial-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    width: 100%;
+
+    max-height: 300px;
+    overflow-y: auto;
+
+    padding-right: 4px;
+}
+
+.historial-lista::-webkit-scrollbar {
+    width: 5px;
+}
+
+.historial-lista::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.historial-lista::-webkit-scrollbar-thumb {
+    background: #d5d9df;
+    border-radius: 10px;
+}
+
+.historial-lista::-webkit-scrollbar-thumb:hover {
+    background: #bfc5cc;
+}
+
+.historial-conversacion {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.historial-conversacion:hover {
+    background-color: #f5f5f5;
+}
+
+.historial-conversacion.activa {
+    background-color: #eeeeee;
+}
+
+/* Botón que abre la conversación */
+.historial-conversacion-contenido {
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding: 0;
+    border: none;
+    background: transparent;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+/* Información de la conversación */
+.historial-conversacion-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.historial-conversacion-info strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.historial-conversacion-info span {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Fecha */
+.historial-conversacion time {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: #999;
+}
+
+/* Botón eliminar */
+.historial-conversacion-eliminar {
+    flex-shrink: 0;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #9ca3af;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.historial-conversacion-eliminar:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.historial-vacio {
+    padding: 16px;
+
+    border: 1px dashed #dfe3e7;
+    border-radius: 10px;
+
+    background: #fafafa;
+
+    text-align: center;
+
+    font-size: 12px;
+    color: #8a919b;
+}
+
 
 /* =========================================================
    INPUT
@@ -498,6 +683,84 @@
     box-shadow 0.2s ease;
 }
 
+/* =====================================================
+   NUEVA CONVERSACIÓN
+   ===================================================== */
+
+.crear-conversacion-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 40px;
+    padding: 9px 14px;
+
+    border: 1px solid #e2e5e9;
+    border-radius: 9px;
+
+    background: #ffffff;
+    color: #3f4650;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+}
+
+.crear-conversacion-btn:hover {
+    background: #f7f8fa;
+    border-color: #d5d9df;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.crear-conversacion-btn:active {
+    transform: scale(0.98);
+}
+
+.crear-conversacion-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+.crear-conversacion-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.crear-conversacion-spinner {
+    width: 15px;
+    height: 15px;
+
+    border: 2px solid #dfe2e6;
+    border-top-color: #59616d;
+    border-radius: 50%;
+
+    animation: crear-conversacion-spin 0.7s linear infinite;
+}
+
+@keyframes crear-conversacion-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .assistant-project-select:focus {
   border-color: #64748b;
 
@@ -607,6 +870,43 @@
   color: #334155;
 }
 
+@media (max-width: 600px) {
+    .historial-lista {
+        max-height: 260px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .historial-conversaciones {
+        margin-top: 16px;
+    }
+
+    .historial-conversacion {
+        padding: 12px;
+    }
+
+    .historial-conversacion-info strong {
+        max-width: 180px;
+    }
+
+    .historial-conversacion time {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 600px) {
+    .assistant-new-conversation {
+        width: 100%;
+    }
+
+    .crear-conversacion-btn {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 14px;
+    }
+}
+
 
 /* =========================================================
    TABLET
@@ -685,6 +985,22 @@
     border-top: none;
     border-left: 1px solid #e5e7eb;
   }
+}
+
+@media (max-width: 600px) {
+    .assistant-chat-header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .assistant-new-conversation {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .assistant-new-conversation button {
+        width: 100%;
+    }
 }
 
 

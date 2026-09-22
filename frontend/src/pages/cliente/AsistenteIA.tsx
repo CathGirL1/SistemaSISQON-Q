@@ -10,6 +10,8 @@ import {
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
+import CrearConversacion from "../../components/cliente/CrearConversacion";
+import HistorialConversaciones from "../../components/cliente/HistorialConversaciones";
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/AsistenteIA.css";
@@ -44,10 +46,16 @@ export default function AsistenteIA() {
   const [mensajes, setMensajes] =
     useState<Mensaje[]>([]);
 
+  const [actualizarHistorial, setActualizarHistorial] =
+    useState(0);
+
   const [proyectos, setProyectos] =
     useState<Proyecto[]>([]);
 
   const [idProyecto, setIdProyecto] =
+    useState<number | null>(null);
+  
+  const [idConversacion, setIdConversacion] = 
     useState<number | null>(null);
 
   const [cargandoProyectos, setCargandoProyectos] =
@@ -65,6 +73,62 @@ export default function AsistenteIA() {
       ? JSON.parse(usuarioGuardado)
       : null;
   });
+
+  const seleccionarConversacion = async (
+      idConversacion: number,
+      idProyecto: number | null
+  ) => {
+      setIdConversacion(idConversacion);
+
+      setIdProyecto(idProyecto);
+
+      setMensajes([]);
+
+      try {
+          const respuesta = await fetch(
+              `http://localhost:3000/api/conversacion-ia/${idConversacion}/mensajes`
+          );
+
+          if (!respuesta.ok) {
+              throw new Error(
+                  "No se pudieron obtener los mensajes de la conversación"
+              );
+          }
+
+          const datos = await respuesta.json();
+
+          const ultimosMensajes = datos.slice(-10);
+
+          const mensajesCargados: Mensaje[] =
+              ultimosMensajes.map(
+                  (item: any) => ({
+                      id: item.idMensaje,
+                      autor:
+                          item.tipo === "usuario"
+                              ? "usuario"
+                              : "asistente",
+                      contenido: item.contenido,
+                      hora: new Date(
+                          item.fecha
+                      ).toLocaleTimeString(
+                          "es-UY",
+                          {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                          }
+                      ),
+                  })
+              );
+
+          setMensajes(mensajesCargados);
+
+      } catch (error) {
+          console.error(
+              "Error al cargar la conversación:",
+              error
+          );
+      }
+  };
 
 
   // =====================================================
@@ -128,152 +192,195 @@ export default function AsistenteIA() {
         proyecto.idProyecto === idProyecto
     );
 
+  const actualizarTituloConversacion = async (
+      pregunta: string
+  ) => {
+      if (!idConversacion) {
+          return;
+      }
+
+      const titulo = pregunta
+          .replace(/[¿?¡!]/g, "")
+          .trim()
+          .slice(0, 60);
+
+      if (!titulo) {
+          return;
+      }
+
+      try {
+          const respuesta = await fetch(
+              `http://localhost:3000/api/conversacion-ia/${idConversacion}/titulo`,
+              {
+                  method: "PUT",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                      titulo,
+                  }),
+              }
+          );
+
+          if (!respuesta.ok) {
+              throw new Error(
+                  "No se pudo actualizar el título"
+              );
+          }
+
+          setActualizarHistorial(
+              (actual) => actual + 1
+          );
+
+      } catch (error) {
+          console.error(
+              "Error al actualizar título:",
+              error
+          );
+      }
+  };
+
 
   // =====================================================
   // ENVIAR MENSAJE
   // =====================================================
 
   const enviarMensaje = async (
-    recomendacionMateriales = false
+      recomendacionMateriales = false,
+      preguntaFija?: string
   ) => {
+      const contenido = (
+          preguntaFija ?? mensaje
+      ).trim();
+    
+    const esPrimerMensaje = mensajes.length === 0;
 
-    const contenido =
-      mensaje.trim();
+      console.log("Pregunta:", contenido);
+    console.log("ID conversación:", idConversacion);
 
-    if (!contenido) {
-      return;
-    }
-
-    if (
-      recomendacionMateriales &&
-      !idProyecto
-    ) {
-
-      setMensajes((actuales) => [
-        ...actuales,
-        {
-          id: Date.now(),
-          autor: "asistente",
-          contenido:
-            "Para recomendarte materiales necesito que selecciones un proyecto.",
-          hora: "Ahora",
-        },
-      ]);
-
-      return;
-    }
-
-    setMensajes((actuales) => [
-      ...actuales,
-      {
-        id: Date.now(),
-        autor: "usuario",
-        contenido,
-        hora: "Ahora",
-      },
-    ]);
-
-    setMensaje("");
-    setCargandoRespuesta(true);
-
-    try {
-
-      const cuerpo: {
-        pregunta: string;
-        idProyecto?: number;
-      } = {
-        pregunta: contenido,
-      };
-
-      if (idProyecto) {
-        cuerpo.idProyecto = idProyecto;
+      if (!contenido) {
+          return;
       }
 
-      const respuesta =
-        await fetch(
-          "http://localhost:3000/api/asistente-ia/preguntar",
+      if (!idConversacion) {
+          setMensajes((actuales) => [
+              ...actuales,
+              {
+                  id: Date.now(),
+                  autor: "asistente",
+                  contenido:
+                      "Primero tenés que iniciar una nueva conversación.",
+                  hora: "Ahora",
+              },
+          ]);
+
+          return;
+      }
+
+      if (
+          recomendacionMateriales &&
+          !idProyecto
+      ) {
+          setMensajes((actuales) => [
+              ...actuales,
+              {
+                  id: Date.now(),
+                  autor: "asistente",
+                  contenido:
+                      "Para recomendarte materiales necesito que selecciones un proyecto.",
+                  hora: "Ahora",
+              },
+          ]);
+
+          return;
+      }
+
+      setMensajes((actuales) => [
+          ...actuales,
           {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify(cuerpo),
+              id: Date.now(),
+              autor: "usuario",
+              contenido,
+              hora: "Ahora",
+          },
+      ]);
+
+      setMensaje("");
+      setCargandoRespuesta(true);
+
+      try {
+          const cuerpo: {
+              pregunta: string;
+              idProyecto?: number;
+              idConversacion: number;
+          } = {
+              pregunta: contenido,
+              idConversacion,
+          };
+
+          if (idProyecto) {
+              cuerpo.idProyecto = idProyecto;
           }
-        );
 
-      const datos =
-        await respuesta.json();
+          const respuesta = await fetch(
+              "http://localhost:3000/api/asistente-ia/preguntar",
+              {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(cuerpo),
+              }
+          );
 
-      if (!respuesta.ok) {
-        throw new Error(
-          datos.mensaje ||
-          "No se pudo obtener una respuesta"
-        );
+          const datos = await respuesta.json();
+
+          if (!respuesta.ok) {
+              throw new Error(
+                  datos.mensaje ||
+                  "No se pudo obtener una respuesta"
+              );
+          }
+
+          setMensajes((actuales) => [
+              ...actuales,
+              {
+                  id: Date.now() + 1,
+                  autor: "asistente",
+                  contenido: datos.respuesta,
+                  hora: "Ahora",
+              },
+          ]);
+
+          if (esPrimerMensaje) {
+              await actualizarTituloConversacion(
+                  contenido
+              );
+          }
+
+      } catch (error) {
+          console.error(
+              "Error al consultar al asistente:",
+              error
+          );
+
+          setMensajes((actuales) => [
+              ...actuales,
+              {
+                  id: Date.now() + 1,
+                  autor: "asistente",
+                  contenido:
+                      "No pude procesar tu consulta en este momento. Intentá nuevamente.",
+                  hora: "Ahora",
+              },
+          ]);
+
+      } finally {
+          setCargandoRespuesta(false);
       }
-
-      setMensajes((actuales) => [
-        ...actuales,
-        {
-          id: Date.now() + 1,
-          autor: "asistente",
-          contenido:
-            datos.respuesta,
-          hora: "Ahora",
-        },
-      ]);
-
-    } catch (error) {
-
-      console.error(
-        "Error al consultar al asistente:",
-        error
-      );
-
-      setMensajes((actuales) => [
-        ...actuales,
-        {
-          id: Date.now() + 1,
-          autor: "asistente",
-          contenido:
-            "No pude procesar tu consulta en este momento. Intentá nuevamente.",
-          hora: "Ahora",
-        },
-      ]);
-
-    } finally {
-
-      setCargandoRespuesta(false);
-    }
   };
 
 
-  // =====================================================
-  // PREGUNTAS RÁPIDAS
-  // =====================================================
-
-  const preguntarMateriales = () => {
-
-    setMensaje(
-      "¿Qué materiales me recomendás para este proyecto?"
-    );
-  };
-
-
-  const preguntarConcepto = () => {
-
-    setMensaje(
-      "¿Qué debo tener en cuenta al elegir materiales para una obra?"
-    );
-  };
-
-
-  const preguntarJornal = () => {
-
-    setMensaje(
-      "¿Qué es un jornal?"
-    );
-  };
 
 
   return (
@@ -310,25 +417,39 @@ export default function AsistenteIA() {
           <section className="assistant-chat">
 
             <header className="assistant-chat-header">
+              <div className="assistant-chat-title">
+                  <div className="assistant-avatar">
+                      <Sparkles size={22} />
+                  </div>
 
-              <div className="assistant-avatar">
-                <Sparkles size={22} />
+                  <div>
+                      <h2>
+                          Asistente SISCON-Q
+                      </h2>
+
+                      <span>
+                          <i />
+                          Disponible
+                      </span>
+                  </div>
               </div>
 
-              <div>
-
-                <h2>
-                  Asistente SISCON-Q
-                </h2>
-
-                <span>
-                  <i />
-                  Disponible
-                </span>
-
-              </div>
-
-            </header>
+              {usuario?.id_Cliente && (
+                  <div className="assistant-new-conversation">
+                      <CrearConversacion
+                          idCliente={usuario.id_Cliente}
+                          idProyecto={idProyecto}
+                          onConversacionCreada={(id) => {
+                              setIdConversacion(id);
+                              setMensajes([]);
+                               setActualizarHistorial(
+                                  (actual) => actual + 1
+                              );
+                          }}
+                      />
+                  </div>
+              )}
+          </header>
 
 
             <div className="assistant-messages">
@@ -426,35 +547,62 @@ export default function AsistenteIA() {
             <div className="assistant-suggestions">
 
               <button
-                type="button"
-                onClick={preguntarMateriales}
-                disabled={
-                  !idProyecto ||
-                  cargandoRespuesta
-                }
+                  type="button"
+                  onClick={() =>
+                      enviarMensaje(
+                          true,
+                          "¿Qué materiales me recomendás para este proyecto?"
+                      )
+                  }
+                  disabled={
+                      !idProyecto ||
+                      cargandoRespuesta
+                  }
               >
-                ¿Qué materiales me recomendás?
+                  ¿Qué materiales me recomendás para este proyecto?
               </button>
 
-              <button
-                type="button"
-                onClick={preguntarConcepto}
-                disabled={
-                  cargandoRespuesta
-                }
+             <button
+                  type="button"
+                  onClick={() =>
+                      enviarMensaje(
+                          false,
+                          "¿Qué debo tener en cuenta al elegir materiales para una obra?"
+                      )
+                  }
+                  disabled={cargandoRespuesta}
               >
-                ¿Qué debo tener en cuenta?
+                  ¿Qué debo tener en cuenta al elegir materiales para una obra?
               </button>
 
-              <button
+            <button
                 type="button"
-                onClick={preguntarJornal}
-                disabled={
-                  cargandoRespuesta
+                onClick={() =>
+                    enviarMensaje(
+                        false,
+                        "¿Qué es un jornal?"
+                    )
                 }
-              >
+                disabled={cargandoRespuesta}
+            >
                 ¿Qué es un jornal?
-              </button>
+            </button>
+
+            <button
+                type="button"
+                onClick={() =>
+                    enviarMensaje(
+                        false,
+                        "¿Me explicás de forma clara los costos estimados de mi proyecto?"
+                    )
+                }
+                disabled={
+                    !idProyecto ||
+                    cargandoRespuesta
+                }
+            >
+                ¿Cuáles son los costos estimados de mi proyecto?
+            </button>
 
             </div>
 
@@ -641,6 +789,7 @@ export default function AsistenteIA() {
 
                 )}
 
+
               </>
 
             )}
@@ -700,9 +849,29 @@ export default function AsistenteIA() {
 
               </div>
 
+              
+
+              
+
             )}
+             <HistorialConversaciones
+                idCliente={usuario.id_Cliente}
+                idConversacion={idConversacion}
+                actualizarHistorial={actualizarHistorial}
+                onSeleccionarConversacion={
+                    seleccionarConversacion
+                }
+                onConversacionEliminada={(idEliminada) => {
+                    if (idConversacion === idEliminada) {
+                        setIdConversacion(null);
+                        setIdProyecto(null);
+                        setMensajes([]);
+                    }
+                }}
+              />
 
           </aside>
+
 
         </section>
 
