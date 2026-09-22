@@ -861,27 +861,21 @@ export class CotizacionService {
     // =====================================================
 
     return {
-      ...cotizacionFinal,
+     ...cotizacionFinal,
+
+      costoConstruccion: calculo.costoConstruccion,
+      monedaCalculo: calculo.moneda,
 
       ...(proyectoCotizacion.codigoTipoObra === "OBR-000003"
         ? {
-          detalleCalculoReforma: {
-            horasEstimadas:
-              calculo.horasEstimadas,
-
-            jornalesEstimados:
-              calculo.jornalesEstimados,
-
-            superficiePiso:
-              calculo.superficiePiso,
-
-            superficieParedes:
-              calculo.superficieParedes,
-
-            superficieTrabajo:
-              calculo.superficieTrabajo
+            detalleCalculoReforma: {
+              horasEstimadas: calculo.horasEstimadas,
+              jornalesEstimados: calculo.jornalesEstimados,
+              superficiePiso: calculo.superficiePiso,
+              superficieParedes: calculo.superficieParedes,
+              superficieTrabajo: calculo.superficieTrabajo
+            }
           }
-        }
         : {})
     };
   }
