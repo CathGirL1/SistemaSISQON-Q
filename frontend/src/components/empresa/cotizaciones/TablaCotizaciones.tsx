@@ -60,9 +60,6 @@ export default function TablaCotizaciones({
   totalCotizaciones,
 }: Props) {
 
-  const [seleccionadas, setSeleccionadas] =
-    useState<string[]>([]);
-
   const [modalDetalle, setModalDetalle] =
     useState(false);
 
@@ -82,67 +79,13 @@ export default function TablaCotizaciones({
 
 
   // =====================================================
-  // SELECCIÓN
-  // =====================================================
-
-  const todasSeleccionadas =
-    cotizaciones.length > 0 &&
-    seleccionadas.length === cotizaciones.length;
-
-
-  const seleccionarTodas = () => {
-
-    if (todasSeleccionadas) {
-
-      setSeleccionadas([]);
-
-    } else {
-
-      setSeleccionadas(
-        cotizaciones.map(
-          (cotizacion) => cotizacion.id
-        )
-      );
-
-    }
-  };
-
-
-  const seleccionarCotizacion = (
-    id: string
-  ) => {
-
-    if (seleccionadas.includes(id)) {
-
-      setSeleccionadas(
-        seleccionadas.filter(
-          (item) => item !== id
-        )
-      );
-
-    } else {
-
-      setSeleccionadas([
-        ...seleccionadas,
-        id,
-      ]);
-
-    }
-  };
-
-
-  // =====================================================
   // ABRIR MODALES
   // =====================================================
 
   const abrirDetalle = (
     cotizacion: Cotizacion
   ) => {
-
-    setCotizacionSeleccionada(
-      cotizacion
-    );
-
+    setCotizacionSeleccionada(cotizacion);
     setModalDetalle(true);
   };
 
@@ -150,11 +93,7 @@ export default function TablaCotizaciones({
   const abrirGestionar = (
     cotizacion: Cotizacion
   ) => {
-
-    setCotizacionSeleccionada(
-      cotizacion
-    );
-
+    setCotizacionSeleccionada(cotizacion);
     setModalGestionar(true);
   };
 
@@ -162,11 +101,7 @@ export default function TablaCotizaciones({
   const abrirEditar = (
     cotizacion: Cotizacion
   ) => {
-
-    setCotizacionSeleccionada(
-      cotizacion
-    );
-
+    setCotizacionSeleccionada(cotizacion);
     setModalEditar(true);
   };
 
@@ -174,11 +109,7 @@ export default function TablaCotizaciones({
   const abrirEliminar = (
     cotizacion: Cotizacion
   ) => {
-
-    setCotizacionSeleccionada(
-      cotizacion
-    );
-
+    setCotizacionSeleccionada(cotizacion);
     setModalEliminar(true);
   };
 
@@ -188,15 +119,10 @@ export default function TablaCotizaciones({
   // =====================================================
 
   const cerrarModales = () => {
-
     setModalDetalle(false);
-
     setModalGestionar(false);
-
     setModalEditar(false);
-
     setModalEliminar(false);
-
     setCotizacionSeleccionada(null);
   };
 
@@ -209,7 +135,6 @@ export default function TablaCotizaciones({
     async (
       cotizacion: Cotizacion
     ) => {
-
       const confirmar =
         window.confirm(
           "¿Seguro que querés finalizar esta cotización? Una vez finalizada no podrá volver a modificarse."
@@ -220,7 +145,6 @@ export default function TablaCotizaciones({
       }
 
       try {
-
         await finalizarCotizacion(
           cotizacion.idCotizacion
         );
@@ -230,16 +154,7 @@ export default function TablaCotizaciones({
         // también actualiza automáticamente los KPIs.
         await onActualizada();
 
-        setSeleccionadas(
-          (anteriores) =>
-            anteriores.filter(
-              (id) =>
-                id !== cotizacion.id
-            )
-        );
-
       } catch (error: unknown) {
-
         console.error(error);
 
         const mensaje =
@@ -259,7 +174,6 @@ export default function TablaCotizaciones({
   const guardarEstado = (
     estado: EstadoCotizacion
   ) => {
-
     if (!cotizacionSeleccionada) {
       return;
     }
@@ -287,7 +201,6 @@ export default function TablaCotizaciones({
   // =====================================================
 
   const eliminarCotizacion = () => {
-
     if (!cotizacionSeleccionada) {
       return;
     }
@@ -303,14 +216,6 @@ export default function TablaCotizaciones({
         )
     );
 
-    setSeleccionadas(
-      (anteriores) =>
-        anteriores.filter(
-          (idSeleccionado) =>
-            idSeleccionado !== id
-        )
-    );
-
     cerrarModales();
   };
 
@@ -320,14 +225,11 @@ export default function TablaCotizaciones({
   // =====================================================
 
   if (cargando) {
-
     return (
       <div className="tabla-cotizaciones-card">
-
         <p>
           Cargando cotizaciones...
         </p>
-
       </div>
     );
   }
@@ -338,14 +240,11 @@ export default function TablaCotizaciones({
   // =====================================================
 
   if (error) {
-
     return (
       <div className="tabla-cotizaciones-card">
-
         <p>
           {error}
         </p>
-
       </div>
     );
   }
@@ -363,9 +262,7 @@ export default function TablaCotizaciones({
           ================================================= */}
 
       <div className="tabla-cotizaciones-header">
-
         <div>
-
           <h2>
             Listado de cotizaciones
           </h2>
@@ -373,41 +270,7 @@ export default function TablaCotizaciones({
           <p>
             Visualizá y gestioná las solicitudes recibidas.
           </p>
-
         </div>
-
-
-        {/* ===============================================
-            ACCIONES MASIVAS
-            =============================================== */}
-
-        {seleccionadas.length > 0 && (
-
-          <div className="acciones-masivas">
-
-            <span>
-              {seleccionadas.length} seleccionada(s)
-            </span>
-
-            <button type="button">
-              Cambiar estado
-            </button>
-
-            <button type="button">
-              Exportar
-            </button>
-
-            <button
-              type="button"
-              className="danger"
-            >
-              Eliminar
-            </button>
-
-          </div>
-
-        )}
-
       </div>
 
 
@@ -420,35 +283,15 @@ export default function TablaCotizaciones({
         <table className="tabla-cotizaciones">
 
           <thead>
-
             <tr>
-
-              <th>
-
-                <input
-                  type="checkbox"
-                  checked={todasSeleccionadas}
-                  onChange={seleccionarTodas}
-                />
-
-              </th>
-
               <th>ID ↕</th>
-
               <th>Cliente ↕</th>
-
               <th>Tipo de obra ↕</th>
-
               <th>Fecha ↕</th>
-
               <th>Total ↕</th>
-
               <th>Estado ↕</th>
-
               <th>Acciones</th>
-
             </tr>
-
           </thead>
 
 
@@ -462,16 +305,6 @@ export default function TablaCotizaciones({
 
                   cotizacion={
                     cotizacion
-                  }
-
-                  seleccionada={
-                    seleccionadas.includes(
-                      cotizacion.id
-                    )
-                  }
-
-                  onSeleccionar={
-                    seleccionarCotizacion
                   }
 
                   onVerDetalle={
@@ -508,6 +341,7 @@ export default function TablaCotizaciones({
       {/* =================================================
           INFORMACIÓN INFERIOR
           ================================================= */}
+
       <div className="tabla-footer-info">
 
         {totalCotizaciones === 0 ? (

@@ -4,9 +4,9 @@ import type { Cotizacion } from "../../../interfaces/Cotizacion";
 
 type FilaCotizacionProps = {
   cotizacion: Cotizacion;
-  seleccionada: boolean;
 
-  onSeleccionar: (id: string) => void;
+
+
   onVerDetalle: (cotizacion: Cotizacion) => void;
   onGestionar: (cotizacion: Cotizacion) => void;
   onEditarEstado: (cotizacion: Cotizacion) => void;
@@ -16,8 +16,6 @@ type FilaCotizacionProps = {
 
 export default function FilaCotizacion({
   cotizacion,
-  seleccionada,
-  onSeleccionar,
   onVerDetalle,
   onGestionar,
   onEditarEstado,
@@ -29,18 +27,10 @@ export default function FilaCotizacion({
     cotizacion.estado === "Finalizada";
 
   return (
-    <tr className={seleccionada ? "fila-seleccionada" : ""}>
+    <tr>
 
-      {/* SELECCIÓN */}
-      <td>
-        <input
-          type="checkbox"
-          checked={seleccionada}
-          onChange={() =>
-            onSeleccionar(cotizacion.id)
-          }
-        />
-      </td>
+
+
 
       {/* ID */}
       <td>

@@ -1,15 +1,7 @@
 import "../../styles/CommonPanel.css";
 
-export type EstadoCotizacion =
-  | "Borrador"
-  | "Enviada"
-  | "Revisada"
-  | "Aceptada"
-  | "Rechazada"
-  | "Finalizada";
-
 type EstadoBadgeProps = {
-  estado: EstadoCotizacion;
+  estado: string;
 };
 
 export default function EstadoBadge({
