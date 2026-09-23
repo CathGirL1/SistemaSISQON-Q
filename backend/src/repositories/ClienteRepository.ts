@@ -498,10 +498,10 @@ export class ClienteRepository {
     }
   }
 
-    public async obtenerHistorialCotizaciones(
+  public async obtenerHistorialCotizaciones(
     idCliente: number,
     idEmpresa: number
-    ) {
+  ) {
     const pool = await connectDB();
 
     const resultado = await pool
@@ -509,27 +509,50 @@ export class ClienteRepository {
       .input("idCliente", sql.Int, idCliente)
       .input("idEmpresa", sql.Int, idEmpresa)
       .query(`
+        WITH CotizacionesVersionadas AS (
+          SELECT
+            co.id_Cotizacion AS idCotizacion,
+            co.fechaRealizada,
+            co.totalCotizacion,
+            co.estado,
+            co.observaciones,
+
+            p.id_Proyecto AS idProyecto,
+            p.nombre AS nombreProyecto,
+
+            ROW_NUMBER() OVER (
+              PARTITION BY co.id_Proyecto
+              ORDER BY
+                co.version DESC,
+                co.fechaCreacion DESC,
+                co.id_Cotizacion DESC
+            ) AS numeroFila
+
+          FROM Cotizacion co
+
+          INNER JOIN Proyecto p
+            ON p.id_Proyecto = co.id_Proyecto
+
+          WHERE p.id_Cliente = @idCliente
+            AND p.id_Empresa = @idEmpresa
+        )
+
         SELECT
-          co.id_Cotizacion AS idCotizacion,
-          co.fechaRealizada,
-          co.totalCotizacion,
-          co.estado,
-          co.observaciones,
+          idCotizacion,
+          fechaRealizada,
+          totalCotizacion,
+          estado,
+          observaciones,
+          idProyecto,
+          nombreProyecto
 
-          p.id_Proyecto AS idProyecto,
-          p.nombre AS nombreProyecto
+        FROM CotizacionesVersionadas
 
-        FROM Cotizacion co
-
-        INNER JOIN Proyecto p
-          ON p.id_Proyecto = co.id_Proyecto
-
-        WHERE p.id_Cliente = @idCliente
-          AND p.id_Empresa = @idEmpresa
+        WHERE numeroFila = 1
 
         ORDER BY
-          co.fechaRealizada DESC,
-          co.id_Cotizacion DESC
+          fechaRealizada DESC,
+          idCotizacion DESC
       `);
 
     return resultado.recordset;
