@@ -13,6 +13,8 @@ import HeaderCliente from "../../components/cliente/HeaderCliente";
 import CrearConversacion from "../../components/cliente/CrearConversacion";
 import HistorialConversaciones from "../../components/cliente/HistorialConversaciones";
 
+import logoIA from "../../assets/logoIASisconQ.png";
+
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/AsistenteIA.css";
 
@@ -419,7 +421,7 @@ export default function AsistenteIA() {
             <header className="assistant-chat-header">
               <div className="assistant-chat-title">
                   <div className="assistant-avatar">
-                      <Sparkles size={22} />
+                    <img src={logoIA} alt="IA SISCON-Q" />
                   </div>
 
                   <div>
@@ -429,7 +431,7 @@ export default function AsistenteIA() {
 
                       <span>
                           <i />
-                          Disponible
+                          <h2>Disponible</h2>
                       </span>
                   </div>
               </div>
@@ -459,7 +461,7 @@ export default function AsistenteIA() {
                 <div className="assistant-welcome">
 
                   <div className="assistant-welcome-icon">
-                    <Sparkles size={28} />
+                       <img src={logoIA} alt="IA SISCON-Q" />
                   </div>
 
                   <h3>
@@ -489,7 +491,8 @@ export default function AsistenteIA() {
                     {item.autor ===
                     "asistente" ? (
 
-                      <Bot size={18} />
+                      <img src={logoIA} alt="IA SISCON-Q" />
+                      
 
                     ) : (
 
