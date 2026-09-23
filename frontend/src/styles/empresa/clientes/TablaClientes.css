@@ -163,3 +163,40 @@
   text-align: center !important;
   color: #64748b !important;
 }
+
+.tabla-clientes th:last-child,
+.tabla-clientes td:last-child {
+  width: 230px;
+  min-width: 230px;
+  white-space: nowrap;
+}
+
+.tabla-clientes td:last-child {
+  overflow: visible;
+}
+
+.tabla-clientes .cliente-acciones {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+
+  width: max-content;
+  min-width: max-content;
+
+  gap: 0.45rem;
+}
+
+.tabla-clientes .cliente-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
+  position: relative;
+}
