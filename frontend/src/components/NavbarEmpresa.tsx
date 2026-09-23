@@ -32,15 +32,6 @@ export default function NavbarEmpresa({
         >
           <FaBars />
         </button>
-
-        <div className="navbar-search">
-          <FaSearch />
-
-          <input
-            type="text"
-            placeholder="Buscar..."
-          />
-        </div>
       </div>
 
       <div className="navbar-right">
