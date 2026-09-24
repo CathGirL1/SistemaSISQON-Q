@@ -91,13 +91,6 @@ export default function HistorialConversaciones({
         idConversacion: number
     ) => {
 
-        const confirmar = window.confirm(
-            "¿Querés eliminar esta conversación?"
-        );
-
-        if (!confirmar) {
-            return;
-        }
 
         try {
 
