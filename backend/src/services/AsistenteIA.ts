@@ -56,6 +56,24 @@ export class AsistenteIA {
             .join("\n");
     }
 
+    private explicarCostosSISCONQ(): string {
+        return `
+            En SISCON-Q, la cotización se genera a partir de la información del proyecto y de los criterios definidos para el tipo de obra.
+
+            La estimación considera las dimensiones y características del proyecto para determinar los componentes correspondientes de la cotización. En el caso de la mano de obra, SISCON-Q puede considerar un factor de esfuerzo relacionado con el tamaño y las características de la obra. Este factor permite estimar el trabajo requerido y no representa necesariamente el costo monetario final de la mano de obra.
+
+            El costo monetario de la mano de obra corresponde a la valoración económica que la empresa determine según el personal necesario, sus horas, jornales u otros criterios utilizados por la empresa.
+
+            Dependiendo del tipo de obra, la mano de obra y otros componentes pueden estar incluidos dentro de un costo integral o aparecer como conceptos separados.
+
+            La cotización generada por SISCON-Q constituye una estimación basada en los datos y criterios disponibles en el sistema. La empresa recibe la información de la cotización y puede determinar posteriormente los valores que correspondan a su operación y a la ejecución de la obra.
+
+            Los valores estimados por SISCON-Q no contemplan necesariamente costos adicionales que puedan ser definidos posteriormente por la empresa, como IVA, impuestos, descuentos, cargas adicionales u otros conceptos asociados a la ejecución y comercialización de la obra.
+
+            Por lo tanto, la estimación de SISCON-Q debe interpretarse como una base para la cotización y no necesariamente como el precio comercial final que la empresa presentará al cliente.
+            `.trim();
+    }
+
     private async guardarRespuestaConversacion(
         idConversacion: number | undefined,
         respuesta: string
@@ -184,6 +202,38 @@ export class AsistenteIA {
                                     cotizacionMasReciente.idCotizacion
                                 )
                             );
+                   
+                    
+                    const tipoObraNormalizado = detalleCotizacion.tipoObra
+                        ?.normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .toLowerCase()
+                        .trim();
+
+                    const esCostoIntegral =
+                        tipoObraNormalizado === "quincho" ||
+                        tipoObraNormalizado === "requincho";
+
+                    const esReforma =
+                    tipoObraNormalizado === "reforma";
+
+                    const textoManoDeObra = esCostoIntegral
+                    ? "La mano de obra estándar está contemplada dentro del costo integral de construcción y no se cobra como un concepto separado."
+                    : esReforma
+                        ? "El costo monetario de la mano de obra todavía no está determinado en esta estimación. SISCON-Q proporciona una estimación de horas y jornales como referencia, pero el costo final debe ser definido posteriormente por la empresa."
+                        : `USD ${Number(
+                            detalleCotizacion.costoManoObra
+                        ).toFixed(2)}`;
+
+                    const textoCostoConstruccion = esReforma
+                    ? "No se calcula como un concepto separado para este tipo de obra."
+                    : detalleCotizacion.monedaCalculo === "UYU"
+                        ? `UYU ${Number(
+                            detalleCotizacion.costoConstruccion
+                        ).toFixed(2)}`
+                        : `USD ${Number(
+                            detalleCotizacion.costoConstruccion
+                        ).toFixed(2)}`;
 
                     contextoCotizacion = `
                         COTIZACIÓN ESTIMADA DEL PROYECTO
@@ -206,20 +256,11 @@ export class AsistenteIA {
                         ).toFixed(2)}
 
                         Costo de mano de obra:
-                        USD ${Number(
-                            detalleCotizacion.costoManoObra
-                        ).toFixed(2)}
+                        Mano de obra:
+                        ${textoManoDeObra}
 
                         Costo de construcción:
-                        ${
-                            detalleCotizacion.monedaCalculo === "UYU"
-                                ? `UYU ${Number(
-                                    detalleCotizacion.costoConstruccion
-                                ).toFixed(2)}`
-                                : `USD ${Number(
-                                    detalleCotizacion.costoConstruccion
-                                ).toFixed(2)}`
-                        }
+                        ${textoCostoConstruccion}
 
                         Total estimado:
                         USD ${Number(
@@ -244,7 +285,15 @@ export class AsistenteIA {
                             detalleCotizacion.materiales
                                 ?.map(
                                     (material: any) =>
-                                        `- ${material.nombre}: ${material.cantidad} ${material.unidad ?? ""} — USD ${Number(material.costoUnitario).toFixed(2)}`
+                                        `- Material: ${material.nombre}
+                        Cantidad: ${material.cantidad}
+                        Unidad: ${material.unidad ?? "Sin especificar"}
+                        Costo unitario: USD ${Number(material.costoUnitario).toFixed(2)}
+                        Subtotal: ${
+                            material.subtotal !== undefined && material.subtotal !== null
+                                ? `USD ${Number(material.subtotal).toFixed(2)}`
+                                : "No disponible"
+                        }`
                                 )
                                 .join("\n")
                             ?? "Sin materiales registrados"
@@ -319,6 +368,19 @@ export class AsistenteIA {
                 idConversacion,
                 respuesta
             );
+        }
+
+        if (
+            preguntaNormalizada.includes("como calcula") ||
+            preguntaNormalizada.includes("cómo calcula") ||
+            preguntaNormalizada.includes("como se calcula") ||
+            preguntaNormalizada.includes("cómo se calcula") ||
+            preguntaNormalizada.includes("como funciona la cotizacion") ||
+            preguntaNormalizada.includes("cómo funciona la cotización") ||
+            preguntaNormalizada.includes("costos de siscon") ||
+            preguntaNormalizada.includes("costos siscon")
+        ) {
+            return this.explicarCostosSISCONQ();
         }
 
         const respuesta = await this.responderConIA(
@@ -545,13 +607,29 @@ export class AsistenteIA {
         - Si el usuario pregunta algo que no está disponible
         en los datos de la cotización, indicá que no
         disponés de esa información.
+
+        - Para los proyectos de tipo Quincho y Requincho, explicá que el costo de construcción integral contempla los materiales y la mano de obra estándar, por lo que estos conceptos no deben presentarse como costos adicionales al total.
+       
         - Cuando la moneda utilizada para el cálculo sea UYU,
         interpretá el costo de construcción informado como
         parte del costo integral de la estimación y explicalo
         según los datos proporcionados, sin inferir ni revelar
         las reglas internas utilizadas para obtenerlo.
 
+        - Para los proyectos de tipo Quincho y Requincho, el costo de construcción es integral e incluye los materiales estándar y la mano de obra estándar. Por lo tanto, estos conceptos NO deben sumarse nuevamente al total ni presentarse como costos adicionales.
+        - Si existen materiales registrados en el detalle de la cotización, mostralos con su nombre, cantidad, unidad, costo unitario y subtotal cuando estén disponibles. Estos datos son informativos y sirven para mostrar el detalle de los materiales registrados, pero NO deben sumarse nuevamente al costo integral.
+        - Si el costo de materiales del resumen figura como USD 0, explicá que no existe un costo de materiales separado o adicional, porque los materiales ya están contemplados dentro del costo integral. No digas que no existen materiales si hay materiales registrados en el detalle.
+        - Nunca sumes los subtotales de los materiales registrados para obtener o verificar el total de la cotización. Utilizá siempre el total proporcionado por SISCON-Q.
+        - Para proyectos de tipo Reforma, un costo de mano de obra igual a 0 no significa que no exista trabajo. Significa que el costo monetario de la mano de obra todavía no está determinado. Si se proporcionan horas o jornales estimados, mostrarlos como referencia y aclarar que el costo final debe ser definido por la empresa.
+        - Para proyectos de tipo Reforma, no presentes el costo de construcción como USD 0.00. SISCON-Q no calcula un costo de construcción separado para este tipo de obra; indicá que no se calcula como un concepto separado.
+        - Para Reforma, no inventes ni calcules un precio de mano de obra a partir de las horas o jornales estimados.
 
+        - Aclaración sobre la mano de obra en cualquier cotización de SISCON-Q que se mencione:
+
+        - En SISCON-Q, la mano de obra considerada en la estimación funciona como un factor de esfuerzo, determinado en función de las dimensiones y características del proyecto. A medida que aumenta el tamaño o la superficie de la obra, aumenta el esfuerzo de mano de obra considerado para la estimación.
+        - Este factor de esfuerzo es diferente del costo monetario de la mano de obra que pueda establecer la empresa. La empresa determina este costo según el personal que necesite para realizar la obra y el valor que corresponda a sus horas, jornales u otros criterios de remuneración.
+        - Por lo tanto, el factor de esfuerzo utilizado por SISCON-Q sirve para estimar el trabajo requerido por el proyecto, mientras que el costo monetario de la mano de obra corresponde a la valoración económica que posteriormente establece la empresa. Asimismo, los valores estimados por SISCON-Q no contemplan otros costos que puedan ser definidos posteriormente por la empresa, como IVA, impuestos, descuentos, cargas adicionales u otros conceptos asociados a la ejecución y comercialización de la obra.  
+        
         Pregunta del usuario:
 
     ${pregunta}
@@ -676,6 +754,7 @@ export class AsistenteIA {
             - Explicá de forma clara por qué determinadas opciones pueden ser
             adecuadas para el proyecto.
             - No modifiques ni calcules la cotización del proyecto.
+            
 
             Pregunta o necesidad del usuario:
 
