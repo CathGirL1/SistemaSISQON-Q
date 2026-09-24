@@ -201,25 +201,10 @@ export default function MaterialesProyectoDropList({
       alert(
         "La cantidad debe ser mayor que cero."
       );
-
-      return;
-    }
-
-    // Verificar stock
-
-    if (
-      cantidad >
-      materialSeleccionado.stock
-    ) {
-      alert(
-        `La cantidad solicitada supera el stock disponible (${materialSeleccionado.stock}).`
-      );
-
       return;
     }
 
     // Verificar si ya existe
-
     const yaExiste =
       materialesSeleccionados.find(
         (material) =>
@@ -228,22 +213,10 @@ export default function MaterialesProyectoDropList({
       );
 
     // Si ya existe, sumar cantidad
-
     if (yaExiste) {
       const nuevaCantidad =
         (yaExiste.cantidad ?? 0) +
         cantidad;
-
-      if (
-        nuevaCantidad >
-        materialSeleccionado.stock
-      ) {
-        alert(
-          `No podés agregar esa cantidad. El stock disponible es de ${materialSeleccionado.stock}.`
-        );
-
-        return;
-      }
 
       actualizarCantidad(
         materialSeleccionado.idMaterial,
@@ -251,12 +224,12 @@ export default function MaterialesProyectoDropList({
       );
 
       setCantidad(1);
+      setMaterialSeleccionadoId("");
 
       return;
     }
 
     // Crear material seleccionado
-
     const nuevoMaterial: Material = {
       ...materialSeleccionado,
       cantidad,
@@ -267,16 +240,13 @@ export default function MaterialesProyectoDropList({
       nuevoMaterial,
     ];
 
-    onMaterialesChange(
-      nuevaLista
-    );
+    onMaterialesChange(nuevaLista);
 
     // Limpiar selección
-
     setMaterialSeleccionadoId("");
-
     setCantidad(1);
   };
+
 
   // ====================================================
   // ACTUALIZAR CANTIDAD
@@ -290,38 +260,16 @@ export default function MaterialesProyectoDropList({
       return;
     }
 
-    const material =
-      materiales.find(
-        (item) =>
-          item.idMaterial ===
-          idMaterial
-      );
-
-    if (!material) {
-      return;
-    }
-
-    if (
-      nuevaCantidad >
-      material.stock
-    ) {
-      alert(
-        `No podés superar el stock disponible (${material.stock}).`
-      );
-
-      return;
-    }
-
     const nuevaLista =
       materialesSeleccionados.map(
         (item) =>
           item.idMaterial ===
-          idMaterial
+            idMaterial
             ? {
-                ...item,
-                cantidad:
-                  nuevaCantidad,
-              }
+              ...item,
+              cantidad:
+                nuevaCantidad,
+            }
             : item
       );
 
@@ -497,9 +445,8 @@ export default function MaterialesProyectoDropList({
                       material.idMaterial
                     }
                     disabled={
-                      material.stock <= 0 ||
-                      material.estado?.toLowerCase() !==
-                        "activo"
+                      material.estado?.toLowerCase() !== "activo" ||
+                      material.disponibilidad?.toLowerCase() !== "disponible"
                     }
                   >
                     {material.nombre} —{" "}

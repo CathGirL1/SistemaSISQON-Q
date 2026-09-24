@@ -54,9 +54,24 @@ router.get(
     controller.obtenerEstadisticasCliente
 );
 
+router.post(
+  "/:idCotizacion/propuesta",
+  controller.crearPropuestaEmpresa
+);
+
+router.put(
+  "/:idCotizacion/propuesta",
+  controller.actualizarPropuestaEmpresa
+);
+
 router.put(
   "/:idCotizacion/enviar",
   controller.enviarCotizacion
+);
+
+router.put(
+  "/:idCotizacion/seleccionar",
+  controller.seleccionarPropuesta
 );
 
 export default router;

@@ -288,6 +288,81 @@ export class CotizacionController {
     }
   };
 
+  // POST /api/cotizaciones/:idCotizacion/propuesta
+  public crearPropuestaEmpresa = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idCotizacion = Number(
+        req.params.idCotizacion
+      );
+
+      const { idEmpresa } = req.body;
+
+      const idNuevaCotizacion =
+        await this.service.crearPropuestaEmpresa(
+          idCotizacion,
+          Number(idEmpresa)
+        );
+
+      res.status(201).json({
+        mensaje: "Propuesta para empresa creada correctamente",
+        idCotizacion: idNuevaCotizacion,
+      });
+    } catch (error: unknown) {
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al crear la propuesta para la empresa";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
+
+  // PUT /api/cotizaciones/:idCotizacion/propuesta
+  public actualizarPropuestaEmpresa = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idCotizacion = Number(
+        req.params.idCotizacion
+      );
+
+      const {
+        costoMateriales,
+        costoManoObra,
+        observaciones,
+      } = req.body;
+
+      await this.service.actualizarPropuestaEmpresa(
+        idCotizacion,
+        Number(costoMateriales),
+        Number(costoManoObra),
+        observaciones
+      );
+
+      res.status(200).json({
+        mensaje: "Propuesta actualizada correctamente",
+      });
+    } catch (error: unknown) {
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al actualizar la propuesta";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
 
   public enviarCotizacion = async (
     req: Request,
@@ -318,6 +393,31 @@ export class CotizacionController {
 
       res.status(400).json({
         mensaje,
+      });
+    }
+  };
+
+  public seleccionarPropuesta = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idCotizacion = Number(
+        req.params.idCotizacion
+      );
+
+      await this.service.seleccionarPropuesta(
+        idCotizacion
+      );
+
+      res.status(200).json({
+        message: "Propuesta seleccionada correctamente",
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        message:
+          error.message ||
+          "Error al seleccionar la propuesta",
       });
     }
   };

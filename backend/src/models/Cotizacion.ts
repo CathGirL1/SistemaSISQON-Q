@@ -2,7 +2,7 @@ export class Cotizacion {
   constructor(
     private _idCotizacion: number | null,
     private _idProyecto: number,
-    private _idEmpresa: number | null,
+    private idEmpresa: number | null,
     private _fechaRealizada: Date | null,
     private _costoMateriales: number,
     private _costoManoObra: number,

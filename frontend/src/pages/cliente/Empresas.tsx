@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
+import HeaderCliente from "../../components/cliente/HeaderCliente";
 
 import type { EmpresaCliente } from "../../interfaces/EmpresaCliente";
 import EmpresaCard from "../../components/cliente/EmpresaCard";
@@ -27,7 +28,7 @@ export default function Empresas() {
   const [empresas, setEmpresas] = useState<EmpresaCliente[]>([]);
   const [cargando, setCargando] = useState(true);
   const [empresaSeleccionada, setEmpresaSeleccionada] =
-  useState<EmpresaCliente | null>(null);
+    useState<EmpresaCliente | null>(null);
   const [error, setError] = useState("");
   const [cotizacionesEnviadas, setCotizacionesEnviadas] = useState(0);
   const [cantidadProyectos, setCantidadProyectos] = useState(0);
@@ -45,7 +46,7 @@ export default function Empresas() {
     )
   );
 
-  
+
   const empresasFiltradas = empresas.filter((empresa) => {
     const coincideNombre = empresa.nombreEmpresa
       .toLowerCase()
@@ -67,7 +68,7 @@ export default function Empresas() {
   });
 
   const totalPaginas = Math.ceil(
-   empresasFiltradas.length / EMPRESAS_POR_PAGINA
+    empresasFiltradas.length / EMPRESAS_POR_PAGINA
   );
 
   const indiceInicio =
@@ -88,7 +89,7 @@ export default function Empresas() {
         setCargando(true);
         setError("");
 
-        const respuesta = await fetch( "http://localhost:3000/api/empresa");
+        const respuesta = await fetch("http://localhost:3000/api/empresa");
 
         if (!respuesta.ok) {
           throw new Error("No se pudieron obtener las empresas");
@@ -109,103 +110,103 @@ export default function Empresas() {
     obtenerEmpresas();
 
     const obtenerEstadisticas = async () => {
-    try {
+      try {
 
-      
 
-      const usuario = JSON.parse(
-        localStorage.getItem("usuario") || "{}"
-      );
 
-      const idCliente = Number(usuario.id_Cliente);
-
-      console.log("USUARIO GUARDADO:", usuario);
-console.log("ID CLIENTE:", usuario.idCliente);
-console.log("ID_CLIENTE:", usuario.id_Cliente);
-
-      const respuesta = await fetch(
-        `http://localhost:3000/api/cotizaciones/estadisticas/cliente/${idCliente}`
-      );
-
-      if (!respuesta.ok) {
-        throw new Error(
-          "No se pudieron obtener las estadísticas"
+        const usuario = JSON.parse(
+          localStorage.getItem("usuario") || "{}"
         );
-      }
 
-      const datos = await respuesta.json();
+        const idCliente = Number(usuario.id_Cliente);
 
-      console.log(
-        "Estadísticas recibidas:",
-        datos
-      );
+        console.log("USUARIO GUARDADO:", usuario);
+        console.log("ID CLIENTE:", usuario.idCliente);
+        console.log("ID_CLIENTE:", usuario.id_Cliente);
 
-      setCotizacionesEnviadas(
-        datos.cotizacionesEnviadas
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Error al obtener estadísticas:",
-        error
-      );
-
-    }
-  };
-
-  obtenerEstadisticas();
-
-  const obtenerProyectosDeCliente = async () => {
-    try {
-      const usuarioGuardado =
-        localStorage.getItem("usuario");
-
-      if (!usuarioGuardado) {
-        throw new Error("No hay un usuario autenticado");
-      }
-
-      const usuario = JSON.parse(usuarioGuardado);
-
-      const respuestaProyectos = await fetch(
-        `http://localhost:3000/api/proyectos/cliente/${usuario.id_Cliente}`
-      );
-
-      if (!respuestaProyectos.ok) {
-        throw new Error(
-          "No se pudieron obtener los proyectos"
+        const respuesta = await fetch(
+          `http://localhost:3000/api/cotizaciones/estadisticas/cliente/${idCliente}`
         );
+
+        if (!respuesta.ok) {
+          throw new Error(
+            "No se pudieron obtener las estadísticas"
+          );
+        }
+
+        const datos = await respuesta.json();
+
+        console.log(
+          "Estadísticas recibidas:",
+          datos
+        );
+
+        setCotizacionesEnviadas(
+          datos.cotizacionesEnviadas
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Error al obtener estadísticas:",
+          error
+        );
+
       }
+    };
 
-      const proyectos =
-        await respuestaProyectos.json();
+    obtenerEstadisticas();
 
-      console.log(
-        "Proyectos del cliente:",
-        proyectos
-      );
+    const obtenerProyectosDeCliente = async () => {
+      try {
+        const usuarioGuardado =
+          localStorage.getItem("usuario");
 
-      setCantidadProyectos(proyectos.length);
+        if (!usuarioGuardado) {
+          throw new Error("No hay un usuario autenticado");
+        }
 
-    } catch (error) {
-      console.error(
-        "Error al obtener proyectos:",
-        error
-      );
+        const usuario = JSON.parse(usuarioGuardado);
 
-      setError(
-        "No se pudieron cargar los proyectos."
-      );
+        const respuestaProyectos = await fetch(
+          `http://localhost:3000/api/proyectos/cliente/${usuario.id_Cliente}`
+        );
 
-    } finally {
-      setCargando(false);
-    }
-  };
+        if (!respuestaProyectos.ok) {
+          throw new Error(
+            "No se pudieron obtener los proyectos"
+          );
+        }
 
-  obtenerProyectosDeCliente();
+        const proyectos =
+          await respuestaProyectos.json();
+
+        console.log(
+          "Proyectos del cliente:",
+          proyectos
+        );
+
+        setCantidadProyectos(proyectos.length);
+
+      } catch (error) {
+        console.error(
+          "Error al obtener proyectos:",
+          error
+        );
+
+        setError(
+          "No se pudieron cargar los proyectos."
+        );
+
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    obtenerProyectosDeCliente();
   }, []);
 
-  
+
 
   return (
     <div className="cliente-panel">
@@ -216,6 +217,10 @@ console.log("ID_CLIENTE:", usuario.id_Cliente);
       />
 
       <main className="cliente-main">
+        <HeaderCliente
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((prev) => !prev)}
+        />
 
         {empresaSeleccionada ? (
 

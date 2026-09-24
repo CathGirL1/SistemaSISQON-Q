@@ -206,13 +206,19 @@ export default function DescargarCotizacionPDF({
 
       // El total se obtiene de materiales + mano de obra.
       const costoMaterialesUSD =
-      Number(cotizacion.costoMateriales) || 0;
+        Number(cotizacion.costoMateriales) || 0;
 
       const costoManoObraUSD =
         Number(cotizacion.costoManoObra) || 0;
 
-      const costoConstruccion =
+      <const costoConstruccion =
         Number(cotizacion.costoConstruccion) || 0;
+
+      // El total oficial de la cotización proviene del backend.
+      // No se recalcula sumando componentes para evitar
+      // diferencias producidas por redondeo.
+      const totalUSD =
+        Number(cotizacion.totalCotizacion) || 0;
 
       const esMonedaUYU =
         cotizacion.monedaCalculo === "UYU";
@@ -224,28 +230,28 @@ export default function DescargarCotizacionPDF({
       const costoManoObraUYU =
         convertirUSDaUYU(costoManoObraUSD);
 
-    // Para Quincho/Requincho, el costo de construcción
-    // ya es integral y viene expresado en UYU.
-    const costoConstruccionUSD =
-      esMonedaUYU && tipoCambio > 0
-        ? costoConstruccion / tipoCambio
-        : costoConstruccion;
+      // Para Quincho/Requincho, el costo de construcción
+      // ya es integral y viene expresado en UYU.
+      const costoConstruccionUSD =
+        esMonedaUYU && tipoCambio > 0
+          ? costoConstruccion / tipoCambio
+          : costoConstruccion;
 
-    const costoConstruccionUYU =
-      esMonedaUYU
-        ? costoConstruccion
-        : convertirUSDaUYU(costoConstruccion);
+      const costoConstruccionUYU =
+        esMonedaUYU
+          ? costoConstruccion
+          : convertirUSDaUYU(costoConstruccion);
 
-    // Total según el tipo de cálculo
-    const totalUSD = esMonedaUYU
-      ? costoConstruccionUSD
-      : costoMaterialesUSD +
+      // Total según el tipo de cálculo
+      const totalUSD = esMonedaUYU
+        ? costoConstruccionUSD
+        : costoMaterialesUSD +
         costoManoObraUSD +
         costoConstruccion;
 
-    const totalUYU = esMonedaUYU
-      ? costoConstruccion
-      : convertirUSDaUYU(totalUSD);
+      const totalUYU = esMonedaUYU
+        ? costoConstruccion
+        : convertirUSDaUYU(totalUSD);
 
       // -------------------------------------------------
       // CREAR PDF
@@ -262,11 +268,11 @@ export default function DescargarCotizacionPDF({
       const anchoPagina =
         doc.internal.pageSize.getWidth();
 
-        const alturaPagina = doc.internal.pageSize.getHeight();
+      const alturaPagina = doc.internal.pageSize.getHeight();
 
-        // Espacio reservado para evitar que el contenido
-        // se superponga con el pie de página.
-        const limiteContenido = alturaPagina - 35;
+      // Espacio reservado para evitar que el contenido
+      // se superponga con el pie de página.
+      const limiteContenido = alturaPagina - 35;
 
       // =================================================
       // ENCABEZADO
@@ -345,50 +351,50 @@ export default function DescargarCotizacionPDF({
       // INFORMACIÓN DEL CLIENTE
       // =====================================================
 
-        let y = 80;
+      let y = 80;
 
-        const verificarEspacio = (espacioNecesario: number) => {
-            if (y + espacioNecesario > limiteContenido) {
-                doc.addPage();
-                y = 25;
-            }
-        };
+      const verificarEspacio = (espacioNecesario: number) => {
+        if (y + espacioNecesario > limiteContenido) {
+          doc.addPage();
+          y = 25;
+        }
+      };
 
-        doc.setFont("times", "bold");
-        doc.setFontSize(13);
+      doc.setFont("times", "bold");
+      doc.setFontSize(13);
 
-        doc.text(
+      doc.text(
         "Datos del cliente",
         margen,
         y
-        );
+      );
 
-        y += 8;
+      y += 8;
 
-        doc.setFont("times", "normal");
-        doc.setFontSize(10);
+      doc.setFont("times", "normal");
+      doc.setFontSize(10);
 
-        doc.text(
+      doc.text(
         `Cliente: ${cotizacion.cliente ?? "No disponible"}`,
         margen,
         y
-        );
+      );
 
-        y += 6;
+      y += 6;
 
-        doc.text(
+      doc.text(
         `Email: ${cotizacion.email ?? "No disponible"}`,
         margen,
         y
-        );
+      );
 
-        y += 6;
+      y += 6;
 
-        doc.text(
+      doc.text(
         `Teléfono: ${cotizacion.telefono ?? "No disponible"}`,
         margen,
         y
-        );
+      );
 
       // =================================================
       // DATOS DEL PROYECTO
@@ -496,34 +502,34 @@ export default function DescargarCotizacionPDF({
         y
       );
 
-    // =====================================================
-    // ACLARACIÓN DEL CÁLCULO
-    // =====================================================
+      // =====================================================
+      // ACLARACIÓN DEL CÁLCULO
+      // =====================================================
 
-    y += 12;
+      y += 12;
 
-    doc.setFont("times", "bold");
-    doc.setFontSize(11);
-    doc.text("Criterio de cálculo", margen, y);
+      doc.setFont("times", "bold");
+      doc.setFontSize(11);
+      doc.text("Criterio de cálculo", margen, y);
 
-    y += 6;
+      y += 6;
 
-    doc.setFont("times", "normal");
-    doc.setFontSize(9);
+      doc.setFont("times", "normal");
+      doc.setFontSize(9);
 
-    const aclaracionCalculo =
-    "La cotización toma como referencia las dimensiones ingresadas del proyecto " +
-    "(ancho, largo y alto). La superficie se calcula a partir de estas dimensiones " +
-    "y se utiliza el metro cuadrado (m²) como unidad de referencia para la estimación.";
+      const aclaracionCalculo =
+        "La cotización toma como referencia las dimensiones ingresadas del proyecto " +
+        "(ancho, largo y alto). La superficie se calcula a partir de estas dimensiones " +
+        "y se utiliza el metro cuadrado (m²) como unidad de referencia para la estimación.";
 
-    const textoAclaracion = doc.splitTextToSize(
-    aclaracionCalculo,
-    anchoPagina - margen * 2
-    );
+      const textoAclaracion = doc.splitTextToSize(
+        aclaracionCalculo,
+        anchoPagina - margen * 2
+      );
 
-    doc.text(textoAclaracion, margen, y);
+      doc.text(textoAclaracion, margen, y);
 
-    y += textoAclaracion.length * 4.5;
+      y += textoAclaracion.length * 4.5;
 
       // =================================================
       // MATERIALES
@@ -562,32 +568,34 @@ export default function DescargarCotizacionPDF({
           body: cotizacion.materiales.map(
             (material) => {
               // -----------------------------------------
-              // MATERIAL EN USD
+              // MATERIAL EN UYU
               // -----------------------------------------
 
-              const costoUnitarioUSD =
+              const costoUnitarioUYU =
                 Number(
                   material.costoUnitario
                 ) || 0;
 
-              const subtotalUSD =
+              const subtotalUYU =
                 Number(
                   material.subtotal
                 ) || 0;
 
               // -----------------------------------------
-              // CONVERSIÓN A UYU
+              // CONVERSIÓN A USD
               // -----------------------------------------
 
-              const costoUnitarioUYU =
-                convertirUSDaUYU(
-                  costoUnitarioUSD
-                );
+              const costoUnitarioUSD =
+                cotizacion.tipoCambio > 0
+                  ? costoUnitarioUYU /
+                  cotizacion.tipoCambio
+                  : 0;
 
-              const subtotalUYU =
-                convertirUSDaUYU(
-                  subtotalUSD
-                );
+              const subtotalUSD =
+                cotizacion.tipoCambio > 0
+                  ? subtotalUYU /
+                  cotizacion.tipoCambio
+                  : 0;
 
               return [
                 material.nombre,
@@ -743,197 +751,197 @@ export default function DescargarCotizacionPDF({
       // COSTO MATERIALES
       // -------------------------------------------------
 
-    // -------------------------------------------------
-// COSTOS
-// -------------------------------------------------
+      // -------------------------------------------------
+      // COSTOS
+      // -------------------------------------------------
 
-doc.setFont("times", "normal");
-doc.setFontSize(10);
+      doc.setFont("times", "normal");
+      doc.setFontSize(10);
 
-if (esMonedaUYU) {
-  // =================================================
-  // CONSTRUCCIÓN INTEGRAL
-  // =================================================
+      if (esMonedaUYU) {
+        // =================================================
+        // CONSTRUCCIÓN INTEGRAL
+        // =================================================
 
-  doc.text(
-    "Construcción integral:",
-    margen,
-    y
-  );
+        doc.text(
+          "Construcción integral:",
+          margen,
+          y
+        );
 
-  doc.text(
-    `$${formatearUYU(costoConstruccion)} UYU`,
-    anchoPagina - margen,
-    y,
-    {
-      align: "right",
-    }
-  );
+        doc.text(
+          `$${formatearUYU(costoConstruccion)} UYU`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
 
-  y += 5;
+        y += 5;
 
-  doc.setFontSize(9);
+        doc.setFontSize(9);
 
-  doc.text(
-    `($${formatearUSD(costoConstruccionUSD)} USD)`,
-    anchoPagina - margen,
-    y,
-    {
-      align: "right",
-    }
-  );
+        doc.text(
+          `($${formatearUSD(costoConstruccionUSD)} USD)`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
 
-  y += 9;
+        y += 9;
 
-} else {
-    // =================================================
-    // COSTO MATERIALES
-    // =================================================
+      } else {
+        // =================================================
+        // COSTO MATERIALES
+        // =================================================
 
-    doc.setFontSize(10);
+        doc.setFontSize(10);
 
-    doc.text(
-      "Costo de materiales:",
-      margen,
-      y
-    );
+        doc.text(
+          "Costo de materiales:",
+          margen,
+          y
+        );
 
-    doc.text(
-      `$${formatearUSD(costoMaterialesUSD)} USD`,
-      anchoPagina - margen,
-      y,
-      {
-        align: "right",
+        doc.text(
+          `$${formatearUSD(costoMaterialesUSD)} USD`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
+
+        y += 5;
+
+        doc.setFontSize(9);
+
+        doc.text(
+          `($${formatearUYU(costoMaterialesUYU)} UYU)`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
+
+        y += 9;
+
+        // =================================================
+        // MANO DE OBRA
+        // =================================================
+
+        doc.setFontSize(10);
+
+        doc.text(
+          "Costo de mano de obra:",
+          margen,
+          y
+        );
+
+        doc.text(
+          `$${formatearUSD(costoManoObraUSD)} USD`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
+
+        y += 5;
+
+        doc.setFontSize(9);
+
+        doc.text(
+          `($${formatearUYU(costoManoObraUYU)} UYU)`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
+
+        y += 9;
       }
-    );
 
-    y += 5;
+      // =================================================
+      // TOTAL
+      // =================================================
 
-    doc.setFontSize(9);
+      y += 1;
 
-    doc.text(
-      `($${formatearUYU(costoMaterialesUYU)} UYU)`,
-      anchoPagina - margen,
-      y,
-      {
-        align: "right",
+      doc.setLineWidth(0.4);
+
+      doc.line(
+        margen,
+        y,
+        anchoPagina - margen,
+        y
+      );
+
+      y += 10;
+
+      doc.setFont("times", "bold");
+      doc.setFontSize(15);
+
+      doc.text(
+        "TOTAL",
+        margen,
+        y
+      );
+
+      if (esMonedaUYU) {
+        doc.text(
+          `$${formatearUYU(totalUYU)} UYU`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
+
+        y += 7;
+
+        doc.setFont("times", "normal");
+        doc.setFontSize(10);
+
+        doc.text(
+          `($${formatearUSD(totalUSD)} USD)`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
+      } else {
+        doc.text(
+          `$${formatearUSD(totalUSD)} USD`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
+
+        y += 7;
+
+        doc.setFont("times", "normal");
+        doc.setFontSize(10);
+
+        doc.text(
+          `($${formatearUYU(totalUYU)} UYU)`,
+          anchoPagina - margen,
+          y,
+          {
+            align: "right",
+          }
+        );
       }
-    );
 
-    y += 9;
-
-    // =================================================
-    // MANO DE OBRA
-    // =================================================
-
-    doc.setFontSize(10);
-
-    doc.text(
-      "Costo de mano de obra:",
-      margen,
-      y
-    );
-
-    doc.text(
-      `$${formatearUSD(costoManoObraUSD)} USD`,
-      anchoPagina - margen,
-      y,
-      {
-        align: "right",
-      }
-    );
-
-    y += 5;
-
-    doc.setFontSize(9);
-
-    doc.text(
-      `($${formatearUYU(costoManoObraUYU)} UYU)`,
-      anchoPagina - margen,
-      y,
-      {
-        align: "right",
-      }
-    );
-
-    y += 9;
-  }
-
-  // =================================================
-  // TOTAL
-  // =================================================
-
-  y += 1;
-
-  doc.setLineWidth(0.4);
-
-  doc.line(
-    margen,
-    y,
-    anchoPagina - margen,
-    y
-  );
-
-  y += 10;
-
-  doc.setFont("times", "bold");
-  doc.setFontSize(15);
-
-  doc.text(
-    "TOTAL",
-    margen,
-    y
-  );
-
-  if (esMonedaUYU) {
-    doc.text(
-      `$${formatearUYU(totalUYU)} UYU`,
-      anchoPagina - margen,
-      y,
-      {
-        align: "right",
-      }
-    );
-
-    y += 7;
-
-    doc.setFont("times", "normal");
-    doc.setFontSize(10);
-
-    doc.text(
-      `($${formatearUSD(totalUSD)} USD)`,
-      anchoPagina - margen,
-      y,
-      {
-        align: "right",
-      }
-    );
-  } else {
-    doc.text(
-      `$${formatearUSD(totalUSD)} USD`,
-      anchoPagina - margen,
-      y,
-      {
-        align: "right",
-      }
-    );
-
-    y += 7;
-
-    doc.setFont("times", "normal");
-    doc.setFontSize(10);
-
-    doc.text(
-      `($${formatearUYU(totalUYU)} UYU)`,
-      anchoPagina - margen,
-      y,
-      {
-        align: "right",
-      }
-    );
-  }
-
-  y += 9;
+      y += 9;
 
       // =================================================
       // TIPO DE CAMBIO

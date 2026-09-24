@@ -68,7 +68,14 @@ export class Quincho implements ITipoObraStrategy {
          * por lo tanto no se vuelven a sumar.
          */
 
-        const totalMateriales = 0;
+        const totalMateriales =
+            materiales.reduce(
+                (total, material) =>
+                    total +
+                    Number(material.cantidad) *
+                    Number(material.costoUnitario),
+                0
+            );
 
 
         /* =================================================
@@ -79,7 +86,8 @@ export class Quincho implements ITipoObraStrategy {
          * del precio de $6.000 UYU por m².
          */
 
-        const manoDeObra = 0;
+        const manoDeObra =
+            costoConstruccion;
 
 
         /* =================================================
@@ -87,7 +95,8 @@ export class Quincho implements ITipoObraStrategy {
          * ================================================= */
 
         const totalGeneral =
-            costoConstruccion;
+            totalMateriales +
+            manoDeObra;
 
 
         /* =================================================

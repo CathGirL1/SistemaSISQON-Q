@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import "../../../styles/empresa/cotizaciones/DetalleCotizacionModal.css";
 
 import ModalBase from "../../common/ModalBase";
@@ -43,6 +44,69 @@ export default function DetalleCotizacionModal({
   cotizacion,
   onCerrar,
 }: Props) {
+  const [editando, setEditando] = useState(false);
+  const [costoMateriales, setCostoMateriales] = useState(0);
+  const [costoManoObra, setCostoManoObra] = useState(0);
+  const [observaciones, setObservaciones] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [mensaje, setMensaje] = useState("");
+
+  useEffect(() => {
+    if (!cotizacion) return;
+
+    setCostoMateriales(cotizacion.costoMateriales);
+    setCostoManoObra(cotizacion.costoManoObra);
+    setObservaciones(cotizacion.observaciones ?? "");
+    setEditando(false);
+    setMensaje("");
+  }, [cotizacion]);
+
+  const totalPropuesta =
+    costoMateriales + costoManoObra;
+
+  const guardarPropuesta = async () => {
+    if (!cotizacion) return;
+
+    try {
+      setGuardando(true);
+      setMensaje("");
+
+      const response = await fetch(
+        `http://localhost:3000/api/cotizaciones/${cotizacion.idCotizacion}/propuesta`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            costoMateriales,
+            costoManoObra,
+            observaciones,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.mensaje ||
+          "No se pudo actualizar la propuesta"
+        );
+      }
+
+      setMensaje("Propuesta actualizada correctamente");
+      setEditando(false);
+    } catch (error) {
+      setMensaje(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al actualizar la propuesta"
+      );
+    } finally {
+      setGuardando(false);
+    }
+  };
   if (!cotizacion) return null;
 
   return (
@@ -214,7 +278,7 @@ export default function DetalleCotizacionModal({
           <h3>Materiales</h3>
 
           {cotizacion.materiales &&
-          cotizacion.materiales.length > 0 ? (
+            cotizacion.materiales.length > 0 ? (
 
             <div className="materiales-tabla-container">
 
@@ -300,57 +364,128 @@ export default function DetalleCotizacionModal({
 
           <h3>Costos de la cotización</h3>
 
-          <div className="costos-cotizacion">
+          {!editando ? (
+            <>
+              <div className="costos-cotizacion">
 
-            <div className="costo-item">
+                <div className="costo-item">
+                  <span>Materiales</span>
+                  <strong>
+                    {formatearMoneda(
+                      costoMateriales,
+                      cotizacion.tipoCambio
+                    )}
+                  </strong>
+                </div>
 
-              <span>
-                Materiales
-              </span>
+                <div className="costo-item">
+                  <span>Mano de obra</span>
+                  <strong>
+                    {formatearMoneda(
+                      costoManoObra,
+                      cotizacion.tipoCambio
+                    )}
+                  </strong>
+                </div>
 
-              <strong>
-                {formatearMoneda(
-                  cotizacion.costoMateriales,
-                  cotizacion.tipoCambio
-                )}
-              </strong>
+                <div className="costo-item costo-total">
+                  <span>Total</span>
+                  <strong>
+                    {formatearMoneda(
+                      totalPropuesta,
+                      cotizacion.tipoCambio
+                    )}
+                  </strong>
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setEditando(true)}
+              >
+                Editar propuesta
+              </button>
+            </>
+          ) : (
+            <div className="editar-propuesta">
+
+              <div className="detalle-item">
+                <strong>Costo de materiales</strong>
+
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={costoMateriales}
+                  onChange={(e) =>
+                    setCostoMateriales(Number(e.target.value))
+                  }
+                />
+              </div>
+
+              <div className="detalle-item">
+                <strong>Costo de mano de obra</strong>
+
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={costoManoObra}
+                  onChange={(e) =>
+                    setCostoManoObra(Number(e.target.value))
+                  }
+                />
+              </div>
+
+              <div className="detalle-item">
+                <strong>Observaciones</strong>
+
+                <textarea
+                  value={observaciones}
+                  onChange={(e) =>
+                    setObservaciones(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="costo-item costo-total">
+                <span>Total de la propuesta</span>
+
+                <strong>
+                  {formatearMoneda(
+                    totalPropuesta,
+                    cotizacion.tipoCambio
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setEditando(false)}
+                  disabled={guardando}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={guardarPropuesta}
+                  disabled={guardando}
+                >
+                  {guardando
+                    ? "Guardando..."
+                    : "Guardar propuesta"}
+                </button>
+              </div>
 
             </div>
+          )}
 
-
-            <div className="costo-item">
-
-              <span>
-                Mano de obra
-              </span>
-
-              <strong>
-                {formatearMoneda(
-                  cotizacion.costoManoObra,
-                  cotizacion.tipoCambio
-                )}
-              </strong>
-
-            </div>
-
-
-            <div className="costo-item costo-total">
-
-              <span>
-                Total
-              </span>
-
-              <strong>
-                {formatearMoneda(
-                  cotizacion.totalCotizacion,
-                  cotizacion.tipoCambio
-                )}
-              </strong>
-
-            </div>
-
-          </div>
-
+          {mensaje && (
+            <p>{mensaje}</p>
+          )}
         </section>
 
 
@@ -407,44 +542,46 @@ export default function DetalleCotizacionModal({
 
             {cotizacion.precioEstimado !==
               null && (
-              <div className="detalle-item">
+                <div className="detalle-item">
 
-                <strong>
-                  Precio estimado
-                </strong>
+                  <strong>
+                    Precio estimado
+                  </strong>
 
-                <p>
-                  {formatearMoneda(
-                    cotizacion.precioEstimado,
-                    cotizacion.tipoCambio
-                  )}
-                </p>
+                  <p>
+                    {formatearMoneda(
+                      cotizacion.precioEstimado,
+                      cotizacion.tipoCambio
+                    )}
+                  </p>
+                </div >
+              )
+            }
 
-              </div>
-            )}
-
-          </div>
+          </div >
 
 
           {/* OBSERVACIONES */}
 
-          {cotizacion.observaciones && (
-            <div className="detalle-descripcion">
+          {
+            cotizacion.observaciones && (
+              <div className="detalle-descripcion">
 
-              <strong>
-                Observaciones
-              </strong>
+                <strong>
+                  Observaciones
+                </strong>
 
-              <p>
-                {cotizacion.observaciones}
-              </p>
+                <p>
+                  {cotizacion.observaciones}
+                </p>
 
-            </div>
-          )}
+              </div>
+            )
+          }
 
-        </section>
+        </section >
 
-      </div>
-    </ModalBase>
+      </div >
+    </ModalBase >
   );
 }

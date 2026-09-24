@@ -53,6 +53,10 @@ export interface Cotizacion {
   costoManoObra: number;
   totalCotizacion: number;
 
+  costoMaterialesUYU: number;
+  costoManoObraUYU: number;
+  totalCotizacionUYU: number;
+
   estado: EstadoCotizacion;
 
   precioEstimado: number | null;
@@ -63,7 +67,7 @@ export interface Cotizacion {
   // MATERIALES
   // ==========================================
 
- 
+
 
   resumenMateriales: string;
   materiales: {
@@ -91,6 +95,6 @@ export interface Cotizacion {
   tipoCambio: number;
   precioEstimadoUYU: number | null;
 
-  
+
 }
 

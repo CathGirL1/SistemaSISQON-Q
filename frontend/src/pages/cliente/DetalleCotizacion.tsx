@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import {
+  useLocation,
   useNavigate,
   useParams,
 } from "react-router-dom";
@@ -18,6 +19,7 @@ import {
   Ruler,
   MapPin,
   Package,
+  DollarSign,
 } from "lucide-react";
 
 import { type ProyectoAPI } from "../cliente/MisProyectos";
@@ -67,6 +69,14 @@ interface Cotizacion {
 
   // Tipo de cambio utilizado
   tipoCambio: number;
+
+  costoMateriales: number;
+  costoManoObra: number;
+  totalCotizacion: number;
+
+  costoMaterialesUYU: number;
+  costoManoObraUYU: number;
+  totalCotizacionUYU: number;
 
   moneda: string;
 
@@ -124,6 +134,7 @@ const API_URL =
 
 export default function DetalleCotizacion() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { idCotizacion } = useParams();
 
@@ -184,7 +195,7 @@ export default function DetalleCotizacion() {
       if (!response.ok) {
         throw new Error(
           data.mensaje ||
-            "No se pudo obtener la cotización"
+          "No se pudo obtener la cotización"
         );
       }
 
@@ -262,7 +273,7 @@ export default function DetalleCotizacion() {
       if (!response.ok) {
         throw new Error(
           data.mensaje ||
-            "No se pudo eliminar la cotización"
+          "No se pudo eliminar la cotización"
         );
       }
 
@@ -322,13 +333,21 @@ export default function DetalleCotizacion() {
 
           <button
             type="button"
-            onClick={() =>
-              navigate(
-                "/panel-cliente/cotizaciones"
-              )
-            }
+            onClick={() => {
+              if (location.state?.origen === "comparador") {
+                navigate(
+                  "/panel-cliente/comparador",
+                  {
+                    state: location.state.estadoComparador,
+                  }
+                );
+                return;
+              }
+
+              navigate(-1);
+            }}
           >
-            Volver a Mis cotizaciones
+            Volver
           </button>
 
         </div>
@@ -369,15 +388,22 @@ export default function DetalleCotizacion() {
           <button
             type="button"
             className="detalle-cotizacion-back"
-            onClick={() =>
-              navigate(
-                "/panel-cliente/cotizaciones"
-              )
-            }
+            onClick={() => {
+              if (location.state?.origen === "comparador") {
+                navigate(
+                  "/panel-cliente/comparador",
+                  {
+                    state: location.state.estadoComparador,
+                  }
+                );
+                return;
+              }
+
+              navigate(-1);
+            }}
           >
             <ArrowLeft size={18} />
-
-            Volver a Mis cotizaciones
+            Volver
           </button>
 
           <div className="detalle-cotizacion-header">
@@ -503,8 +529,8 @@ export default function DetalleCotizacion() {
                 value={
                   cotizacion.fechaActualizacion
                     ? formatearFecha(
-                        cotizacion.fechaActualizacion
-                      )
+                      cotizacion.fechaActualizacion
+                    )
                     : "Sin modificaciones"
                 }
               />
@@ -670,45 +696,37 @@ export default function DetalleCotizacion() {
                 {cotizacion.materiales?.map(
                   (material) => {
 
-                    
 
-                    // -----------------------------------------
-                    // PRECIO UNITARIO USD
-                    // -----------------------------------------
-
-                    const precioUSD =
-                      Number(
-                        material.costoUnitario
-                      );
 
                     // -----------------------------------------
                     // PRECIO UNITARIO UYU
                     // -----------------------------------------
 
                     const precioUYU =
-                      precioUSD *
-                      Number(
-                        cotizacion.tipoCambio
-                      );
+                      Number(material.costoUnitario);
 
                     // -----------------------------------------
-                    // SUBTOTAL USD
+                    // PRECIO UNITARIO USD
                     // -----------------------------------------
 
-                    const subtotalUSD =
-                      Number(
-                        material.subtotal
-                      );
+                    const precioUSD =
+                      precioUYU /
+                      Number(cotizacion.tipoCambio);
 
                     // -----------------------------------------
                     // SUBTOTAL UYU
                     // -----------------------------------------
 
                     const subtotalUYU =
-                      subtotalUSD *
-                      Number(
-                        cotizacion.tipoCambio
-                      );
+                      Number(material.subtotal);
+
+                    // -----------------------------------------
+                    // SUBTOTAL USD
+                    // -----------------------------------------
+
+                    const subtotalUSD =
+                      subtotalUYU /
+                      Number(cotizacion.tipoCambio);
 
                     return (
 
@@ -825,6 +843,121 @@ export default function DetalleCotizacion() {
               </div>
 
             )}
+
+          </article>
+          {/* ================================================= */}
+          {/* RESUMEN DE COSTOS */}
+          {/* ================================================= */}
+
+          <article className="detalle-cotizacion-card">
+
+            <CardTitle
+              icon={<DollarSign size={21} />}
+              title="Resumen de costos"
+            />
+
+            <div className="detalle-cotizacion-materiales-lista">
+
+              {/* MATERIALES */}
+
+              <div className="detalle-cotizacion-material">
+
+                <div className="detalle-cotizacion-material-nombre">
+                  Materiales
+                </div>
+
+                <div className="detalle-cotizacion-material-dato">
+                  <span>Total</span>
+
+                  <strong>
+                    <div className="precio-doble">
+                      <span>
+                        {formatearPrecioUYU(
+                          cotizacion.costoMaterialesUYU
+                        )}{" "}
+                        UYU
+                      </span>
+
+                      <small>
+                        (
+                        {formatearPrecioUSD(
+                          cotizacion.costoMateriales
+                        )}{" "}
+                        USD)
+                      </small>
+                    </div>
+                  </strong>
+                </div>
+
+              </div>
+
+              {/* MANO DE OBRA */}
+
+              <div className="detalle-cotizacion-material">
+
+                <div className="detalle-cotizacion-material-nombre">
+                  Mano de obra
+                </div>
+
+                <div className="detalle-cotizacion-material-dato">
+                  <span>Total</span>
+
+                  <strong>
+                    <div className="precio-doble">
+                      <span>
+                        {formatearPrecioUYU(
+                          cotizacion.costoManoObraUYU
+                        )}{" "}
+                        UYU
+                      </span>
+
+                      <small>
+                        (
+                        {formatearPrecioUSD(
+                          cotizacion.costoManoObra
+                        )}{" "}
+                        USD)
+                      </small>
+                    </div>
+                  </strong>
+                </div>
+
+              </div>
+
+              {/* TOTAL GENERAL */}
+
+              <div className="detalle-cotizacion-material">
+
+                <div className="detalle-cotizacion-material-nombre">
+                  Total estimado
+                </div>
+
+                <div className="detalle-cotizacion-material-dato">
+                  <span>Total</span>
+
+                  <strong>
+                    <div className="precio-doble">
+                      <span>
+                        {formatearPrecioUYU(
+                          cotizacion.totalCotizacionUYU
+                        )}{" "}
+                        UYU
+                      </span>
+
+                      <small>
+                        (
+                        {formatearPrecioUSD(
+                          cotizacion.totalCotizacion
+                        )}{" "}
+                        USD)
+                      </small>
+                    </div>
+                  </strong>
+                </div>
+
+              </div>
+
+            </div>
 
           </article>
 

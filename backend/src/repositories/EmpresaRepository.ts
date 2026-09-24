@@ -94,8 +94,8 @@ export class EmpresaRepository {
           e.id_Empresa AS idEmpresa,
           e.id_Usuario AS idUsuario,
 
-          ISNULL(e.razonSocial, '') AS razonSocial,
-          ISNULL(e.nombreComercial, '') AS nombreComercial,
+          ISNULL(e.nombreEmpresa, '') AS razonSocial,
+          ISNULL(e.nombreEmpresa, '') AS nombreComercial,
 
           ISNULL(e.rut, '') AS rut,
           ISNULL(e.rubro, '') AS rubro,
@@ -154,8 +154,8 @@ export class EmpresaRepository {
           e.id_Empresa AS idEmpresa,
           e.id_Usuario AS idUsuario,
 
-          ISNULL(e.razonSocial, '') AS razonSocial,
-          ISNULL(e.nombreComercial, '') AS nombreComercial,
+          ISNULL(e.nombreEmpresa, '') AS razonSocial,
+          ISNULL(e.nombreEmpresa, '') AS nombreComercial,
 
           ISNULL(e.rut, '') AS rut,
           ISNULL(e.rubro, '') AS rubro,

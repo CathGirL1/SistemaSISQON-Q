@@ -145,15 +145,15 @@ export class CotizacionService {
 
   public async obtenerEstadisticasCliente(
     idCliente: number
-    ) {
+  ) {
 
     this.validarId(
-        idCliente,
-        "El id del cliente no es válido"
+      idCliente,
+      "El id del cliente no es válido"
     );
 
     return await this.repository
-        .obtenerEstadisticasCliente(idCliente);
+      .obtenerEstadisticasCliente(idCliente);
   }
   public async generarCotizacion(
     idProyecto: number
@@ -274,6 +274,12 @@ export class CotizacionService {
     let totalGeneralUSD =
       resultado.totalGeneral;
 
+    let costoMaterialesUSD =
+      resultado.totalMateriales;
+
+    let costoManoObraUSD =
+      resultado.manoDeObra;
+
     if (resultado.moneda === "UYU") {
 
       const tipoCambio =
@@ -282,6 +288,14 @@ export class CotizacionService {
 
       totalGeneralUSD =
         resultado.totalGeneral /
+        tipoCambio;
+
+      costoMaterialesUSD =
+        resultado.totalMateriales /
+        tipoCambio;
+
+      costoManoObraUSD =
+        resultado.manoDeObra /
         tipoCambio;
     }
     // =========================================
@@ -348,14 +362,10 @@ export class CotizacionService {
       estado: "Borrador",
 
       costoMateriales:
-        resultado.moneda === "UYU"
-          ? 0
-          : resultado.totalMateriales,
+        costoMaterialesUSD,
 
       costoManoObra:
-        resultado.moneda === "UYU"
-          ? 0
-          : resultado.manoDeObra,
+        costoManoObraUSD,
 
       totalCotizacion:
         totalGeneralUSD,
@@ -368,6 +378,143 @@ export class CotizacionService {
 
       version,
     });
+  }
+
+  // =========================================================
+  // CREAR PROPUESTA PARA EMPRESA
+  // =========================================================
+
+  public async crearPropuestaEmpresa(
+    idCotizacionBase: number,
+    idEmpresa: number
+  ): Promise<number> {
+
+    this.validarId(
+      idCotizacionBase,
+      "El id de la cotización no es válido"
+    );
+
+    this.validarId(
+      idEmpresa,
+      "El id de la empresa no es válido"
+    );
+
+    // Obtener la cotización que servirá como base
+    const cotizacionBase =
+      await this.repository.obtenerCotizacionPorId(
+        idCotizacionBase
+      );
+
+    if (!cotizacionBase) {
+      throw new Error(
+        "Cotización base no encontrada"
+      );
+    }
+
+    // Obtener una nueva versión dentro del mismo proyecto
+    const version =
+      await this.repository.obtenerProximaVersion(
+        cotizacionBase.idProyecto
+      );
+
+    // Crear una nueva cotización vinculada a la empresa
+    return this.repository.crearCotizacion({
+
+      idProyecto:
+        cotizacionBase.idProyecto,
+
+      idEmpresa,
+
+      estado:
+        "Borrador",
+
+      costoMateriales:
+        cotizacionBase.costoMateriales,
+
+      costoManoObra:
+        cotizacionBase.costoManoObra,
+
+      totalCotizacion:
+        cotizacionBase.totalCotizacion,
+
+      precioEstimado:
+        cotizacionBase.precioEstimado,
+
+      observaciones:
+        cotizacionBase.observaciones,
+
+      version,
+    });
+  }
+
+  // =========================================================
+  // ACTUALIZAR PROPUESTA DE EMPRESA
+  // =========================================================
+
+  public async actualizarPropuestaEmpresa(
+    idCotizacion: number,
+    costoMateriales: number,
+    costoManoObra: number,
+    observaciones?: string | null
+  ): Promise<void> {
+
+    this.validarId(
+      idCotizacion,
+      "El id de la cotización no es válido"
+    );
+
+    const cotizacion =
+      await this.repository.obtenerCotizacionPorId(
+        idCotizacion
+      );
+
+    if (!cotizacion) {
+      throw new Error(
+        "Cotización no encontrada"
+      );
+    }
+
+    // La cotización debe pertenecer a una empresa
+    if (!cotizacion.idEmpresa) {
+      throw new Error(
+        "La cotización no está asociada a una empresa"
+      );
+    }
+
+    if (
+      !Number.isFinite(costoMateriales) ||
+      costoMateriales < 0
+    ) {
+      throw new Error(
+        "El costo de materiales no es válido"
+      );
+    }
+
+    if (
+      !Number.isFinite(costoManoObra) ||
+      costoManoObra < 0
+    ) {
+      throw new Error(
+        "El costo de mano de obra no es válido"
+      );
+    }
+
+    const totalCotizacion =
+      costoMateriales + costoManoObra;
+
+    await this.repository.actualizarCotizacion(
+      idCotizacion,
+      {
+        costoMateriales,
+        costoManoObra,
+        totalCotizacion,
+        precioEstimado: totalCotizacion,
+        observaciones:
+          observaciones !== undefined
+            ? observaciones
+            : cotizacion.observaciones,
+      }
+    );
   }
 
 
@@ -619,6 +766,21 @@ export class CotizacionService {
       await this.repository.obtenerCotizacionBorradorPorProyecto(
         idProyecto
       );
+
+    if (
+      borradorExistente &&
+      borradorExistente.idCotizacion === idCotizacion
+    ) {
+      await this.repository.actualizarCotizacion(
+        idCotizacion,
+        {
+          estado: data.estado,
+          observaciones: data.observaciones,
+        }
+      );
+
+      return idCotizacion;
+    }
 
     if (borradorExistente) {
       return borradorExistente.idCotizacion;
@@ -1062,6 +1224,52 @@ export class CotizacionService {
     }
   }
 
+  public async seleccionarPropuesta(
+    idCotizacion: number
+  ): Promise<void> {
+
+    this.validarId(
+      idCotizacion,
+      "El id de la cotización no es válido"
+    );
+
+    const cotizacion =
+      await this.repository.obtenerCotizacionPorId(
+        idCotizacion
+      );
+
+    if (!cotizacion) {
+      throw new Error(
+        "Cotización no encontrada"
+      );
+    }
+
+    if (
+      cotizacion.idEmpresa === null ||
+      cotizacion.idEmpresa === undefined
+    ) {
+      throw new Error(
+        "La cotización seleccionada no pertenece a una empresa"
+      );
+    }
+
+    if (cotizacion.estado !== "Borrador") {
+      throw new Error(
+        "Solo se puede seleccionar una propuesta en estado Borrador"
+      );
+    }
+
+    const seleccionada =
+      await this.repository.seleccionarPropuesta(
+        idCotizacion
+      );
+
+    if (!seleccionada) {
+      throw new Error(
+        "No se pudo seleccionar la propuesta"
+      );
+    }
+  }
 
   // =========================================================
   // VALIDAR ESTADO
