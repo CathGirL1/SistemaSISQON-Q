@@ -1,0 +1,144 @@
+/* ======================================================
+   BOTÓN DESCARGAR PDF
+   ====================================================== */
+
+.descargar-cotizacion-pdf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  min-height: 36px;
+  padding: 8px 12px;
+
+  border: 1px solid #d8dee8;
+  border-radius: 7px;
+
+  background-color: #ffffff;
+  color: #344054;
+
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* ======================================================
+   HOVER
+   ====================================================== */
+
+.descargar-cotizacion-pdf:hover:not(:disabled) {
+  background-color: #f8fafc;
+  border-color: #b8c2d1;
+  color: #1d2939;
+
+  box-shadow:
+    0 2px 5px rgba(16, 24, 40, 0.08);
+}
+
+/* ======================================================
+   ACTIVE
+   ====================================================== */
+
+.descargar-cotizacion-pdf:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* ======================================================
+   FOCUS
+   ====================================================== */
+
+.descargar-cotizacion-pdf:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.2);
+  outline-offset: 2px;
+}
+
+/* ======================================================
+   DISABLED
+   ====================================================== */
+
+.descargar-cotizacion-pdf:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.65;
+
+  background-color: #f8fafc;
+  color: #667085;
+  border-color: #e4e7ec;
+}
+
+/* ======================================================
+   ICONO
+   ====================================================== */
+
+.descargar-cotizacion-pdf svg {
+  flex-shrink: 0;
+}
+
+/* ======================================================
+   SPINNER
+   ====================================================== */
+
+.pdf-spinner {
+  animation: pdf-spinner-animation 0.9s linear infinite;
+}
+
+@keyframes pdf-spinner-animation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ======================================================
+   TABLET
+   ====================================================== */
+
+@media (max-width: 900px) {
+  .descargar-cotizacion-pdf {
+    min-height: 35px;
+    padding: 7px 10px;
+
+    font-size: 0.82rem;
+  }
+}
+
+/* ======================================================
+   CELULAR
+   ====================================================== */
+
+@media (max-width: 600px) {
+  .descargar-cotizacion-pdf {
+    width: 100%;
+    min-height: 40px;
+
+    padding: 9px 12px;
+
+    font-size: 0.85rem;
+  }
+}
+
+/* ======================================================
+   CELULAR PEQUEÑO
+   ====================================================== */
+
+@media (max-width: 400px) {
+  .descargar-cotizacion-pdf {
+    min-height: 38px;
+
+    padding: 8px 10px;
+
+    font-size: 0.8rem;
+  }
+}

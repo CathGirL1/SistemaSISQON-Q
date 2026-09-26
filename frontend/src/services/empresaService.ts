@@ -1,51 +1,52 @@
+import type { EmpresaCliente } from "../interfaces/EmpresaCliente";
 import type { Empresa } from "../types/Empresa";
 
-const API_URL = "http://localhost:3000/api/empresa";
+const API_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api/empresa`
+  : "http://localhost:3000/api/empresa";
+
+/* =========================================================
+   RESPUESTA DEL BACKEND
+========================================================= */
 
 interface EmpresaApi {
   idEmpresa: number;
-
-  razonSocial: string;
-  nombreComercial: string;
-
-  rut: string;
-  rubro: string;
-
-  email: string;
-  telefono: string;
-
-  direccion: string;
-  paginaWeb: string;
-
-  descripcion: string;
-
+  razonSocial: string | null;
+  nombreComercial: string | null;
+  rut: string | null;
+  rubro: string | null;
+  email: string | null;
+  telefono: string | null;
+  direccion: string | null;
+  paginaWeb: string | null;
+  descripcion: string | null;
   logo: string | null;
 
-  zonasTrabajo: string;
-
-  condicionesComerciales: string;
-
-  textoLegal: string;
-
-  impuestos: string;
-
-  validezCotizacion: number;
-
-  diasLaborables: string;
-
-  horarioInicio: string;
-
-  horarioFin: string;
-
-  idiomaDocumentos: string;
+  zonasTrabajo: string | null;
+  condicionesComerciales: string | null;
+  textoLegal: string | null;
+  impuestos: string | null;
+  validezCotizacion: number | null;
+  diasLaborables: string | null;
+  horarioInicio: string | null;
+  horarioFin: string | null;
+  idiomaDocumentos: string | null;
 
   fechaRegistro: string | null;
 }
+
+/* =========================================================
+   ERRORES DEL BACKEND
+========================================================= */
 
 interface ErrorApi {
   mensaje?: string;
   message?: string;
 }
+
+/* =========================================================
+   MANEJO DE ERRORES
+========================================================= */
 
 async function obtenerMensajeError(
   respuesta: Response
@@ -63,6 +64,10 @@ async function obtenerMensajeError(
   }
 }
 
+/* =========================================================
+   VALIDACIONES
+========================================================= */
+
 function validarIdUsuario(idUsuario: number): void {
   if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
     throw new Error("Usuario inválido.");
@@ -74,6 +79,10 @@ function validarIdEmpresa(idEmpresa: number): void {
     throw new Error("Empresa inválida.");
   }
 }
+
+/* =========================================================
+   FORMATEAR FECHA
+========================================================= */
 
 function formatearFecha(fecha: string | null): string {
   if (!fecha) {
@@ -89,7 +98,14 @@ function formatearFecha(fecha: string | null): string {
   return fechaConvertida.toLocaleDateString("es-UY");
 }
 
-function convertirEmpresa(api: EmpresaApi): Empresa {
+/* =========================================================
+   CONVERTIR EMPRESA DEL BACKEND
+   EmpresaApi → EmpresaCliente
+========================================================= */
+
+function convertirEmpresa(
+  api: EmpresaApi
+): EmpresaCliente {
   const logo =
     api.logo && api.logo.startsWith("/")
       ? `http://localhost:3000${api.logo}`
@@ -98,20 +114,26 @@ function convertirEmpresa(api: EmpresaApi): Empresa {
   return {
     idEmpresa: api.idEmpresa,
 
+    /*
+      EmpresaCliente utiliza nombreEmpresa para
+      mostrar el nombre principal de la empresa.
+    */
+    nombreEmpresa:
+      api.nombreComercial ||
+      api.razonSocial ||
+      "Empresa",
+
     razonSocial: api.razonSocial ?? "",
-    nombreComercial:
-      api.nombreComercial ?? "",
+    nombreComercial: api.nombreComercial ?? "",
 
     rut: api.rut ?? "",
     rubro: api.rubro ?? "",
+    descripcion: api.descripcion ?? "",
 
-    email: api.email ?? "",
     telefono: api.telefono ?? "",
-
+    email: api.email ?? "",
     direccion: api.direccion ?? "",
     paginaWeb: api.paginaWeb ?? "",
-
-    descripcion: api.descripcion ?? "",
 
     logo,
 
@@ -119,16 +141,17 @@ function convertirEmpresa(api: EmpresaApi): Empresa {
       api.fechaRegistro
     ),
 
+    /*
+      Información adicional del perfil
+    */
     zonasTrabajo: api.zonasTrabajo ?? "",
 
     condicionesComerciales:
       api.condicionesComerciales ?? "",
 
-    textoLegal:
-      api.textoLegal ?? "",
+    textoLegal: api.textoLegal ?? "",
 
-    impuestos:
-      api.impuestos ?? "",
+    impuestos: api.impuestos ?? "",
 
     validezCotizacion:
       api.validezCotizacion ?? 30,
@@ -147,9 +170,14 @@ function convertirEmpresa(api: EmpresaApi): Empresa {
   };
 }
 
+/* =========================================================
+   OBTENER EMPRESA POR USUARIO
+   Usado principalmente por el panel de empresa
+========================================================= */
+
 export async function obtenerEmpresaPorUsuario(
   idUsuario: number
-): Promise<Empresa> {
+): Promise<EmpresaCliente> {
   validarIdUsuario(idUsuario);
 
   const respuesta = await fetch(
@@ -168,11 +196,44 @@ export async function obtenerEmpresaPorUsuario(
   return convertirEmpresa(empresaApi);
 }
 
+/* =========================================================
+   OBTENER EMPRESA POR ID
+   Usado por EmpresaDetalle
+========================================================= */
+
+export async function obtenerEmpresaPorId(
+  idEmpresa: number
+): Promise<EmpresaCliente> {
+  validarIdEmpresa(idEmpresa);
+
+  const respuesta = await fetch(
+    `${API_URL}/${idEmpresa}`
+  );
+
+  if (!respuesta.ok) {
+    throw new Error(
+      await obtenerMensajeError(respuesta)
+    );
+  }
+
+  const empresaApi =
+    (await respuesta.json()) as EmpresaApi;
+
+  return convertirEmpresa(empresaApi);
+}
+
+/* =========================================================
+   ACTUALIZAR EMPRESA
+========================================================= */
+
 export async function actualizarEmpresa(
   empresa: Empresa
-): Promise<Empresa> {
+): Promise<EmpresaCliente> {
 
-  validarIdEmpresa(empresa.idEmpresa!);
+  if (empresa.idEmpresa === undefined) {
+    throw new Error("La empresa no tiene un ID válido.");
+  }
+  validarIdEmpresa(empresa.idEmpresa);
 
   const respuesta = await fetch(
     `${API_URL}/${empresa.idEmpresa}`,
@@ -184,7 +245,6 @@ export async function actualizarEmpresa(
       },
 
       body: JSON.stringify({
-
         razonSocial: empresa.razonSocial,
         nombreComercial: empresa.nombreComercial,
 
@@ -198,10 +258,10 @@ export async function actualizarEmpresa(
         paginaWeb: empresa.paginaWeb,
 
         descripcion: empresa.descripcion,
-
         logo: empresa.logo,
 
-        zonasTrabajo: empresa.zonasTrabajo,
+        zonasTrabajo:
+          empresa.zonasTrabajo,
 
         condicionesComerciales:
           empresa.condicionesComerciales,
@@ -242,10 +302,14 @@ export async function actualizarEmpresa(
   return convertirEmpresa(empresaApi);
 }
 
+/* =========================================================
+   SUBIR LOGO
+========================================================= */
+
 export async function subirLogoEmpresa(
   idEmpresa: number,
   archivo: File
-): Promise<Empresa> {
+): Promise<EmpresaCliente> {
   validarIdEmpresa(idEmpresa);
 
   const formulario = new FormData();

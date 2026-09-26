@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Send, ChevronDown, X } from "lucide-react";
 
 import "../../styles/EnviarCotizacion.css";
@@ -48,7 +48,7 @@ export default function EnviarCotizacion({
       setError("");
 
       const response = await fetch(
-        `${API_URL}/api/empresas`
+        `${API_URL}/api/empresa`
       );
 
       const data = await response.json();
@@ -175,7 +175,7 @@ export default function EnviarCotizacion({
         type="button"
         className="enviar-cotizacion-trigger"
         onClick={abrirEnvio}
-        disabled={estado !== "Borrador"}
+        disabled={estado !== "Revisada" && estado !== "Aceptada"}
       >
         <Send size={16} />
         Enviar

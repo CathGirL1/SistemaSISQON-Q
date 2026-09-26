@@ -250,6 +250,44 @@ export class CotizacionController {
     }
   };
 
+  // =========================================================
+  // GET /api/cotizaciones/estadisticas/cliente/:idCliente
+  // =========================================================
+
+  public obtenerEstadisticasCliente = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+
+    try {
+
+      const idCliente =
+        Number(req.params.idCliente);
+
+      const estadisticas =
+        await this.service.obtenerEstadisticasCliente(
+          idCliente
+        );
+
+      res.status(200).json(
+        estadisticas
+      );
+
+    } catch (error: unknown) {
+
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al obtener las estadísticas del cliente";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
+
 
   public enviarCotizacion = async (
     req: Request,

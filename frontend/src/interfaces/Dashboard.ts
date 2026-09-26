@@ -1,6 +1,4 @@
-import type {
-  EstadoCotizacion,
-} from "../components/common/EstadoBadge";
+import type { EstadoCotizacion } from "./Cotizacion";
 
 export interface EmpresaDashboard {
   nombreEmpresa: string;

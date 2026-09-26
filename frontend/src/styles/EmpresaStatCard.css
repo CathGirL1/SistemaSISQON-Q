@@ -1,0 +1,138 @@
+/* =========================================================
+   ESTADÍSTICAS DE EMPRESAS
+   ========================================================= */
+
+.empresas-stats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.empresa-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  min-width: 0;
+  padding: 20px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.empresa-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================================================
+   ICONO
+   ========================================================= */
+
+.empresa-stat-icon {
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+}
+
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+
+.empresa-stat-content {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.empresa-stat-content strong {
+  color: #111827;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.empresa-stat-content span {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.empresa-stat-content small {
+  margin-top: 3px;
+
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* =========================================================
+   VARIANTES
+   ========================================================= */
+
+.empresa-stat-blue .empresa-stat-icon {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.empresa-stat-green .empresa-stat-icon {
+  background: #ecfdf5;
+  color: #16a34a;
+}
+
+.empresa-stat-purple .empresa-stat-icon {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.empresa-stat-orange .empresa-stat-icon {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .empresas-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .empresas-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .empresa-stat-card {
+    padding: 17px;
+  }
+
+  .empresa-stat-content strong {
+    font-size: 22px;
+  }
+}

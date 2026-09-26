@@ -102,12 +102,26 @@ export default function FilaCliente({
           evento.stopPropagation()
         }
       >
-      <ClienteAcciones
-        onWhatsapp={() => onWhatsapp(cliente)}
-        onCambiarEstado={() => onCambiarEstado(cliente)}
-        onAgregarNota={() => onAgregarNota(cliente)}
-        onVerHistorial={() => onVerHistorial(cliente)}
-      />
+        <ClienteAcciones
+          onWhatsapp={() =>
+            onWhatsapp(cliente)
+          }
+          onCambiarEstado={() =>
+            onCambiarEstado(cliente)
+          }
+          onAgregarNota={() =>
+            onAgregarNota(cliente)
+          }
+          onLlamar={() =>
+            onLlamar(cliente)
+          }
+          onVerHistorial={() =>
+            onVerHistorial(cliente)
+          }
+          onEliminar={() =>
+            onEliminar(cliente)
+          }
+        />
       </td>
     </tr>
   );

@@ -13,7 +13,7 @@ export interface HistorialCotizacionCliente {
 export interface ClienteEmpresa {
   id: number;
   idUsuario: number;
-
+  idEmpresa: number
   cedula: string;
   nombreUsuario: string;
 

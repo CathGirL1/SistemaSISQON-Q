@@ -7,13 +7,51 @@ export class LoginRepository {
         gmail: string,
         password: string
     ) {
-
-        
         const pool = await connectDB();
 
-        const result = await pool.request()
+        // -----------------------------------------
+        // 1. BUSCAR SI EXISTE EL USUARIO
+        // -----------------------------------------
+        const usuarioExiste = await pool
+            .request()
             .input("gmail", sql.VarChar, gmail)
-            .input("password", sql.VarChar, password)
+            .query(`
+                SELECT
+                    id_Usuario,
+                    password
+                FROM Usuario
+                WHERE gmail = @gmail
+            `);
+
+        if (usuarioExiste.recordset.length === 0) {
+            return {
+                existe: false,
+                usuario: null
+            };
+        }
+
+        // -----------------------------------------
+        // 2. COMPROBAR CONTRASEÑA
+        // -----------------------------------------
+        const usuario = usuarioExiste.recordset[0];
+
+        if (usuario.password !== password) {
+            return {
+                existe: true,
+                usuario: null
+            };
+        }
+
+        // -----------------------------------------
+        // 3. OBTENER DATOS DEL USUARIO
+        // -----------------------------------------
+        const result = await pool
+            .request()
+            .input(
+                "idUsuario",
+                sql.Int,
+                usuario.id_Usuario
+            )
             .query(`
                 SELECT
                     u.id_Usuario,
@@ -22,19 +60,17 @@ export class LoginRepository {
                     u.nombreUsuario,
                     u.rol
                 FROM Usuario u
-
                 LEFT JOIN Cliente c
                     ON c.id_Usuario = u.id_Usuario
-
                 LEFT JOIN Empresa e
                     ON e.id_Usuario = u.id_Usuario
-
-                WHERE u.gmail = @gmail
-                AND u.password = @password
+                WHERE u.id_Usuario = @idUsuario
             `);
-        
-        console.log(result.recordset);
-        return result.recordset[0];
+
+        return {
+            existe: true,
+            usuario: result.recordset[0]
+        };
     }
 
 }

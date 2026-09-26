@@ -11,6 +11,8 @@ export interface ManoObraEmpresa {
   unidad: string;
 
   costoUnitario: number;
+  costoUnitarioUSD: number;
+  tipoCambio: number;
 
   observaciones: string;
 

@@ -31,11 +31,17 @@ export function EmpresaProvider({ children }: Props) {
 
   const recargarEmpresa = useCallback(async () => {
     try {
+      setLoading(true);
+
       const usuarioSesion = JSON.parse(
         localStorage.getItem("usuario") || "{}"
       );
 
-      const idUsuario = usuarioSesion.id_Usuario;
+      console.log("USUARIO SESION:", usuarioSesion);
+
+      const idUsuario = Number(usuarioSesion.id_Usuario);
+
+      console.log("ID USUARIO EMPRESA:", idUsuario);
 
       if (!idUsuario) {
         setEmpresa(null);
@@ -44,9 +50,11 @@ export function EmpresaProvider({ children }: Props) {
 
       const datos = await obtenerEmpresaPorUsuario(idUsuario);
 
+      console.log("EMPRESA OBTENIDA:", datos);
+
       setEmpresa(datos);
     } catch (error) {
-      console.error(error);
+      console.error("Error al obtener empresa:", error);
       setEmpresa(null);
     } finally {
       setLoading(false);

@@ -12,6 +12,11 @@ router.get(
 );
 
 router.get(
+  "/empresa/:idEmpresa",
+  controller.obtenerMaterialesPorEmpresa
+);
+
+router.get(
   "/:id",
   controller.obtenerMaterialPorId
 );

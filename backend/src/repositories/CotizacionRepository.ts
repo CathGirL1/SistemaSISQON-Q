@@ -170,9 +170,7 @@ export class CotizacionRepository {
       .query(`
         SELECT
 
-          -- ============================================
-          -- COTIZACIÓN
-          -- ============================================
+       
 
           c.id_Cotizacion AS idCotizacion,
           c.id_Proyecto AS idProyecto,
@@ -212,9 +210,7 @@ export class CotizacionRepository {
             c.precioEstimado,
             c.observaciones,
 
-          -- ============================================
-          -- CLIENTE
-          -- ============================================
+    
 
           p.id_Cliente AS idCliente,
 
@@ -227,9 +223,7 @@ export class CotizacionRepository {
           u.gmail AS emailCliente,
           u.telefono AS telefonoCliente,
 
-          -- ============================================
-          -- PROYECTO
-          -- ============================================
+  
 
           p.id_TipoObra AS idTipoObra,
 
@@ -250,9 +244,6 @@ export class CotizacionRepository {
             AS DECIMAL(18, 2)
           ) AS superficie,
 
-          -- ============================================
-          -- MATERIALES
-          -- ============================================
 
           ISNULL(
             (
@@ -289,9 +280,22 @@ export class CotizacionRepository {
             'Sin materiales agregados'
           ) AS resumenMateriales,
 
-          -- ============================================
-          -- EMPRESA
-          -- ============================================
+          (
+            SELECT
+              mp.idMaterialProyecto AS idMaterialProyecto,
+              mp.id_Proyecto AS idProyecto,
+              mp.id_Material AS idMaterial,
+              mp.cantidad,
+              m.nombre,
+              m.costoUnitario,
+              m.unidad,
+              mp.cantidad * m.costoUnitario AS subtotal
+            FROM MaterialProyecto mp
+            INNER JOIN Material m
+              ON m.id_Material = mp.id_Material
+            WHERE mp.id_Proyecto = p.id_Proyecto
+            FOR JSON PATH
+          ) AS materiales,
 
           e.nombreEmpresa AS nombreEmpresa
 
@@ -299,6 +303,9 @@ export class CotizacionRepository {
 
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
         INNER JOIN Empresa e
           ON e.id_Empresa = c.id_Empresa
@@ -308,9 +315,6 @@ export class CotizacionRepository {
 
         INNER JOIN Usuario u
           ON u.id_Usuario = cl.id_Usuario
-
-        INNER JOIN TipoObra t
-          ON t.id_TipoObra = p.id_TipoObra
 
         WHERE c.id_Empresa = @idEmpresa
 
@@ -646,7 +650,7 @@ export class CotizacionRepository {
 
           p.id_Cliente AS idCliente,
           p.id_TipoObra AS idTipoObra,
-
+          t.nombre AS tipoObra,
           p.nombre AS nombreProyecto,
           p.descripcion AS descripcionProyecto,
 
@@ -665,6 +669,9 @@ export class CotizacionRepository {
 
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
         WHERE c.id_Proyecto = @idProyecto
 
@@ -683,25 +690,22 @@ export class CotizacionRepository {
   public async obtenerCotizacionPorId(
     idCotizacion: number
   ) {
-
     const pool = await connectDB();
 
     const result = await pool
       .request()
-
       .input(
         "idCotizacion",
         sql.Int,
         idCotizacion
       )
-
       .query(`
         SELECT
+      
 
           c.id_Cotizacion AS idCotizacion,
           c.id_Proyecto AS idProyecto,
           c.id_Empresa AS idEmpresa,
-          e.nombreEmpresa AS nombreEmpresa,
 
           CONCAT(
             'COT-',
@@ -720,7 +724,6 @@ export class CotizacionRepository {
           c.fechaCreacion,
           c.fechaActualizacion,
           c.version,
-
           c.costoMateriales,
           c.costoManoObra,
 
@@ -734,18 +737,22 @@ export class CotizacionRepository {
           c.tipoCambioUSD,
           c.totalUYU,
 
+
           c.estado,
           c.precioEstimado,
           c.observaciones,
 
+          e.nombreEmpresa AS nombreEmpresa,
+
+
           p.id_Cliente AS idCliente,
           p.id_TipoObra AS idTipoObra,
 
+          t.nombre AS tipoObra,
+
           p.nombre AS nombreProyecto,
           p.descripcion AS descripcionProyecto,
-
           p.ubicacion,
-
           p.alto,
           p.ancho,
           p.largo,
@@ -753,13 +760,39 @@ export class CotizacionRepository {
           CAST(
             p.ancho * p.largo
             AS DECIMAL(18, 2)
-          ) AS superficie
+          ) AS superficie,
+
+          -- ==========================================
+          -- CLIENTE
+          -- ==========================================
+
+          cl.nombre AS cliente,
+
+          -- ==========================================
+          -- USUARIO
+          -- ==========================================
+
+          u.gmail AS email,
+          u.telefono AS telefono
 
         FROM Cotizacion c
 
+        -- Cotización → Proyecto
         INNER JOIN Proyecto p
           ON p.id_Proyecto = c.id_Proyecto
+          
+        INNER JOIN TipoObra t
+          ON t.id_TipoObra = p.id_TipoObra
 
+        -- Proyecto → Cliente
+        INNER JOIN Cliente cl
+          ON cl.id_Cliente = p.id_Cliente
+
+        -- Cliente → Usuario
+        INNER JOIN Usuario u
+          ON u.id_Usuario = cl.id_Usuario
+
+        -- Cotización → Empresa
         LEFT JOIN Empresa e
           ON e.id_Empresa = c.id_Empresa
 
@@ -961,7 +994,7 @@ export class CotizacionRepository {
   }
 
 
-  public async enviarCotizacion(
+    public async enviarCotizacion(
     idCotizacion: number,
     idEmpresa: number
   ): Promise<boolean> {
@@ -992,6 +1025,7 @@ export class CotizacionRepository {
 
     return result.rowsAffected[0] > 0;
   }
+
 
     public async obtenerImpuestoEmpresa(
     idEmpresa: number
@@ -1077,32 +1111,117 @@ export class CotizacionRepository {
     return result.rowsAffected[0] > 0;
   }
 
-  public async existeProyecto(
-    idProyecto: number
-  ): Promise<boolean> {
 
+  // ====================================================
+  // ESTADÍSTICAS DEL CLIENTE
+  // ====================================================
+
+
+ public async obtenerEstadisticasCliente(
+    idCliente: number
+  ) {
     const pool = await connectDB();
 
     const result = await pool
       .request()
-
       .input(
-        "idProyecto",
+        "idCliente",
         sql.Int,
-        idProyecto
+        idCliente
       )
-
       .query(`
-        SELECT TOP 1
-          id_Proyecto
+        SELECT
 
-        FROM Proyecto
+          COUNT(DISTINCT
+            CASE
+              WHEN c.fechaRealizada IS NOT NULL
+              THEN c.id_Cotizacion
+            END
+          ) AS cotizacionesEnviadas,
 
-        WHERE id_Proyecto = @idProyecto
+          COUNT(DISTINCT
+            CASE
+              WHEN c.fechaRealizada IS NOT NULL
+              THEN c.id_Proyecto
+            END
+          ) AS proyectosEnviados
+
+        FROM Cotizacion c
+
+        INNER JOIN Proyecto p
+          ON p.id_Proyecto = c.id_Proyecto
+
+        WHERE p.id_Cliente = @idCliente
       `);
 
-    return result.recordset.length > 0;
+    return result.recordset[0];
   }
+
+  // ====================================================
+  // OBTENER COTIZACIÓN BORRADOR POR PROYECTO
+  // ====================================================
+
+  public async obtenerCotizacionBorradorPorProyecto(
+    idProyecto: number
+  ) {
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+      .input("idProyecto", sql.Int, idProyecto)
+      .query(`
+        SELECT TOP 1
+          c.id_Cotizacion AS idCotizacion,
+          c.id_Proyecto AS idProyecto,
+          c.fechaCreacion,
+          c.fechaActualizacion,
+          c.estado,
+          c.precioEstimado,
+          c.observaciones
+        FROM Cotizacion c
+        WHERE c.id_Proyecto = @idProyecto
+          AND c.estado = 'Borrador'
+        ORDER BY
+          c.fechaCreacion DESC,
+          c.id_Cotizacion DESC
+      `);
+
+    return result.recordset[0] ?? null;
+  }
+
+    // ====================================================
+    // VERIFICAR SI EXISTE PROYECTO
+    // ====================================================
+
+
+    public async existeProyecto(
+      idProyecto: number
+    ): Promise<boolean> {
+
+      const pool = await connectDB();
+
+      const result = await pool
+        .request()
+
+        .input(
+          "idProyecto",
+          sql.Int,
+          idProyecto
+        )
+
+        .query(`
+          SELECT TOP 1
+            id_Proyecto
+
+          FROM Proyecto
+
+          WHERE id_Proyecto = @idProyecto
+        `);
+
+      return result.recordset.length > 0;
+    }
+  
+
 
 
     public async actualizarCotizacionDesdeEmpresa(
@@ -1205,3 +1324,4 @@ export class CotizacionRepository {
     return result.rowsAffected[0] > 0;
   }
 }
+

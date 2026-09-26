@@ -33,7 +33,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const tiposPermitidos = [
+export const tiposPermitidos = [
   "image/jpeg",
   "image/png",
   "image/webp",

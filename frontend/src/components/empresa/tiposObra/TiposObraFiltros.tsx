@@ -1,6 +1,5 @@
 import "../../../styles/empresa/tiposObra/TiposObraFiltros.css";
 
-import { FaFilter } from "react-icons/fa";
 import PanelSearchBar from "../../common/PanelSearchBar";
 
 type Props = {

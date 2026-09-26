@@ -17,7 +17,7 @@ export interface Empresa {
 
   logo?: string;
 
-  fechaRegistro?: string;
+  fechaRegistro?: string | null;
 
   zonasTrabajo: string;
 

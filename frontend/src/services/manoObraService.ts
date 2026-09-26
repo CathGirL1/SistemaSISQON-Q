@@ -16,6 +16,8 @@ export type ManoObraApi = {
   categoria: string | null;
   unidad: string | null;
   costoUnitario: number;
+  costoUnitarioUSD: number;
+  tipoCambio: number;
   observaciones: string | null;
   ultimaActualizacion: string;
   estado: EstadoManoObra;
@@ -80,6 +82,14 @@ const transformarManoObra = (
 
     costoUnitario: Number(
       trabajo.costoUnitario
+    ),
+
+    costoUnitarioUSD: Number(
+      trabajo.costoUnitarioUSD
+    ),
+
+    tipoCambio: Number(
+      trabajo.tipoCambio
     ),
 
     observaciones:

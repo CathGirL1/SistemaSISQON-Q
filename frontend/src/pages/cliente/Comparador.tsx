@@ -662,7 +662,7 @@ function ComparisonRow({
 
       {values.map((value, index) => (
         <td
-          key={`${label}-${value}`}
+          key={`${label}-${value}-${index}`}
           className={index === 1 ? "recommended-column" : ""}
         >
           {value}

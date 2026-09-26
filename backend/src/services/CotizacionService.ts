@@ -93,6 +93,25 @@ export class CotizacionService {
             );
         }
 
+        const estado =
+            data.estado?.trim() ||
+            "Borrador";
+
+        // Si ya existe un borrador para este proyecto,
+        // reutilizamos esa cotización.
+        if (estado === "Borrador") {
+
+            const borradorExistente =
+                await this.repository
+                    .obtenerCotizacionBorradorPorProyecto(
+                        data.idProyecto
+                    );
+
+            if (borradorExistente) {
+                return borradorExistente.idCotizacion;
+            }
+        }
+
         // =========================================
         // Obtener próxima versión
         // =========================================
@@ -107,9 +126,7 @@ export class CotizacionService {
             idProyecto:
                 data.idProyecto,
 
-            estado:
-                data.estado?.trim() ||
-                "Borrador",
+            estado,
 
             costoMateriales:
                 data.costoMateriales,
@@ -130,6 +147,23 @@ export class CotizacionService {
 
             version,
         });
+    }
+
+        // =========================================================
+    // OBTENER ESTADÍSTICAS DEL CLIENTE
+    // =========================================================
+
+    public async obtenerEstadisticasCliente(
+        idCliente: number
+    ) {
+
+        this.validarId(
+            idCliente,
+            "El id del cliente no es válido"
+        );
+
+        return await this.repository
+            .obtenerEstadisticasCliente(idCliente);
     }
 
 
@@ -309,6 +343,20 @@ export class CotizacionService {
                         resultado.superficieTrabajo,
                 }
         : undefined;
+        
+        // =========================================
+        // Verificar si ya existe un borrador
+        // =========================================
+
+        const borradorExistente =
+            await this.repository
+                .obtenerCotizacionBorradorPorProyecto(
+                    idProyecto
+                );
+
+        if (borradorExistente) {
+            return borradorExistente.idCotizacion;
+        }
 
         // =========================================
         // 8. Obtener próxima versión
@@ -404,6 +452,66 @@ export class CotizacionService {
             throw new Error(
                 "Una cotización solo puede finalizarse mediante la operación de finalización."
             );
+        }
+
+                const soloEdicion =
+            (data.estado !== undefined ||
+                data.observaciones !== undefined) &&
+            Object.keys(data).every(
+                campo =>
+                    campo === "estado" ||
+                    campo === "observaciones"
+            );
+
+        if (soloEdicion) {
+
+            const nuevoEstado = data.estado;
+
+            if (nuevoEstado !== undefined) {
+
+                this.validarEstado(nuevoEstado);
+
+                if (nuevoEstado.trim() === "Enviada") {
+                    throw new Error(
+                        "La cotización debe enviarse mediante la opción Enviar cotización"
+                    );
+                }
+
+                if (nuevoEstado.trim() === "Finalizada") {
+                    throw new Error(
+                        "Una cotización solo puede finalizarse mediante la operación de finalización."
+                    );
+                }
+            }
+
+            if (data.observaciones !== undefined) {
+                this.validarObservaciones(
+                    data.observaciones
+                );
+            }
+
+            const actualizado =
+                await this.repository.actualizarCotizacion(
+                    idCotizacion,
+                    {
+                        ...(data.estado !== undefined && {
+                            estado: data.estado.trim()
+                        }),
+
+                        ...(data.observaciones !== undefined && {
+                            observaciones:
+                                data.observaciones?.trim() || null
+                        })
+                    }
+                );
+
+            if (!actualizado) {
+                throw new Error(
+                    "No se pudo actualizar la cotización"
+                );
+            }
+
+            return idCotizacion;
         }
 
         // =========================================
@@ -563,6 +671,20 @@ export class CotizacionService {
             resultado.totalGeneral,
             "El total de la cotización"
         );
+        
+        // =========================================
+        // Verificar si ya existe un borrador
+        // =========================================
+
+        const borradorExistente =
+            await this.repository
+                .obtenerCotizacionBorradorPorProyecto(
+                    idProyecto
+                );
+
+        if (borradorExistente) {
+            return borradorExistente.idCotizacion;
+        }
 
         // =========================================
         // 11. Obtener próxima versión
@@ -789,6 +911,12 @@ export class CotizacionService {
         return {
             ...cotizacionFinal,
             manosObra,
+            
+            costoConstruccion:
+                calculo.costoConstruccion,
+
+            monedaCalculo:
+                calculo.moneda,
 
             ...(proyectoCotizacion.codigoTipoObra === "OBR-000003"
                 ? {
@@ -1023,6 +1151,15 @@ export class CotizacionService {
         if (cotizacion.estado === "Finalizada") {
             throw new Error(
                 "La cotización está finalizada y no puede volver a enviarse."
+            );
+        }
+
+                if (
+            cotizacion.estado !== "Revisada" &&
+            cotizacion.estado !== "Aceptada"
+        ) {
+            throw new Error(
+                "Solo se puede enviar una cotización que esté en estado Revisada o Aceptada"
             );
         }
 

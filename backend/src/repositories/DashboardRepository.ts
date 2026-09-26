@@ -178,7 +178,7 @@ export class DashboardRepository {
     }
 
     private async obtenerClientesRecientes(
-    idEmpresa: number
+        idEmpresa: number
     ) {
     const pool = await connectDB();
 
@@ -225,6 +225,7 @@ export class DashboardRepository {
         `);
 
     return resultado.recordset;
+
     }
 
     private async obtenerProyectosActivos(

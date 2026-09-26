@@ -79,6 +79,8 @@ version: number;
   // MATERIALES
   // ==========================================
 
+ 
+
   resumenMateriales: string;
   materiales: {
     idMaterialProyecto: number;
@@ -127,3 +129,4 @@ version: number;
   // Indica si la conversión quedó congelada al finalizar.
   conversionHistorica: boolean;
 }
+

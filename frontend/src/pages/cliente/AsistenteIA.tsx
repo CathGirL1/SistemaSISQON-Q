@@ -1,30 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import {
   Sparkles,
   Send,
-  Plus,
-  MessageSquare,
   FolderOpen,
-  FileText,
-  Building2,
   Bot,
   User,
-  Paperclip,
-  Mic,
-  MoreVertical,
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
+import CrearConversacion from "../../components/cliente/CrearConversacion";
+import HistorialConversaciones from "../../components/cliente/HistorialConversaciones";
 
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/AsistenteIA.css";
 
-interface Conversacion {
-  id: number;
-  titulo: string;
-  fecha: string;
-  activa?: boolean;
+interface Proyecto {
+  idProyecto: number;
+  nombre: string;
+  tipoObra: string;
+  descripcion: string | null;
+  ubicacion: string | null;
+  alto: number;
+  ancho: number;
+  largo: number;
+  superficie: number;
 }
 
 interface Mensaje {
@@ -34,322 +35,848 @@ interface Mensaje {
   hora: string;
 }
 
-const conversaciones: Conversacion[] = [
-  {
-    id: 1,
-    titulo: "Materiales para quincho",
-    fecha: "Hoy",
-    activa: true,
-  },
-  {
-    id: 2,
-    titulo: "Comparación de opciones",
-    fecha: "Ayer",
-  },
-  {
-    id: 3,
-    titulo: "Empresas recomendadas",
-    fecha: "20/05/2024",
-  },
-];
-
-const mensajesIniciales: Mensaje[] = [
-  {
-    id: 1,
-    autor: "asistente",
-    contenido:
-      "Hola Nicolás. Puedo ayudarte a comparar materiales, estimar costos, revisar tus proyectos y encontrar empresas adecuadas.",
-    hora: "10:24",
-  },
-  {
-    id: 2,
-    autor: "usuario",
-    contenido:
-      "¿Qué material me conviene para un quincho de 30 metros cuadrados?",
-    hora: "10:25",
-  },
-  {
-    id: 3,
-    autor: "asistente",
-    contenido:
-      "Para un quincho de 30 m², la mejor opción depende del presupuesto y el mantenimiento que quieras asumir. La madera de eucalipto tratada ofrece una muy buena relación entre precio, durabilidad y apariencia. Si priorizás menor mantenimiento, una estructura metálica con revestimiento puede ser más conveniente.",
-    hora: "10:25",
-  },
-];
-
 export default function AsistenteIA() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [mensaje, setMensaje] = useState("");
-  const [mensajes, setMensajes] = useState(mensajesIniciales);
 
-  const enviarMensaje = () => {
-    const contenido = mensaje.trim();
+  const [menuOpen, setMenuOpen] =
+    useState(false);
 
-    if (!contenido) {
-      return;
-    }
+  const [mensaje, setMensaje] =
+    useState("");
 
-    setMensajes((actuales) => [
-      ...actuales,
-      {
-        id: Date.now(),
-        autor: "usuario",
-        contenido,
-        hora: "Ahora",
-      },
-    ]);
+  const [mensajes, setMensajes] =
+    useState<Mensaje[]>([]);
 
-    setMensaje("");
+  const [actualizarHistorial, setActualizarHistorial] =
+    useState(0);
+
+  const [proyectos, setProyectos] =
+    useState<Proyecto[]>([]);
+
+  const [idProyecto, setIdProyecto] =
+    useState<number | null>(null);
+  
+  const [idConversacion, setIdConversacion] = 
+    useState<number | null>(null);
+
+  const [cargandoProyectos, setCargandoProyectos] =
+    useState(true);
+
+  const [cargandoRespuesta, setCargandoRespuesta] =
+    useState(false);
+
+  const [usuario] = useState(() => {
+
+    const usuarioGuardado =
+      localStorage.getItem("usuario");
+
+    return usuarioGuardado
+      ? JSON.parse(usuarioGuardado)
+      : null;
+  });
+
+  const seleccionarConversacion = async (
+      idConversacion: number,
+      idProyecto: number | null
+  ) => {
+      setIdConversacion(idConversacion);
+
+      setIdProyecto(idProyecto);
+
+      setMensajes([]);
+
+      try {
+          const respuesta = await fetch(
+              `http://localhost:3000/api/conversacion-ia/${idConversacion}/mensajes`
+          );
+
+          if (!respuesta.ok) {
+              throw new Error(
+                  "No se pudieron obtener los mensajes de la conversación"
+              );
+          }
+
+          const datos = await respuesta.json();
+
+          const ultimosMensajes = datos.slice(-10);
+
+          const mensajesCargados: Mensaje[] =
+              ultimosMensajes.map(
+                  (item: any) => ({
+                      id: item.idMensaje,
+                      autor:
+                          item.tipo === "usuario"
+                              ? "usuario"
+                              : "asistente",
+                      contenido: item.contenido,
+                      hora: new Date(
+                          item.fecha
+                      ).toLocaleTimeString(
+                          "es-UY",
+                          {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                          }
+                      ),
+                  })
+              );
+
+          setMensajes(mensajesCargados);
+
+      } catch (error) {
+          console.error(
+              "Error al cargar la conversación:",
+              error
+          );
+      }
   };
 
+
+  // =====================================================
+  // OBTENER PROYECTOS DEL CLIENTE
+  // =====================================================
+
+  useEffect(() => {
+
+    const obtenerProyectos = async () => {
+
+      if (!usuario?.id_Cliente) {
+        setCargandoProyectos(false);
+        return;
+      }
+
+      try {
+
+        const respuesta = await fetch(
+          `http://localhost:3000/api/proyectos/cliente/${usuario.id_Cliente}`
+        );
+
+        if (!respuesta.ok) {
+          throw new Error(
+            "No se pudieron obtener los proyectos"
+          );
+        }
+
+        const datos = await respuesta.json();
+
+        setProyectos(datos);
+
+        if (datos.length > 0) {
+          setIdProyecto(datos[0].idProyecto);
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Error al obtener proyectos:",
+          error
+        );
+
+      } finally {
+
+        setCargandoProyectos(false);
+      }
+    };
+
+    obtenerProyectos();
+
+  }, [usuario]);
+
+
+  // =====================================================
+  // PROYECTO SELECCIONADO
+  // =====================================================
+
+  const proyectoSeleccionado =
+    proyectos.find(
+      (proyecto) =>
+        proyecto.idProyecto === idProyecto
+    );
+
+  const actualizarTituloConversacion = async (
+      pregunta: string
+  ) => {
+      if (!idConversacion) {
+          return;
+      }
+
+      const titulo = pregunta
+          .replace(/[¿?¡!]/g, "")
+          .trim()
+          .slice(0, 60);
+
+      if (!titulo) {
+          return;
+      }
+
+      try {
+          const respuesta = await fetch(
+              `http://localhost:3000/api/conversacion-ia/${idConversacion}/titulo`,
+              {
+                  method: "PUT",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                      titulo,
+                  }),
+              }
+          );
+
+          if (!respuesta.ok) {
+              throw new Error(
+                  "No se pudo actualizar el título"
+              );
+          }
+
+          setActualizarHistorial(
+              (actual) => actual + 1
+          );
+
+      } catch (error) {
+          console.error(
+              "Error al actualizar título:",
+              error
+          );
+      }
+  };
+
+
+  // =====================================================
+  // ENVIAR MENSAJE
+  // =====================================================
+
+  const enviarMensaje = async (
+      recomendacionMateriales = false,
+      preguntaFija?: string
+  ) => {
+      const contenido = (
+          preguntaFija ?? mensaje
+      ).trim();
+    
+    const esPrimerMensaje = mensajes.length === 0;
+
+      console.log("Pregunta:", contenido);
+    console.log("ID conversación:", idConversacion);
+
+      if (!contenido) {
+          return;
+      }
+
+      if (!idConversacion) {
+          setMensajes((actuales) => [
+              ...actuales,
+              {
+                  id: Date.now(),
+                  autor: "asistente",
+                  contenido:
+                      "Primero tenés que iniciar una nueva conversación.",
+                  hora: "Ahora",
+              },
+          ]);
+
+          return;
+      }
+
+      if (
+          recomendacionMateriales &&
+          !idProyecto
+      ) {
+          setMensajes((actuales) => [
+              ...actuales,
+              {
+                  id: Date.now(),
+                  autor: "asistente",
+                  contenido:
+                      "Para recomendarte materiales necesito que selecciones un proyecto.",
+                  hora: "Ahora",
+              },
+          ]);
+
+          return;
+      }
+
+      setMensajes((actuales) => [
+          ...actuales,
+          {
+              id: Date.now(),
+              autor: "usuario",
+              contenido,
+              hora: "Ahora",
+          },
+      ]);
+
+      setMensaje("");
+      setCargandoRespuesta(true);
+
+      try {
+          const cuerpo: {
+              pregunta: string;
+              idProyecto?: number;
+              idConversacion: number;
+          } = {
+              pregunta: contenido,
+              idConversacion,
+          };
+
+          if (idProyecto) {
+              cuerpo.idProyecto = idProyecto;
+          }
+
+          const respuesta = await fetch(
+              "http://localhost:3000/api/asistente-ia/preguntar",
+              {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(cuerpo),
+              }
+          );
+
+          const datos = await respuesta.json();
+
+          if (!respuesta.ok) {
+              throw new Error(
+                  datos.mensaje ||
+                  "No se pudo obtener una respuesta"
+              );
+          }
+
+          setMensajes((actuales) => [
+              ...actuales,
+              {
+                  id: Date.now() + 1,
+                  autor: "asistente",
+                  contenido: datos.respuesta,
+                  hora: "Ahora",
+              },
+          ]);
+
+          if (esPrimerMensaje) {
+              await actualizarTituloConversacion(
+                  contenido
+              );
+          }
+
+      } catch (error) {
+          console.error(
+              "Error al consultar al asistente:",
+              error
+          );
+
+          setMensajes((actuales) => [
+              ...actuales,
+              {
+                  id: Date.now() + 1,
+                  autor: "asistente",
+                  contenido:
+                      "No pude procesar tu consulta en este momento. Intentá nuevamente.",
+                  hora: "Ahora",
+              },
+          ]);
+
+      } finally {
+          setCargandoRespuesta(false);
+      }
+  };
+
+
+
+
   return (
+
     <div className="cliente-panel">
+
       <SidebarCliente
         menuOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
+        onClose={() =>
+          setMenuOpen(false)
+        }
       />
 
       <main className="cliente-main">
+
         <HeaderCliente
-
           title="Asistente IA"
-          subtitle="Consultá sobre materiales, costos, proyectos, cotizaciones y empresas."
-
+          subtitle="Consultá sobre materiales y aspectos relacionados con tu proyecto."
           menuOpen={menuOpen}
-          onToggleMenu={() => setMenuOpen((prev) => !prev)}
+          onToggleMenu={() =>
+            setMenuOpen(
+              (prev) => !prev
+            )
+          }
         />
 
         <section className="assistant-page">
-          <aside className="assistant-history">
-            <div className="assistant-history-header">
-              <div>
-                <span>CONVERSACIONES</span>
-                <h2>Historial</h2>
-              </div>
 
-              <button type="button" aria-label="Nueva conversación">
-                <Plus size={19} />
-              </button>
-            </div>
 
-            <button type="button" className="new-chat-button">
-              <Sparkles size={18} />
-              Nueva conversación
-            </button>
-
-            <div className="conversation-list">
-              {conversaciones.map((conversacion) => (
-                <button
-                  type="button"
-                  key={conversacion.id}
-                  className={`conversation-item ${
-                    conversacion.activa ? "active" : ""
-                  }`}
-                >
-                  <MessageSquare size={17} />
-
-                  <div>
-                    <strong>{conversacion.titulo}</strong>
-                    <span>{conversacion.fecha}</span>
-                  </div>
-
-                  <MoreVertical size={17} />
-                </button>
-              ))}
-            </div>
-
-            <div className="assistant-history-tip">
-              <Bot size={22} />
-              <p>
-                El asistente usa la información de tus proyectos para darte
-                respuestas más útiles.
-              </p>
-            </div>
-          </aside>
+          {/* =====================================================
+              CHAT
+          ===================================================== */}
 
           <section className="assistant-chat">
+
             <header className="assistant-chat-header">
-              <div className="assistant-avatar">
-                <Sparkles size={22} />
+              <div className="assistant-chat-title">
+                  <div className="assistant-avatar">
+                      <Sparkles size={22} />
+                  </div>
+
+                  <div>
+                      <h2>
+                          Asistente SISCON-Q
+                      </h2>
+
+                      <span>
+                          <i />
+                          Disponible
+                      </span>
+                  </div>
               </div>
 
-              <div>
-                <h2>Asistente SISCON-Q</h2>
-                <span>
-                  <i />
-                  Disponible
-                </span>
-              </div>
-            </header>
+              {usuario?.id_Cliente && (
+                  <div className="assistant-new-conversation">
+                      <CrearConversacion
+                          idCliente={usuario.id_Cliente}
+                          idProyecto={idProyecto}
+                          onConversacionCreada={(id) => {
+                              setIdConversacion(id);
+                              setMensajes([]);
+                               setActualizarHistorial(
+                                  (actual) => actual + 1
+                              );
+                          }}
+                      />
+                  </div>
+              )}
+          </header>
+
 
             <div className="assistant-messages">
-              <div className="assistant-welcome">
-                <div className="assistant-welcome-icon">
-                  <Sparkles size={28} />
+
+              {mensajes.length === 0 && (
+
+                <div className="assistant-welcome">
+
+                  <div className="assistant-welcome-icon">
+                    <Sparkles size={28} />
+                  </div>
+
+                  <h3>
+                    ¿En qué puedo ayudarte?
+                  </h3>
+
+                  <p>
+                    Podés consultar sobre materiales,
+                    proyectos y aspectos generales
+                    relacionados con la construcción.
+                  </p>
+
                 </div>
 
-                <h3>¿En qué puedo ayudarte?</h3>
+              )}
 
-                <p>
-                  Podés consultar sobre materiales, costos, cotizaciones,
-                  empresas y decisiones de tu proyecto.
-                </p>
-              </div>
 
               {mensajes.map((item) => (
+
                 <div
                   key={item.id}
                   className={`message-row message-${item.autor}`}
                 >
+
                   <div className="message-avatar">
-                    {item.autor === "asistente" ? (
+
+                    {item.autor ===
+                    "asistente" ? (
+
                       <Bot size={18} />
+
                     ) : (
+
                       <User size={18} />
+
                     )}
+
                   </div>
 
+
                   <div className="message-content">
+
                     <div className="message-bubble">
                       {item.contenido}
                     </div>
 
-                    <span>{item.hora}</span>
+                    <span>
+                      {item.hora}
+                    </span>
+
                   </div>
+
                 </div>
+
               ))}
+
+
+              {cargandoRespuesta && (
+
+                <div className="message-row message-asistente">
+
+                  <div className="message-avatar">
+                    <Bot size={18} />
+                  </div>
+
+                  <div className="message-content">
+
+                    <div className="message-bubble">
+                      Pensando...
+                    </div>
+
+                  </div>
+
+                </div>
+
+              )}
+
             </div>
+
+
+            {/* =====================================================
+                PREGUNTAS RÁPIDAS
+            ===================================================== */}
 
             <div className="assistant-suggestions">
-              <button
-                type="button"
-                onClick={() =>
-                  setMensaje("¿Qué material me conviene para un quincho?")
-                }
-              >
-                ¿Qué material me conviene?
-              </button>
 
               <button
-                type="button"
-                onClick={() =>
-                  setMensaje("Ayúdame a estimar el costo de mi proyecto")
-                }
+                  type="button"
+                  onClick={() =>
+                      enviarMensaje(
+                          true,
+                          "¿Qué materiales me recomendás para este proyecto?"
+                      )
+                  }
+                  disabled={
+                      !idProyecto ||
+                      cargandoRespuesta
+                  }
               >
-                Estimar costo del proyecto
+                  ¿Qué materiales me recomendás para este proyecto?
               </button>
 
-              <button
+             <button
+                  type="button"
+                  onClick={() =>
+                      enviarMensaje(
+                          false,
+                          "¿Qué debo tener en cuenta al elegir materiales para una obra?"
+                      )
+                  }
+                  disabled={cargandoRespuesta}
+              >
+                  ¿Qué debo tener en cuenta al elegir materiales para una obra?
+              </button>
+
+            <button
                 type="button"
                 onClick={() =>
-                  setMensaje("¿Qué empresa me recomendás para este proyecto?")
+                    enviarMensaje(
+                        false,
+                        "¿Qué es un jornal?"
+                    )
                 }
-              >
-                Recomendar una empresa
-              </button>
+                disabled={cargandoRespuesta}
+            >
+                ¿Qué es un jornal?
+            </button>
+
+            <button
+                type="button"
+                onClick={() =>
+                    enviarMensaje(
+                        false,
+                        "¿Me explicás de forma clara los costos estimados de mi proyecto?"
+                    )
+                }
+                disabled={
+                    !idProyecto ||
+                    cargandoRespuesta
+                }
+            >
+                ¿Cuáles son los costos estimados de mi proyecto?
+            </button>
+
             </div>
 
+
+            {/* =====================================================
+                INPUT
+            ===================================================== */}
+
             <footer className="assistant-input-area">
-              <button
-                type="button"
-                className="assistant-attachment"
-                aria-label="Adjuntar archivo"
-              >
-                <Paperclip size={20} />
-              </button>
 
               <textarea
                 placeholder="Escribí tu consulta..."
                 value={mensaje}
-                onChange={(event) => setMensaje(event.target.value)}
+                disabled={cargandoRespuesta}
+                onChange={(event) =>
+                  setMensaje(
+                    event.target.value
+                  )
+                }
                 onKeyDown={(event) => {
-                  if (event.key === "Enter" && !event.shiftKey) {
+
+                  if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                  ) {
+
                     event.preventDefault();
+
                     enviarMensaje();
                   }
+
                 }}
               />
 
               <button
                 type="button"
-                className="assistant-microphone"
-                aria-label="Usar micrófono"
-              >
-                <Mic size={20} />
-              </button>
-
-              <button
-                type="button"
                 className="assistant-send"
-                onClick={enviarMensaje}
+                onClick={() =>
+                  enviarMensaje()
+                }
+                disabled={
+                  cargandoRespuesta ||
+                  !mensaje.trim()
+                }
                 aria-label="Enviar mensaje"
               >
+
                 <Send size={19} />
+
               </button>
+
             </footer>
+
           </section>
 
+
+          {/* =====================================================
+              CONTEXTO DEL PROYECTO
+          ===================================================== */}
+
           <aside className="assistant-context">
+
             <div className="assistant-context-header">
-              <span>CONTEXTO ACTUAL</span>
-              <h2>Tu proyecto</h2>
+
+              <span>
+                CONTEXTO ACTUAL
+              </span>
+
+              <h2>
+                Tu proyecto
+              </h2>
+
             </div>
 
-            <article className="context-project-card">
-              <div className="context-project-icon">
-                <FolderOpen size={22} />
-              </div>
 
-              <div>
-                <strong>Quincho familiar</strong>
-                <span>La Serena · 30 m²</span>
-              </div>
-            </article>
+            {cargandoProyectos ? (
 
-            <div className="context-details">
-              <div>
-                <FileText size={17} />
+              <article className="context-project-card">
+
+                <div className="context-project-icon">
+                  <FolderOpen size={22} />
+                </div>
 
                 <div>
-                  <span>Cotizaciones</span>
-                  <strong>3 opciones</strong>
-                </div>
-              </div>
 
-              <div>
-                <Building2 size={17} />
+                  <strong>
+                    Cargando proyectos...
+                  </strong>
+
+                </div>
+
+              </article>
+
+            ) : proyectos.length === 0 ? (
+
+              <article className="context-project-card">
+
+                <div className="context-project-icon">
+                  <FolderOpen size={22} />
+                </div>
 
                 <div>
-                  <span>Empresas seleccionadas</span>
-                  <strong>2 empresas</strong>
+
+                  <strong>
+                    Sin proyectos
+                  </strong>
+
+                  <span>
+                    Creá un proyecto para utilizar recomendaciones.
+                  </span>
+
                 </div>
+
+              </article>
+
+            ) : (
+
+              <>
+
+                <select
+                  value={
+                    idProyecto ?? ""
+                  }
+                  onChange={(event) =>
+                    setIdProyecto(
+                      Number(
+                        event.target.value
+                      )
+                    )
+                  }
+                  className="assistant-project-select"
+                >
+
+                  {proyectos.map(
+                    (proyecto) => (
+
+                      <option
+                        key={
+                          proyecto.idProyecto
+                        }
+                        value={
+                          proyecto.idProyecto
+                        }
+                      >
+                        {proyecto.nombre}
+                      </option>
+
+                    )
+                  )}
+
+                </select>
+
+
+                {proyectoSeleccionado && (
+
+                  <article className="context-project-card">
+
+                    <div className="context-project-icon">
+                      <FolderOpen size={22} />
+                    </div>
+
+                    <div>
+
+                      <strong>
+                        {
+                          proyectoSeleccionado.nombre
+                        }
+                      </strong>
+
+                      <span>
+                        {
+                          proyectoSeleccionado.ubicacion ||
+                          "Sin ubicación"
+                        }
+                        {" · "}
+                        {
+                          proyectoSeleccionado.superficie
+                        } m²
+                      </span>
+
+                    </div>
+
+                  </article>
+
+                )}
+
+
+              </>
+
+            )}
+
+
+            {proyectoSeleccionado && (
+
+              <div className="context-summary">
+
+                <h3>
+                  Información del proyecto
+                </h3>
+
+                <p>
+
+                  <strong>
+                    Tipo de obra:
+                  </strong>{" "}
+
+                  {
+                    proyectoSeleccionado.tipoObra
+                  }
+
+                </p>
+
+                <p>
+
+                  <strong>
+                    Dimensiones:
+                  </strong>{" "}
+
+                  {
+                    proyectoSeleccionado.ancho
+                  } × {
+                    proyectoSeleccionado.largo
+                  } × {
+                    proyectoSeleccionado.alto
+                  } m
+
+                </p>
+
+                {proyectoSeleccionado.descripcion && (
+
+                  <p>
+
+                    <strong>
+                      Descripción:
+                    </strong>{" "}
+
+                    {
+                      proyectoSeleccionado.descripcion
+                    }
+
+                  </p>
+
+                )}
+
               </div>
 
-              <div>
-                <Sparkles size={17} />
+              
 
-                <div>
-                  <span>Opción recomendada</span>
-                  <strong>Estándar</strong>
-                </div>
-              </div>
-            </div>
+              
 
-            <div className="context-summary">
-              <h3>Resumen rápido</h3>
+            )}
+             <HistorialConversaciones
+                idCliente={usuario.id_Cliente}
+                idConversacion={idConversacion}
+                actualizarHistorial={actualizarHistorial}
+                onSeleccionarConversacion={
+                    seleccionarConversacion
+                }
+                onConversacionEliminada={(idEliminada) => {
+                    if (idConversacion === idEliminada) {
+                        setIdConversacion(null);
+                        setIdProyecto(null);
+                        setMensajes([]);
+                    }
+                }}
+              />
 
-              <p>
-                Proyecto activo con tres cotizaciones y una recomendación
-                generada por el comparador.
-              </p>
-
-              <button type="button">
-                Ver proyecto
-              </button>
-            </div>
           </aside>
+
+
         </section>
+
       </main>
+
     </div>
   );
 }

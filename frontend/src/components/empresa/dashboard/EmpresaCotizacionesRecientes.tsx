@@ -2,9 +2,8 @@ import type {
   CotizacionReciente,
 } from "../../../interfaces/Dashboard";
 
-import EstadoBadge, {
-  type EstadoCotizacion,
-} from "../../common/EstadoBadge";
+import EstadoBadge from "../../common/EstadoBadge";
+import type { EstadoCotizacion } from "../../../interfaces/Cotizacion";
 
 interface Props {
   cotizaciones: CotizacionReciente[];

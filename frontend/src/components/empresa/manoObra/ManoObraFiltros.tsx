@@ -1,6 +1,6 @@
 import "../../../styles/empresa/manoObra/ManoObraFiltros.css";
 
-import { FaFilter, FaSearch } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 
 type Props = {
   busqueda: string;
