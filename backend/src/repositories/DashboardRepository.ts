@@ -112,6 +112,11 @@ export class DashboardRepository {
             (
             SELECT COUNT(DISTINCT p.id_Cliente)
             FROM Proyecto p
+
+            INNER JOIN Cotizacion c
+                ON c.id_Proyecto = p.id_Proyecto
+                AND c.id_Empresa = @idEmpresa
+
             WHERE p.id_Empresa = @idEmpresa
             ) AS clientes,
 
@@ -190,38 +195,41 @@ export class DashboardRepository {
         idEmpresa
         )
         .query(`
-        WITH ClientesEmpresa AS (
-            SELECT
-            c.id_Cliente,
-            c.nombre,
-            c.apellido,
-            p.nombre AS proyecto,
-            p.fechaCreacion,
+            WITH ClientesEmpresa AS (
+                SELECT
+                    c.id_Cliente,
+                    c.nombre,
+                    c.apellido,
+                    p.nombre AS proyecto,
+                    p.fechaCreacion,
 
-            ROW_NUMBER() OVER (
-                PARTITION BY c.id_Cliente
-                ORDER BY p.fechaCreacion DESC
-            ) AS fila
+                    ROW_NUMBER() OVER (
+                        PARTITION BY c.id_Cliente
+                        ORDER BY p.fechaCreacion DESC
+                    ) AS fila
 
-            FROM Cliente c
+                FROM Cliente c
 
-            INNER JOIN Proyecto p
-            ON p.id_Cliente = c.id_Cliente
+                INNER JOIN Proyecto p
+                    ON p.id_Cliente = c.id_Cliente
+                    AND p.id_Empresa = @idEmpresa
 
-            WHERE p.id_Empresa = @idEmpresa
-        )
+                INNER JOIN Cotizacion co
+                    ON co.id_Proyecto = p.id_Proyecto
+                    AND co.id_Empresa = @idEmpresa
+            )
 
-        SELECT TOP 5
-            id_Cliente,
-            nombre,
-            apellido,
-            proyecto
+            SELECT TOP 5
+                id_Cliente,
+                nombre,
+                apellido,
+                proyecto
 
-        FROM ClientesEmpresa
+            FROM ClientesEmpresa
 
-        WHERE fila = 1
+            WHERE fila = 1
 
-        ORDER BY fechaCreacion DESC
+            ORDER BY fechaCreacion DESC
         `);
 
     return resultado.recordset;

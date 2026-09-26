@@ -85,17 +85,6 @@ export default function SidebarEmpresa() {
         </NavLink>
       </nav>
 
-      <div className="sidebar-help">
-        <div className="help-icon">
-          <FaQuestionCircle />
-        </div>
-
-        <h4>¿Necesitás ayuda?</h4>
-        <p>Contactá al soporte de SISCON-Q.</p>
-
-        <button>Contactar</button>
-      </div>
-
       <div className="sidebar-user">
         <div className="sidebar-avatar">
           {empresa?.logo ? (

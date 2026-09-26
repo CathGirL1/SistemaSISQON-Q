@@ -22,7 +22,7 @@ interface PerfilEmpresaDB {
   zonasTrabajo: string;
   condicionesComerciales: string;
   textoLegal: string;
-  impuestos: string;
+  impuestos: number | null;
   validezCotizacion: number;
   diasLaborables: string;
   horarioInicio: string;
@@ -94,8 +94,8 @@ export class EmpresaRepository {
           e.id_Empresa AS idEmpresa,
           e.id_Usuario AS idUsuario,
 
-          ISNULL(e.razonSocial, '') AS razonSocial,
-          ISNULL(e.nombreComercial, '') AS nombreComercial,
+          ISNULL(e.nombreEmpresa, '') AS razonSocial,
+          ISNULL(e.nombreEmpresa, '') AS nombreComercial,
 
           ISNULL(e.rut, '') AS rut,
           ISNULL(e.rubro, '') AS rubro,
@@ -109,7 +109,7 @@ export class EmpresaRepository {
           ISNULL(e.zonasTrabajo, '') AS zonasTrabajo,
           ISNULL(e.condicionesComerciales, '') AS condicionesComerciales,
           ISNULL(e.textoLegal, '') AS textoLegal,
-          ISNULL(e.impuestos, '') AS impuestos,
+          e.impuestos AS impuestos,
 
           ISNULL(e.validezCotizacion, 30) AS validezCotizacion,
 
@@ -154,8 +154,8 @@ export class EmpresaRepository {
           e.id_Empresa AS idEmpresa,
           e.id_Usuario AS idUsuario,
 
-          ISNULL(e.razonSocial, '') AS razonSocial,
-          ISNULL(e.nombreComercial, '') AS nombreComercial,
+          ISNULL(e.nombreEmpresa, '') AS razonSocial,
+          ISNULL(e.nombreEmpresa, '') AS nombreComercial,
 
           ISNULL(e.rut, '') AS rut,
           ISNULL(e.rubro, '') AS rubro,
@@ -169,7 +169,7 @@ export class EmpresaRepository {
           ISNULL(e.zonasTrabajo, '') AS zonasTrabajo,
           ISNULL(e.condicionesComerciales, '') AS condicionesComerciales,
           ISNULL(e.textoLegal, '') AS textoLegal,
-          ISNULL(e.impuestos, '') AS impuestos,
+          e.impuestos AS impuestos,
 
           ISNULL(e.validezCotizacion, 30) AS validezCotizacion,
 
@@ -296,8 +296,8 @@ export class EmpresaRepository {
 
       .input(
         "impuestos",
-        sql.VarChar(500),
-        empresa.impuestos || null
+        sql.Decimal(5, 2),
+        empresa.impuestos ?? null
       )
 
       .input(
@@ -333,8 +333,12 @@ export class EmpresaRepository {
       .query(`
         UPDATE Empresa
         SET
-          razonSocial = @razonSocial,
-          nombreComercial = @nombreComercial,
+          nombreEmpresa =
+            COALESCE(
+              NULLIF(@nombreComercial, ''),
+              @razonSocial
+            ),
+
           rut = @rut,
           rubro = @rubro,
           descripcion = @descripcion,

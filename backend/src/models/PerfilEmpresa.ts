@@ -22,7 +22,7 @@ export interface PerfilEmpresa {
 
   textoLegal: string;
 
-  impuestos: string;
+  impuestos: number | null;
   validezCotizacion: number;
 
   diasLaborables: string;
@@ -55,7 +55,7 @@ export interface ActualizarPerfilEmpresaDTO {
 
   textoLegal: string;
 
-  impuestos: string;
+  impuestos: number | null;
   validezCotizacion: number;
 
   diasLaborables: string;

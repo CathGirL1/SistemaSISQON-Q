@@ -196,10 +196,6 @@ export default function useManoObra() {
     };
 
   useEffect(() => {
-    if (!idEmpresa) {
-      return;
-    }
-
     void cargarManoObra();
 
     return () => {
