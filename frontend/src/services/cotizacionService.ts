@@ -30,6 +30,18 @@ interface CotizacionBackend {
 
   totalCotizacion: number;
 
+  // EMPRESA
+  nombreEmpresa: string;
+
+  // MONEDA
+  moneda: string;
+  tipoCambio: number;
+  precioEstimadoUYU: number | null;
+
+  costoMaterialesUYU: number;
+  costoManoObraUYU: number;
+  totalCotizacionUYU: number;
+
   estado: string;
   precioEstimado: number | null;
   observaciones: string | null;
@@ -59,22 +71,9 @@ interface CotizacionBackend {
   resumenMateriales: string;
   materiales: string | null;
 
-  // EMPRESA
-  nombreEmpresa: string;
-
-  // MONEDA
-  moneda: string;
-
-  tipoCambio: number;
-
-  precioEstimadoUYU: number | null;
-
   // Snapshot histórico
   tipoCambioUSD: number | null;
   totalUYU: number | null;
-
-  // Conversión preparada por backend
-  totalCotizacionUYU: number;
 
   conversionHistorica: boolean;
 }
@@ -156,227 +155,232 @@ export async function obtenerCotizacionesEmpresa(
     );
   }
 
-    const cotizaciones: CotizacionBackend[] = data;
+  const cotizaciones: CotizacionBackend[] = data;
 
-        
+  return cotizaciones.map(
+    (cotizacion) => ({
+      // ==========================================
+      // IDENTIFICACIÓN
+      // ==========================================
 
-        return cotizaciones.map(
-        (cotizacion) => ({
-            // ==========================================
-            // IDENTIFICACIÓN
-            // ==========================================
+      id: cotizacion.codigo,
 
-            id: cotizacion.codigo,
+      idCotizacion:
+        cotizacion.idCotizacion,
 
-            idCotizacion:
-            cotizacion.idCotizacion,
+      idProyecto:
+        cotizacion.idProyecto,
 
-            idProyecto:
-            cotizacion.idProyecto,
+      idEmpresa:
+        cotizacion.idEmpresa,
 
-            idEmpresa:
-            cotizacion.idEmpresa,
+      idCliente:
+        cotizacion.idCliente,
 
-            idCliente:
-            cotizacion.idCliente,
+      // ==========================================
+      // CLIENTE
+      // ==========================================
 
-            // ==========================================
-            // CLIENTE
-            // ==========================================
+      cliente:
+        cotizacion.nombreCliente,
 
-            cliente:
-            cotizacion.nombreCliente,
+      email:
+        cotizacion.emailCliente,
 
-            email:
-            cotizacion.emailCliente,
+      telefono:
+        cotizacion.telefonoCliente,
 
-            telefono:
-            cotizacion.telefonoCliente,
+      // ==========================================
+      // PROYECTO
+      // ==========================================
 
-            // ==========================================
-            // PROYECTO
-            // ==========================================
+      nombreProyecto:
+        cotizacion.nombreProyecto,
 
-            nombreProyecto:
-            cotizacion.nombreProyecto,
+      descripcionProyecto:
+        cotizacion.descripcionProyecto,
 
-            descripcionProyecto:
-            cotizacion.descripcionProyecto,
+      tipoObra:
+        cotizacion.tipoObra,
 
-            tipoObra:
-            cotizacion.tipoObra,
+      codigoTipoObra:
+        cotizacion.codigoTipoObra,
 
-            codigoTipoObra:
-            cotizacion.codigoTipoObra,
+      ubicacion:
+        cotizacion.ubicacion,
 
-            ubicacion:
-            cotizacion.ubicacion,
+      alto:
+        Number(cotizacion.alto),
 
-            alto:
-            Number(cotizacion.alto),
+      ancho:
+        Number(cotizacion.ancho),
 
-            ancho:
-            Number(cotizacion.ancho),
+      largo:
+        Number(cotizacion.largo),
 
-            largo:
-            Number(cotizacion.largo),
+      superficie:
+        Number(cotizacion.superficie),
 
-            superficie:
-            Number(cotizacion.superficie),
+      // ==========================================
+      // COTIZACIÓN
+      // ==========================================
 
-            // ==========================================
-            // COTIZACIÓN
-            // ==========================================
-
-            fecha:
+      fecha:
+        cotizacion.fechaCreacion
+          ? new Date(
             cotizacion.fechaCreacion
-              ? new Date(
-                  cotizacion.fechaCreacion
-                ).toLocaleDateString("es-UY")
-              : "Sin fecha",
+          ).toLocaleDateString("es-UY")
+          : "Sin fecha",
 
-            total: (() => {
-              const totalUYU = Number(
-                cotizacion.totalCotizacion
-              );
-
-              const tipoCambio = Number(
-                cotizacion.tipoCambio
-              );
-
-              const totalUSD =
-                tipoCambio > 0
-                  ? totalUYU / tipoCambio
-                  : 0;
-
-              return `${formatearUSD(totalUSD)} (${formatearUYU(totalUYU)})`;
-            })(),
-
-              costoMateriales:
-              Number(
-                  cotizacion.costoMateriales
-              ),
-
-              costoManoObra:
-              Number(
-                  cotizacion.costoManoObra
-              ),
-
-              costoManoObraAdicional:
-              Number(
-                  cotizacion.costoManoObraAdicional ?? 0
-              ),
-
-              subtotal:
-              cotizacion.subtotal !== null &&
-              cotizacion.subtotal !== undefined
-                  ? Number(cotizacion.subtotal)
-                  : null,
-
-              porcentajeIVAAplicado:
-              cotizacion.porcentajeIVAAplicado !== null &&
-              cotizacion.porcentajeIVAAplicado !== undefined
-                  ? Number(cotizacion.porcentajeIVAAplicado)
-                  : null,
-
-              montoIVA:
-              cotizacion.montoIVA !== null &&
-              cotizacion.montoIVA !== undefined
-                  ? Number(cotizacion.montoIVA)
-                  : null,
-
-              totalCotizacion:
-              Number(
-                  cotizacion.totalCotizacion
-              ),
-
-            estado:
-            convertirEstado(
-                cotizacion.estado
-            ),
-
-            precioEstimado:
-            cotizacion.precioEstimado !== null
-                ? Number(cotizacion.precioEstimado)
-                : null,
-
-            observaciones:
-            cotizacion.observaciones,
-
-            version:
-            Number(cotizacion.version),
-
-            // ==========================================
-            // MATERIALES
-            // ==========================================
-
-          resumenMateriales:
-            cotizacion.resumenMateriales,
-
-          materiales:
-            cotizacion.materiales
-              ? JSON.parse(cotizacion.materiales).map(
-                  (material: {
-                    idMaterialProyecto: number;
-                    idProyecto: number;
-                    idMaterial: number;
-                    cantidad: number;
-                    nombre: string;
-                    costoUnitario: number;
-                    unidad: string | null;
-                    subtotal: number;
-                  }) => ({
-                    ...material,
-                    cantidad: Number(material.cantidad),
-                    costoUnitario: Number(material.costoUnitario),
-                    subtotal: Number(material.subtotal),
-                  })
-                )
-              : [],
-
-            // ==========================================
-            // EMPRESA
-            // ==========================================
-
-            nombreEmpresa:
-            cotizacion.nombreEmpresa,
-            
-            // ==========================================
-            // MONEDA
-            // ==========================================
-
-            moneda:
-            cotizacion.moneda,
-
-            tipoCambio:
-            Number(cotizacion.tipoCambio),
-
-            precioEstimadoUYU:
-            cotizacion.precioEstimadoUYU !== null &&
-            cotizacion.precioEstimadoUYU !== undefined
-                ? Number(cotizacion.precioEstimadoUYU)
-                : null,
-
-            tipoCambioUSD:
-            cotizacion.tipoCambioUSD !== null &&
-            cotizacion.tipoCambioUSD !== undefined
-                ? Number(cotizacion.tipoCambioUSD)
-                : null,
-
-            totalUYU:
-            cotizacion.totalUYU !== null &&
-            cotizacion.totalUYU !== undefined
-                ? Number(cotizacion.totalUYU)
-                : null,
-
-            totalCotizacionUYU:
-            Number(cotizacion.totalCotizacionUYU),
-
-            conversionHistorica:
-            Boolean(cotizacion.conversionHistorica),
-        })
+      total: (() => {
+        const totalUYU = Number(
+          cotizacion.totalCotizacion
         );
-    }
+
+        const tipoCambio = Number(
+          cotizacion.tipoCambio
+        );
+
+        const totalUSD =
+          tipoCambio > 0
+            ? totalUYU / tipoCambio
+            : 0;
+
+        return `${formatearUSD(totalUSD)} (${formatearUYU(totalUYU)})`;
+      })(),
+
+      costoMateriales:
+        Number(
+          cotizacion.costoMateriales
+        ),
+
+      costoManoObra:
+        Number(
+          cotizacion.costoManoObra
+        ),
+
+      costoManoObraAdicional:
+        Number(
+          cotizacion.costoManoObraAdicional ?? 0
+        ),
+
+      subtotal:
+        cotizacion.subtotal !== null &&
+          cotizacion.subtotal !== undefined
+          ? Number(cotizacion.subtotal)
+          : null,
+
+      porcentajeIVAAplicado:
+        cotizacion.porcentajeIVAAplicado !== null &&
+          cotizacion.porcentajeIVAAplicado !== undefined
+          ? Number(cotizacion.porcentajeIVAAplicado)
+          : null,
+
+      montoIVA:
+        cotizacion.montoIVA !== null &&
+          cotizacion.montoIVA !== undefined
+          ? Number(cotizacion.montoIVA)
+          : null,
+
+      totalCotizacion:
+        Number(
+          cotizacion.totalCotizacion
+        ),
+
+
+      estado:
+        convertirEstado(
+          cotizacion.estado
+        ),
+
+      precioEstimado:
+        cotizacion.precioEstimado !== null
+          ? Number(cotizacion.precioEstimado)
+          : null,
+
+      observaciones:
+        cotizacion.observaciones,
+
+      version:
+        Number(cotizacion.version),
+
+      // ==========================================
+      // MATERIALES
+      // ==========================================
+
+      resumenMateriales:
+        cotizacion.resumenMateriales,
+
+      materiales:
+        cotizacion.materiales
+          ? JSON.parse(cotizacion.materiales).map(
+            (material: {
+              idMaterialProyecto: number;
+              idProyecto: number;
+              idMaterial: number;
+              cantidad: number;
+              nombre: string;
+              costoUnitario: number;
+              unidad: string | null;
+              subtotal: number;
+            }) => ({
+              ...material,
+              cantidad: Number(material.cantidad),
+              costoUnitario: Number(material.costoUnitario),
+              subtotal: Number(material.subtotal),
+            })
+          )
+          : [],
+
+      // ==========================================
+      // EMPRESA
+      // ==========================================
+
+      nombreEmpresa:
+        cotizacion.nombreEmpresa,
+
+      // ==========================================
+      // MONEDA
+      // ==========================================
+
+      moneda:
+        cotizacion.moneda,
+
+      tipoCambio:
+        Number(cotizacion.tipoCambio),
+
+      precioEstimadoUYU:
+        cotizacion.precioEstimadoUYU !== null &&
+          cotizacion.precioEstimadoUYU !== undefined
+          ? Number(cotizacion.precioEstimadoUYU)
+          : null,
+
+      costoMaterialesUYU:
+        Number(cotizacion.costoMaterialesUYU),
+
+      costoManoObraUYU:
+        Number(cotizacion.costoManoObraUYU),
+
+      tipoCambioUSD:
+        cotizacion.tipoCambioUSD !== null &&
+          cotizacion.tipoCambioUSD !== undefined
+          ? Number(cotizacion.tipoCambioUSD)
+          : null,
+
+      totalUYU:
+        cotizacion.totalUYU !== null &&
+          cotizacion.totalUYU !== undefined
+          ? Number(cotizacion.totalUYU)
+          : null,
+
+      totalCotizacionUYU:
+        Number(cotizacion.totalCotizacionUYU),
+
+      conversionHistorica:
+        Boolean(cotizacion.conversionHistorica),
+    })
+  );
+}
 
 export interface ManoObraCotizacionData {
   idManoObra: number;

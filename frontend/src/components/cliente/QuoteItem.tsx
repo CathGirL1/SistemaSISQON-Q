@@ -2,9 +2,10 @@ interface QuoteItemProps {
   code: string;
   project: string;
   amount: string;
-  amountUYU: string;
+  amountUYU?: string;
   date: string;
   tag: string;
+  onClick?: () => void;
 }
 
 export default function QuoteItem({
@@ -14,16 +15,31 @@ export default function QuoteItem({
   amountUYU,
   date,
   tag,
+  onClick,
 }: QuoteItemProps) {
   const badgeClass =
-    tag === "Premium"
+    tag === "Aceptada"
       ? "badge-premium"
-      : tag === "Económica"
-      ? "badge-economica"
-      : "badge-estandar";
+      : tag === "Enviada" || tag === "Revisada"
+        ? "badge-economica"
+        : "badge-estandar";
 
   return (
-    <div className="list-row quote-row no-thumb">
+    <div
+      className="list-row quote-row no-thumb"
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={(event) => {
+        if (
+          onClick &&
+          (event.key === "Enter" || event.key === " ")
+        ) {
+          event.preventDefault();
+          onClick();
+        }
+      }}
+    >
       <div>
         <strong>{code}</strong>
         <span>{project}</span>
@@ -34,9 +50,11 @@ export default function QuoteItem({
       <div className="amount-box">
         <b>{amount}</b>
 
-        <span className="amount-uyu">
-          ({amountUYU})
-        </span>
+        {amountUYU && (
+          <span className="amount-uyu">
+            ({amountUYU})
+          </span>
+        )}
 
         <span>{date}</span>
       </div>

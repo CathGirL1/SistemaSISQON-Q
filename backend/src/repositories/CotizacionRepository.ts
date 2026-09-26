@@ -110,7 +110,7 @@ export class CotizacionRepository {
         data.observaciones ?? null
       )
 
-      .input( "version", sql.Int, data.version )
+      .input("version", sql.Int, data.version)
 
       .query(`
         INSERT INTO Cotizacion
@@ -452,8 +452,8 @@ export class CotizacionRepository {
     return result.recordset.map((material) => ({
       ...material,
       subtotal:
-          Number(material.cantidad) *
-          Number(material.costoUnitario),
+        Number(material.cantidad) *
+        Number(material.costoUnitario),
     }));
   }
 
@@ -619,6 +619,8 @@ export class CotizacionRepository {
 
           c.id_Cotizacion AS idCotizacion,
           c.id_Proyecto AS idProyecto,
+          c.id_Empresa AS idEmpresa,
+          e.nombreEmpresa AS nombreEmpresa,
 
           CONCAT(
             'COT-',
@@ -672,6 +674,9 @@ export class CotizacionRepository {
           
         INNER JOIN TipoObra t
           ON t.id_TipoObra = p.id_TipoObra
+
+        LEFT JOIN Empresa e
+          ON e.id_Empresa = c.id_Empresa
 
         WHERE c.id_Proyecto = @idProyecto
 
@@ -994,7 +999,7 @@ export class CotizacionRepository {
   }
 
 
-    public async enviarCotizacion(
+  public async enviarCotizacion(
     idCotizacion: number,
     idEmpresa: number
   ): Promise<boolean> {
@@ -1027,7 +1032,7 @@ export class CotizacionRepository {
   }
 
 
-    public async obtenerImpuestoEmpresa(
+  public async obtenerImpuestoEmpresa(
     idEmpresa: number
   ): Promise<number | null> {
 
@@ -1111,13 +1116,36 @@ export class CotizacionRepository {
     return result.rowsAffected[0] > 0;
   }
 
+  public async seleccionarPropuesta(
+    idCotizacion: number
+  ): Promise<boolean> {
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+      .input(
+        "idCotizacion",
+        sql.Int,
+        idCotizacion
+      )
+      .query(`
+      UPDATE Cotizacion
+      SET
+        estado = 'Enviada',
+        fechaActualizacion = GETDATE()
+      WHERE id_Cotizacion = @idCotizacion
+        AND id_Empresa IS NOT NULL
+        AND estado = 'Borrador'
+    `);
+
+    return result.rowsAffected[0] > 0;
+  }
 
   // ====================================================
   // ESTADÍSTICAS DEL CLIENTE
   // ====================================================
 
-
- public async obtenerEstadisticasCliente(
+  public async obtenerEstadisticasCliente(
     idCliente: number
   ) {
     const pool = await connectDB();
@@ -1189,27 +1217,27 @@ export class CotizacionRepository {
     return result.recordset[0] ?? null;
   }
 
-    // ====================================================
-    // VERIFICAR SI EXISTE PROYECTO
-    // ====================================================
+  // ====================================================
+  // VERIFICAR SI EXISTE PROYECTO
+  // ====================================================
 
 
-    public async existeProyecto(
-      idProyecto: number
-    ): Promise<boolean> {
+  public async existeProyecto(
+    idProyecto: number
+  ): Promise<boolean> {
 
-      const pool = await connectDB();
+    const pool = await connectDB();
 
-      const result = await pool
-        .request()
+    const result = await pool
+      .request()
 
-        .input(
-          "idProyecto",
-          sql.Int,
-          idProyecto
-        )
+      .input(
+        "idProyecto",
+        sql.Int,
+        idProyecto
+      )
 
-        .query(`
+      .query(`
           SELECT TOP 1
             id_Proyecto
 
@@ -1217,14 +1245,10 @@ export class CotizacionRepository {
 
           WHERE id_Proyecto = @idProyecto
         `);
+    return result.recordset.length > 0;
+  }
 
-      return result.recordset.length > 0;
-    }
-  
-
-
-
-    public async actualizarCotizacionDesdeEmpresa(
+  public async actualizarCotizacionDesdeEmpresa(
     idCotizacion: number,
     costoManoObraAdicional: number,
     subtotal: number,
@@ -1324,4 +1348,3 @@ export class CotizacionRepository {
     return result.rowsAffected[0] > 0;
   }
 }
-

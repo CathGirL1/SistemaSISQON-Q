@@ -26,6 +26,7 @@ import SidebarCliente from "../../components/cliente/SidebarCliente";
 import ActualizarCotizacion from "../../components/cliente/ActualizarCotizacion";
 import EnviarCotizacion from "../../components/cliente/EnviarCotizacion";
 import DescargarCotizacionPDF from "../../components/cliente/DescargarCotizacionPDF";
+import HeaderCliente from "../../components/cliente/HeaderCliente";
 
 import {
   formatearPrecioUYU,
@@ -110,38 +111,37 @@ export default function MisCotizaciones() {
       // -----------------------------------------
       // 1. OBTENER COTIZACIONES
       // -----------------------------------------
+      const usuarioGuardado = localStorage.getItem("usuario");
 
-     const usuarioGuardado = localStorage.getItem("usuario");
+      if (!usuarioGuardado) {
+        throw new Error("No se encontró una sesión activa");
+      }
 
-        if (!usuarioGuardado) {
-          throw new Error("No se encontró una sesión activa");
-        }
+      const usuario = JSON.parse(usuarioGuardado);
 
-        const usuario = JSON.parse(usuarioGuardado);
-
-        if (!usuario.id_Cliente) {
-          throw new Error(
-            "No se encontró el identificador del cliente"
-          );
-        }
-
-        // -----------------------------------------
-        // 1. OBTENER COTIZACIONES
-        // -----------------------------------------
-        const response = await fetch(
-          `${API_URL}/api/cotizaciones/cliente/${usuario.id_Cliente}`
+      if (!usuario.id_Cliente) {
+        throw new Error(
+          "No se encontró el identificador del cliente"
         );
+      }
 
-        const data: CotizacionAPI[] =
-          await response.json();
+      // -----------------------------------------
+      // 1. OBTENER COTIZACIONES
+      // -----------------------------------------
+      const response = await fetch(
+        `${API_URL}/api/cotizaciones/cliente/${usuario.id_Cliente}`
+      );
 
-        if (!response.ok) {
-          throw new Error(
-            "No se pudieron obtener las cotizaciones"
-          );
-        }
+      const data: CotizacionAPI[] =
+        await response.json();
 
-        setCotizaciones(data);
+      if (!response.ok) {
+        throw new Error(
+          "No se pudieron obtener las cotizaciones"
+        );
+      }
+
+      setCotizaciones(data);
 
       // -----------------------------------------
       // 2. OBTENER IDS DE PROYECTOS
@@ -250,12 +250,12 @@ export default function MisCotizaciones() {
   const tiposObra = useMemo(() => {
     return Array.from(
       new Set(
-        cotizaciones
-          .map((cotizaciones) => cotizaciones.tipoObra)
-          .filter(Boolean)
+        Object.values(tiposObraProyectos).filter(
+          (tipo) => tipo && tipo !== "No especificado"
+        )
       )
     ).sort();
-  }, [cotizaciones]);
+  }, [tiposObraProyectos]);
 
   const cotizacionesFiltradas = useMemo(() => {
     const textoBusqueda =
@@ -275,7 +275,7 @@ export default function MisCotizaciones() {
 
       const coincideTipo =
         tipoSeleccionado === "Todos" ||
-        cotizacion.tipoObra === tipoSeleccionado;
+        tiposObraProyectos[cotizacion.idProyecto] === tipoSeleccionado;
 
       const coincideEstado =
         estadoSeleccionado === "Todos" ||
@@ -302,6 +302,7 @@ export default function MisCotizaciones() {
     estadoSeleccionado,
     ordenFecha,
     cotizaciones,
+    tiposObraProyectos,
   ]);
   // -----------------------------------------
   // ESTADÍSTICAS
@@ -346,6 +347,10 @@ export default function MisCotizaciones() {
       />
 
       <main className="cliente-main">
+        <HeaderCliente
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((prev) => !prev)}
+        />
 
         {/* ---------------------------------- */}
         {/* ENCABEZADO */}
@@ -442,7 +447,7 @@ export default function MisCotizaciones() {
           <div className="filter-select">
             <span>
               {tipoSeleccionado === "Todos"
-                ? "Todos los tipos"
+                ? "Tipo de obra"
                 : tipoSeleccionado}
             </span>
 
@@ -455,7 +460,7 @@ export default function MisCotizaciones() {
                 setTipoSeleccionado(event.target.value)
               }
             >
-              <option value="Todos">Todos los tipos</option>
+              <option value="Todos">Todos los tipos de obra</option>
 
               {tiposObra.map((tipo) => (
                 <option key={tipo} value={tipo}>

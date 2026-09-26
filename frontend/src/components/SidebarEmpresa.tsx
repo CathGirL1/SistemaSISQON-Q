@@ -1,7 +1,7 @@
 import "../styles/SidebarEmpresa.css";
 import iconoHomeMenu from "../assets/iconoHomeMenu.png";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import {
   FaHome,
@@ -11,7 +11,6 @@ import {
   FaHardHat,
   FaUserCog,
   FaUserCircle,
-  FaQuestionCircle,
   FaSignOutAlt,
 } from "react-icons/fa";
 
@@ -19,6 +18,12 @@ import useEmpresa from "../hooks/useEmpresa";
 
 export default function SidebarEmpresa() {
   const { empresa } = useEmpresa();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("usuario");
+    navigate("/login", { replace: true });
+  };
 
   const nombreEmpresa =
     empresa?.nombreComercial ||
@@ -103,7 +108,13 @@ export default function SidebarEmpresa() {
           <p>Administrador</p>
         </div>
 
-        <button className="sidebar-logout">
+        <button
+          type="button"
+          className="sidebar-logout"
+          onClick={handleLogout}
+          title="Cerrar sesión"
+          aria-label="Cerrar sesión"
+        >
           <FaSignOutAlt />
         </button>
       </div>

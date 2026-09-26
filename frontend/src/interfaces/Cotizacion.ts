@@ -46,40 +46,39 @@ export interface Cotizacion {
   // COTIZACIÓN
   // ==========================================
 
- fecha: string;
+  fecha: string;
 
-total: string;
+  total: string;
 
-costoMateriales: number;
+  costoMateriales: number;
+  costoManoObra: number;
 
-costoManoObra: number;
+  // Mano de obra agregada desde Panel Empresa
+  costoManoObraAdicional: number;
 
-// Mano de obra agregada desde Panel Empresa
-costoManoObraAdicional: number;
+  // Precio original generado por SISCON-Q
+  precioEstimado: number | null;
 
-// Precio original generado por SISCON-Q
-precioEstimado: number | null;
+  // Cálculo realizado por la empresa
+  subtotal: number | null;
 
-// Cálculo realizado por la empresa
-subtotal: number | null;
+  porcentajeIVAAplicado: number | null;
 
-porcentajeIVAAplicado: number | null;
+  montoIVA: number | null;
 
-montoIVA: number | null;
+  totalCotizacion: number;
 
-totalCotizacion: number;
+  estado: EstadoCotizacion;
 
-estado: EstadoCotizacion;
+  observaciones: string | null;
 
-observaciones: string | null;
-
-version: number;
+  version: number;
 
   // ==========================================
   // MATERIALES
   // ==========================================
 
- 
+
 
   resumenMateriales: string;
   materiales: {
@@ -118,6 +117,9 @@ version: number;
   // Precio estimado convertido a pesos uruguayos.
   precioEstimadoUYU: number | null;
 
+  costoMaterialesUYU: number;
+  costoManoObraUYU: number;
+
   // Total convertido a pesos.
   // Si está Finalizada, este valor es el snapshot histórico.
   totalUYU: number | null;
@@ -129,4 +131,3 @@ version: number;
   // Indica si la conversión quedó congelada al finalizar.
   conversionHistorica: boolean;
 }
-

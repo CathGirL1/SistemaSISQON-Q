@@ -1,4 +1,8 @@
-import { useEffect, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useState,
+  type FormEvent,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,18 +14,10 @@ import {
 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-import MaterialesProyectoDropList, {
-  type Material,
-} from "../../components/cliente/MaterialesProyectoDropList";
+import HeaderCliente from "../../components/cliente/HeaderCliente";
 
-import ModalDatosMaterial from "../../components/cliente/ModalDatosMaterial";
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/CrearProyecto.css";
-
-interface TipoObra {
-  idTipoObra: number;
-  nombre: string;
-}
 
 interface FormularioProyecto {
   nombre: string;
@@ -31,15 +27,22 @@ interface FormularioProyecto {
   alto: string;
   ancho: string;
   largo: string;
-  imagenUrl: string; 
+  imagenUrl: string;
 }
 
+interface TipoObra {
+  idTipoObra: number;
+  nombre: string;
+  descripcion: string | null;
+  estado: string;
+}
 
+interface RespuestaError {
+  mensaje?: string;
+}
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-
 
 const formularioInicial: FormularioProyecto = {
   nombre: "",
@@ -49,75 +52,22 @@ const formularioInicial: FormularioProyecto = {
   alto: "",
   ancho: "",
   largo: "",
-  imagenUrl: ""
+  imagenUrl: "",
 };
 
 export default function CrearProyecto() {
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [formulario, setFormulario] =
     useState<FormularioProyecto>(formularioInicial);
 
   const [tiposObra, setTiposObra] = useState<TipoObra[]>([]);
- 
+  const [cargandoTiposObra, setCargandoTiposObra] =
+    useState(true);
 
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
-
-  const [materialesSeleccionados, setMaterialesSeleccionados] = useState<Material[]>([]);
-  const [materialModal, setMaterialModal] =
-  useState<Material | null>(null);
-
-  const [modalMaterialAbierto, setModalMaterialAbierto] =
-  useState(false);
-
-  const abrirModalMaterial = (material: Material) => {
-    setMaterialModal(material);
-    setModalMaterialAbierto(true);
-  };
-
-  const cerrarModalMaterial = () => {
-    setModalMaterialAbierto(false);
-    setMaterialModal(null);
-  };
-
-  // ==========================================
-  // OBTENER TIPOS DE OBRA
-  // ==========================================
-
-  useEffect(() => {
-    obtenerTiposObra();
-  }, []);
-
-  const obtenerTiposObra = async () => {
-    try {
-      const response = await fetch(
-        `${API_URL}/api/tipos-obra`
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          "No se pudieron obtener los tipos de obra."
-        );
-      }
-
-      const data: TipoObra[] = await response.json();
-
-      setTiposObra(data);
-    } catch (error) {
-      console.error(error);
-
-      setError(
-        "No se pudieron cargar los tipos de obra."
-      );
-    }
-  };
-
-  // ==========================================
-  // ACTUALIZAR CAMPOS
-  // ==========================================
 
   const actualizarCampo = (
     campo: keyof FormularioProyecto,
@@ -129,269 +79,165 @@ export default function CrearProyecto() {
     }));
   };
 
- 
-
   const enviarFormulario = async (
-    event: FormEvent
-    ) => {
+    event: FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
 
     try {
       setGuardando(true);
       setError("");
 
-      // ==========================================
-      // 1. CREAR PROYECTO
-      // ==========================================
+      const usuarioGuardado = localStorage.getItem("usuario");
 
-        const usuarioGuardado =
-          localStorage.getItem("usuario");
+      if (!usuarioGuardado) {
+        throw new Error("No hay una sesión iniciada");
+      }
 
-          if (!usuarioGuardado) {
-            throw new Error(
-              "No se encontró una sesión activa."
-            );
-          }
+      const usuario = JSON.parse(usuarioGuardado);
+      const idCliente = usuario.id_Cliente;
 
-          const usuario = JSON.parse(usuarioGuardado);
-
-          if (!usuario.id_Cliente) {
-            throw new Error(
-              "No se encontró el identificador del cliente."
-            );
-          }
+      if (!idCliente) {
+        throw new Error(
+          "El usuario autenticado no tiene un cliente asociado"
+        );
+      }
+      
 
       const proyecto = {
-        idCliente: usuario.id_Cliente,
-
-        idTipoObra: Number(
-          formulario.idTipoObra
-        ),
-
-        nombre:
-          formulario.nombre.trim(),
-
-        descripcion:
-          formulario.descripcion.trim() || null,
-
-        imagenUrl:
-          formulario.imagenUrl.trim() || null,
-
-        ubicacion:
-          formulario.ubicacion.trim() || null,
-
+        idCliente,
+        idTipoObra: Number(formulario.idTipoObra),
+        nombre: formulario.nombre.trim(),
+        descripcion: formulario.descripcion.trim() || null,
+        imagenUrl: formulario.imagenUrl.trim() || null,
+        ubicacion: formulario.ubicacion.trim() || null,
         alto: Number(formulario.alto),
-
         ancho: Number(formulario.ancho),
-
         largo: Number(formulario.largo),
       };
-
-      console.log(
-        "Proyecto a enviar:",
-        proyecto
-      );
 
       const response = await fetch(
         `${API_URL}/api/proyectos`,
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify(proyecto),
         }
       );
 
-      const data = await response.json();
+      const data: RespuestaError = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.mensaje ||
-            "No se pudo crear el proyecto"
+          data.mensaje || "No se pudo crear el proyecto"
         );
       }
 
-      // ==========================================
-      // 2. OBTENER ID DEL PROYECTO CREADO
-      // ==========================================
-
-      const idProyecto =
-        data.idProyecto;
-
-      console.log(
-        "Proyecto creado con ID:",
-        idProyecto
-      );
-
-      if (!idProyecto) {
-        throw new Error(
-          "El backend no devolvió el ID del proyecto creado."
-        );
-      }
-
-      // ==========================================
-      // 3. GUARDAR MATERIALES DEL PROYECTO
-      // ==========================================
-
-      for (
-        const material
-        of materialesSeleccionados
-      ) {
-
-        const materialProyecto = {
-          idProyecto:
-            idProyecto,
-
-          idMaterial:
-            material.idMaterial,
-
-          cantidad:
-            material.cantidad ?? 1,
-        };
-
-        console.log(
-          "Material a guardar:",
-          materialProyecto
-        );
-
-        const respuestaMaterial =
-          await fetch(
-            `${API_URL}/api/materiales-proyecto/agregarMaterialAProyecto`,
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type": "application/json",
-              },
-
-              body: JSON.stringify(
-                materialProyecto
-              ),
-            }
-          );
-
-        const datosMaterial =
-          await respuestaMaterial.json();
-
-        if (!respuestaMaterial.ok) {
-          throw new Error(
-            datosMaterial.mensaje ||
-              `No se pudo guardar el material ${material.nombre}`
-          );
-        }
-      }
-
-      // ==========================================
-      // 4. TODO CORRECTO
-      // ==========================================
-
-      console.log(
-        "Proyecto y materiales guardados correctamente."
-      );
-
-      navigate(
-        "/panel-cliente/proyectos"
-      );
-
+      navigate("/panel-cliente/proyectos");
     } catch (error) {
-
-      console.error(error);
-
       const mensaje =
         error instanceof Error
           ? error.message
           : "Ocurrió un error al crear el proyecto";
 
       setError(mensaje);
-
     } finally {
-
       setGuardando(false);
-
     }
+  };
+
+  useEffect(() => {
+    const cargarTiposObra = async () => {
+      try {
+        setCargandoTiposObra(true);
+
+        const response = await fetch(
+          "http://localhost:3000/api/tipos-obra"
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "No se pudieron cargar los tipos de obra."
+          );
+        }
+
+        const data: TipoObra[] = await response.json();
+
+        setTiposObra(
+          data.filter((tipo) => tipo.estado === "Activo")
+        );
+      } catch (error) {
+        console.error(
+          "Error al cargar tipos de obra:",
+          error
+        );
+      } finally {
+        setCargandoTiposObra(false);
+      }
     };
+
+    cargarTiposObra();
+  }, []);
 
   return (
     <div className="cliente-panel">
-
       <SidebarCliente
         menuOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
       />
 
       <main className="cliente-main">
-
-     
+        <HeaderCliente
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((prev) => !prev)}
+        />
 
         <section className="crear-proyecto-heading">
-
           <div>
-
             <button
               type="button"
               className="crear-proyecto-back"
               onClick={() =>
-                navigate(
-                  "/panel-cliente/proyectos"
-                )
+                navigate("/panel-cliente/proyectos")
               }
             >
               <ArrowLeft size={18} />
-
               Volver a Mis proyectos
             </button>
 
             <h2>Nuevo proyecto</h2>
 
             <p>
-              Completá la información básica para
-              comenzar a configurar la obra.
+              Completá la información básica para comenzar a
+              configurar la obra.
             </p>
-
           </div>
-
         </section>
 
         <form
           className="crear-proyecto-form"
           onSubmit={enviarFormulario}
         >
-
-          {/* ==========================================
-              INFORMACIÓN GENERAL
-          ========================================== */}
-
           <section className="crear-proyecto-card">
-
             <div className="crear-proyecto-card-title">
-
               <div className="crear-proyecto-icon">
                 <FileText size={21} />
               </div>
 
               <div>
-
                 <h3>Información general</h3>
-
                 <p>
-                  Identificá el proyecto y agregá una
-                  breve descripción.
+                  Identificá el proyecto y agregá una breve
+                  descripción.
                 </p>
-
               </div>
-
             </div>
 
             <div className="crear-proyecto-grid">
-
               <label className="crear-proyecto-field">
-
-                <span>
-                  Nombre del proyecto
-                </span>
+                <span>Nombre del proyecto</span>
 
                 <input
                   type="text"
@@ -406,17 +252,12 @@ export default function CrearProyecto() {
                   maxLength={100}
                   required
                 />
-
               </label>
 
               <label className="crear-proyecto-field">
-
-                <span>
-                  Ubicación
-                </span>
+                <span>Ubicación</span>
 
                 <div className="crear-proyecto-input-icon">
-
                   <MapPin size={18} />
 
                   <input
@@ -431,16 +272,11 @@ export default function CrearProyecto() {
                     placeholder="Ej.: Maldonado, Uruguay"
                     maxLength={200}
                   />
-
                 </div>
-
               </label>
 
               <label className="crear-proyecto-field crear-proyecto-field-full">
-
-                <span>
-                  Descripción
-                </span>
+                <span>Descripción</span>
 
                 <textarea
                   value={formulario.descripcion}
@@ -454,65 +290,27 @@ export default function CrearProyecto() {
                   maxLength={500}
                   rows={5}
                 />
-
               </label>
-
-              <label className="crear-proyecto-field">
-
-                <span>
-                  Imagen de proyecto
-                </span>
-
-               <input
-                  type="text"
-                  value={formulario.imagenUrl}
-                  onChange={(event) =>
-                    actualizarCampo(
-                      "imagenUrl",
-                      event.target.value
-                    )
-                  }
-                  placeholder="Ingrese un enlace de imagen"
-                  maxLength={100}
-                  required
-                />
-
-              </label>
-
             </div>
-
           </section>
 
-          {/* ==========================================
-              TIPO DE OBRA
-          ========================================== */}
-
           <section className="crear-proyecto-card">
-
             <div className="crear-proyecto-card-title">
-
               <div className="crear-proyecto-icon">
                 <Hammer size={21} />
               </div>
 
               <div>
-
                 <h3>Tipo de obra</h3>
-
                 <p>
-                  Seleccioná el tipo de construcción
-                  que querés realizar.
+                  Seleccioná el tipo de construcción que querés
+                  realizar.
                 </p>
-
               </div>
-
             </div>
 
             <label className="crear-proyecto-field">
-
-              <span>
-                Tipo de obra
-              </span>
+              <span>Tipo de obra</span>
 
               <select
                 value={formulario.idTipoObra}
@@ -522,11 +320,13 @@ export default function CrearProyecto() {
                     event.target.value
                   )
                 }
+                disabled={cargandoTiposObra}
                 required
               >
-
                 <option value="">
-                  Seleccioná un tipo de obra
+                  {cargandoTiposObra
+                    ? "Cargando tipos de obra..."
+                    : "Seleccioná un tipo de obra"}
                 </option>
 
                 {tiposObra.map((tipo) => (
@@ -537,45 +337,40 @@ export default function CrearProyecto() {
                     {tipo.nombre}
                   </option>
                 ))}
-
               </select>
 
+              {formulario.idTipoObra && (
+                <small>
+                  {
+                    tiposObra.find(
+                      (tipo) =>
+                        tipo.idTipoObra ===
+                        Number(formulario.idTipoObra)
+                    )?.descripcion
+                  }
+                </small>
+              )}
             </label>
 
           </section>
 
-          {/* ==========================================
-              MEDIDAS
-          ========================================== */}
-
           <section className="crear-proyecto-card">
-
             <div className="crear-proyecto-card-title">
-
               <div className="crear-proyecto-icon">
                 <Ruler size={21} />
               </div>
 
               <div>
-
                 <h3>Medidas</h3>
-
                 <p>
-                  Ingresá las dimensiones principales
-                  en metros.
+                  Ingresá las dimensiones principales en metros.
                 </p>
-
               </div>
-
             </div>
 
             <div className="crear-proyecto-measures">
-
               <label className="crear-proyecto-field">
-
-                <span>
-                  Alto
-                </span>
+                <span>Alto</span>
 
                 <input
                   type="number"
@@ -591,14 +386,10 @@ export default function CrearProyecto() {
                   placeholder="2.50"
                   required
                 />
-
               </label>
 
               <label className="crear-proyecto-field">
-
-                <span>
-                  Ancho
-                </span>
+                <span>Ancho</span>
 
                 <input
                   type="number"
@@ -614,14 +405,10 @@ export default function CrearProyecto() {
                   placeholder="5.00"
                   required
                 />
-
               </label>
 
               <label className="crear-proyecto-field">
-
-                <span>
-                  Largo
-                </span>
+                <span>Largo</span>
 
                 <input
                   type="number"
@@ -637,24 +424,9 @@ export default function CrearProyecto() {
                   placeholder="7.00"
                   required
                 />
-
               </label>
-
             </div>
-
           </section>
-
-            {/* ==========================================
-                MATERIALES DEL PROYECTO
-            ========================================== */}
-
-        <MaterialesProyectoDropList
-           materialesSeleccionados={materialesSeleccionados}
-           onMaterialesChange={setMaterialesSeleccionados}
-           onVerDatosMaterial={abrirModalMaterial}
-        />
-
-          {/* ERROR */}
 
           {error && (
             <div className="crear-proyecto-error">
@@ -662,17 +434,12 @@ export default function CrearProyecto() {
             </div>
           )}
 
-          {/* BOTONES */}
-
           <div className="crear-proyecto-actions">
-
             <button
               type="button"
               className="crear-proyecto-cancel"
               onClick={() =>
-                navigate(
-                  "/panel-cliente/proyectos"
-                )
+                navigate("/panel-cliente/proyectos")
               }
               disabled={guardando}
             >
@@ -684,26 +451,15 @@ export default function CrearProyecto() {
               className="crear-proyecto-save"
               disabled={guardando}
             >
-
               <Save size={18} />
 
               {guardando
                 ? "Guardando..."
                 : "Guardar proyecto"}
-
             </button>
-
           </div>
-
         </form>
-
       </main>
-      <ModalDatosMaterial
-        material={materialModal}
-        abierto={modalMaterialAbierto}
-        onCerrar={cerrarModalMaterial}
-      />
-
     </div>
   );
 }

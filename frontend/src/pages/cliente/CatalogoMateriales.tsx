@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Star, Building2 } from "lucide-react";
 
 import SidebarCliente from "../../components/cliente/SidebarCliente";
+import HeaderCliente from "../../components/cliente/HeaderCliente";
 import CatalogoFiltros from "../cliente/CatalogoFiltros";
 import PaginacionCatalogoMateriales from "../cliente/PaginacionCatalogoMateriales";
 
@@ -244,6 +245,11 @@ export default function CatalogoMateriales() {
       />
 
       <main className="cliente-main">
+        <HeaderCliente
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((prev) => !prev)}
+        />
+
         <section className="catalogo-heading">
           <div>
             <h2>Materiales disponibles</h2>
@@ -377,12 +383,12 @@ export default function CatalogoMateriales() {
                     <div className="material-footer">
                       <span
                         className={`material-stock ${material.disponibilidad ===
-                            "Disponible"
-                            ? "available"
-                            : material.disponibilidad ===
-                              "Stock bajo"
-                              ? "warning"
-                              : "out"
+                          "Disponible"
+                          ? "available"
+                          : material.disponibilidad ===
+                            "Stock bajo"
+                            ? "warning"
+                            : "out"
                           }`}
                       >
                         {material.disponibilidad}

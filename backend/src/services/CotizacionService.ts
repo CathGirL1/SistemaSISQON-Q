@@ -149,7 +149,7 @@ export class CotizacionService {
         });
     }
 
-        // =========================================================
+    // =========================================================
     // OBTENER ESTADÍSTICAS DEL CLIENTE
     // =========================================================
 
@@ -342,8 +342,8 @@ export class CotizacionService {
                     superficieTrabajo:
                         resultado.superficieTrabajo,
                 }
-        : undefined;
-        
+                : undefined;
+
         // =========================================
         // Verificar si ya existe un borrador
         // =========================================
@@ -361,7 +361,7 @@ export class CotizacionService {
         // =========================================
         // 8. Obtener próxima versión
         // =========================================
-        
+
         const version =
             await this.repository.obtenerProximaVersion(
                 idProyecto
@@ -370,25 +370,25 @@ export class CotizacionService {
         // =========================================
         // 9. Crear nueva cotización
         // =========================================
-            
-            const idEmpresa =
+
+        const idEmpresa =
             Number(proyectoCotizacion.idEmpresa);
 
-            if (
-                !Number.isInteger(idEmpresa) ||
-                idEmpresa <= 0
-            ) {
-                throw new Error(
-                    "El proyecto no tiene una empresa asociada válida"
-                );
-            }
+        if (
+            !Number.isInteger(idEmpresa) ||
+            idEmpresa <= 0
+        ) {
+            throw new Error(
+                "El proyecto no tiene una empresa asociada válida"
+            );
+        }
         return this.repository.crearCotizacion({
 
             idProyecto,
             idEmpresa,
             estado: "Borrador",
 
-             costoMateriales:
+            costoMateriales:
                 resultado.moneda === "UYU"
                     ? 0
                     : resultado.totalMateriales,
@@ -454,7 +454,7 @@ export class CotizacionService {
             );
         }
 
-                const soloEdicion =
+        const soloEdicion =
             (data.estado !== undefined ||
                 data.observaciones !== undefined) &&
             Object.keys(data).every(
@@ -671,7 +671,7 @@ export class CotizacionService {
             resultado.totalGeneral,
             "El total de la cotización"
         );
-        
+
         // =========================================
         // Verificar si ya existe un borrador
         // =========================================
@@ -759,7 +759,7 @@ export class CotizacionService {
             const precioEstimadoUYU =
                 cotizacion.precioEstimado !== null
                     ? Number(cotizacion.precioEstimado) *
-                      tipoCambio
+                    tipoCambio
                     : null;
 
             return {
@@ -779,7 +779,7 @@ export class CotizacionService {
     // OBTENER POR PROYECTO
     // =========================================================
 
-        public async obtenerCotizacionesPorProyecto(
+    public async obtenerCotizacionesPorProyecto(
         idProyecto: number
     ) {
 
@@ -898,12 +898,12 @@ export class CotizacionService {
                 proyecto,
                 materialesParaCotizacion
             );
-        
+
         const manosObra =
             await this.cotizacionManoObraRepository
                 .obtenerPorCotizacion(
                     idCotizacion
-            );
+                );
         // =====================================================
         // RESULTADO
         // =====================================================
@@ -911,7 +911,7 @@ export class CotizacionService {
         return {
             ...cotizacionFinal,
             manosObra,
-            
+
             costoConstruccion:
                 calculo.costoConstruccion,
 
@@ -939,8 +939,8 @@ export class CotizacionService {
                 }
                 : {})
         };
-    }
 
+    }
     // =========================================================
     // OBTENER COTIZACIONES POR EMPRESA
     // =========================================================
@@ -962,6 +962,141 @@ export class CotizacionService {
 
         return this.agregarConversionMonetaria(
             cotizaciones
+        );
+    }
+
+
+    // =========================================================
+    // CREAR PROPUESTA PARA EMPRESA
+    // =========================================================
+
+    public async crearPropuestaEmpresa(
+        idCotizacionBase: number,
+        idEmpresa: number
+    ): Promise<number> {
+
+        this.validarId(
+            idCotizacionBase,
+            "El id de la cotización no es válido"
+        );
+
+        this.validarId(
+            idEmpresa,
+            "El id de la empresa no es válido"
+        );
+
+        const cotizacionBase =
+            await this.repository.obtenerCotizacionPorId(
+                idCotizacionBase
+            );
+
+        if (!cotizacionBase) {
+            throw new Error(
+                "Cotización base no encontrada"
+            );
+        }
+
+        const version =
+            await this.repository.obtenerProximaVersion(
+                cotizacionBase.idProyecto
+            );
+
+        return this.repository.crearCotizacion({
+
+            idProyecto:
+                cotizacionBase.idProyecto,
+
+            idEmpresa,
+
+            estado:
+                "Borrador",
+
+            costoMateriales:
+                cotizacionBase.costoMateriales,
+
+            costoManoObra:
+                cotizacionBase.costoManoObra,
+
+            totalCotizacion:
+                cotizacionBase.totalCotizacion,
+
+            precioEstimado:
+                cotizacionBase.precioEstimado,
+
+            observaciones:
+                cotizacionBase.observaciones,
+
+            version,
+        });
+    }
+
+
+    // =========================================================
+    // ACTUALIZAR PROPUESTA DE EMPRESA
+    // =========================================================
+
+    public async actualizarPropuestaEmpresa(
+        idCotizacion: number,
+        costoMateriales: number,
+        costoManoObra: number,
+        observaciones?: string | null
+    ): Promise<void> {
+
+        this.validarId(
+            idCotizacion,
+            "El id de la cotización no es válido"
+        );
+
+        const cotizacion =
+            await this.repository.obtenerCotizacionPorId(
+                idCotizacion
+            );
+
+        if (!cotizacion) {
+            throw new Error(
+                "Cotización no encontrada"
+            );
+        }
+
+        if (!cotizacion.idEmpresa) {
+            throw new Error(
+                "La cotización no está asociada a una empresa"
+            );
+        }
+
+        if (
+            !Number.isFinite(costoMateriales) ||
+            costoMateriales < 0
+        ) {
+            throw new Error(
+                "El costo de materiales no es válido"
+            );
+        }
+
+        if (
+            !Number.isFinite(costoManoObra) ||
+            costoManoObra < 0
+        ) {
+            throw new Error(
+                "El costo de mano de obra no es válido"
+            );
+        }
+
+        const totalCotizacion =
+            costoMateriales + costoManoObra;
+
+        await this.repository.actualizarCotizacion(
+            idCotizacion,
+            {
+                costoMateriales,
+                costoManoObra,
+                totalCotizacion,
+                precioEstimado: totalCotizacion,
+                observaciones:
+                    observaciones !== undefined
+                        ? observaciones
+                        : cotizacion.observaciones,
+            }
         );
     }
 
@@ -1154,7 +1289,7 @@ export class CotizacionService {
             );
         }
 
-                if (
+        if (
             cotizacion.estado !== "Revisada" &&
             cotizacion.estado !== "Aceptada"
         ) {
@@ -1341,7 +1476,7 @@ export class CotizacionService {
         const esValido =
             ESTADOS_VALIDOS.includes(
                 estadoNormalizado as
-                    (typeof ESTADOS_VALIDOS)[number]
+                (typeof ESTADOS_VALIDOS)[number]
             );
 
         if (!esValido) {
@@ -1852,5 +1987,55 @@ export class CotizacionService {
                     ? data.observaciones
                     : cotizacion.observaciones,
         };
+    }
+    // =========================================================
+    // SELECCIONAR PROPUESTA
+    // =========================================================
+
+    public async seleccionarPropuesta(
+        idCotizacion: number
+    ): Promise<void> {
+
+        this.validarId(
+            idCotizacion,
+            "El id de la cotización no es válido"
+        );
+
+        const cotizacion =
+            await this.repository.obtenerCotizacionPorId(
+                idCotizacion
+            );
+
+        if (!cotizacion) {
+            throw new Error(
+                "Cotización no encontrada"
+            );
+        }
+
+        if (
+            cotizacion.idEmpresa === null ||
+            cotizacion.idEmpresa === undefined
+        ) {
+            throw new Error(
+                "La cotización seleccionada no pertenece a una empresa"
+            );
+        }
+
+        if (cotizacion.estado !== "Borrador") {
+            throw new Error(
+                "Solo se puede seleccionar una propuesta en estado Borrador"
+            );
+        }
+
+        const seleccionada =
+            await this.repository.seleccionarPropuesta(
+                idCotizacion
+            );
+
+        if (!seleccionada) {
+            throw new Error(
+                "No se pudo seleccionar la propuesta"
+            );
+        }
     }
 }
