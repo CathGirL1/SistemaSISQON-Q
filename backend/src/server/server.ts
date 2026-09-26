@@ -22,7 +22,7 @@ import cotizacionRoutes from "../routes/CotizacionRoutes";
 import materialProyectoRoutes from "../routes/MaterialProyectoRoutes";
 import monedaRoutes from "../routes/monedaRoutes";
 import asistenteIARoutes from "../routes/AsistenteIARoutes";
-import conversacion from "../routes/ConversacionIARoutes"
+import conversacion from "../routes/conversacionIARoutes"
 
 
 import { connectDB } from "./database";

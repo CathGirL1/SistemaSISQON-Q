@@ -196,34 +196,27 @@ export default function DescargarCotizacionPDF({
         return valorUSD * tipoCambio;
       };
 
-      // -------------------------------------------------
+            // -------------------------------------------------
       // COSTOS PRINCIPALES
       // -------------------------------------------------
 
-
-      // El total se obtiene de materiales + mano de obra.
-      // De esta forma evitamos mostrar un total desactualizado.
-
-      // El total se obtiene de materiales + mano de obra.
       const costoMaterialesUSD =
         Number(cotizacion.costoMateriales) || 0;
 
       const costoManoObraUSD =
         Number(cotizacion.costoManoObra) || 0;
 
-      <const costoConstruccion =
+      const costoConstruccion =
         Number(cotizacion.costoConstruccion) || 0;
 
       // El total oficial de la cotización proviene del backend.
-      // No se recalcula sumando componentes para evitar
-      // diferencias producidas por redondeo.
+      // No se recalcula para evitar diferencias por redondeo.
       const totalUSD =
         Number(cotizacion.totalCotizacion) || 0;
 
       const esMonedaUYU =
         cotizacion.monedaCalculo === "UYU";
 
-      // Costos expresados en USD
       const costoMaterialesUYU =
         convertirUSDaUYU(costoMaterialesUSD);
 
@@ -231,27 +224,16 @@ export default function DescargarCotizacionPDF({
         convertirUSDaUYU(costoManoObraUSD);
 
       // Para Quincho/Requincho, el costo de construcción
-      // ya es integral y viene expresado en UYU.
+      // puede venir calculado originalmente en UYU.
       const costoConstruccionUSD =
         esMonedaUYU && tipoCambio > 0
           ? costoConstruccion / tipoCambio
           : costoConstruccion;
 
-      const costoConstruccionUYU =
-        esMonedaUYU
-          ? costoConstruccion
-          : convertirUSDaUYU(costoConstruccion);
+          
 
-      // Total según el tipo de cálculo
-      const totalUSD = esMonedaUYU
-        ? costoConstruccionUSD
-        : costoMaterialesUSD +
-        costoManoObraUSD +
-        costoConstruccion;
-
-      const totalUYU = esMonedaUYU
-        ? costoConstruccion
-        : convertirUSDaUYU(totalUSD);
+      const totalUYU =
+        convertirUSDaUYU(totalUSD);
 
       // -------------------------------------------------
       // CREAR PDF

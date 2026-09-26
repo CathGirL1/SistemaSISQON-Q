@@ -11,15 +11,103 @@ import {
 
 import KpiCard from "../../common/KpiCard";
 
-export default function CotizacionesKPIs() {
+import type {
+  Cotizacion,
+} from "../../../interfaces/Cotizacion";
+
+type Props = {
+  cotizaciones: Cotizacion[];
+};
+
+export default function CotizacionesKPIs({
+  cotizaciones,
+}: Props) {
+
+  // =====================================================
+  // ESTADÍSTICAS
+  // =====================================================
+
+  const nuevas =
+    cotizaciones.filter(
+      (cotizacion) =>
+        cotizacion.estado === "Nueva"
+    ).length;
+
+  const enRevision =
+    cotizaciones.filter(
+      (cotizacion) =>
+        cotizacion.estado === "En revisión"
+    ).length;
+
+  const contactadas =
+    cotizaciones.filter(
+      (cotizacion) =>
+        cotizacion.estado === "Contactado"
+    ).length;
+
+  const aprobadas =
+    cotizaciones.filter(
+      (cotizacion) =>
+        cotizacion.estado === "Aprobada"
+    ).length;
+
+  const rechazadas =
+    cotizaciones.filter(
+      (cotizacion) =>
+        cotizacion.estado === "Rechazada"
+    ).length;
+
+  const finalizadas =
+    cotizaciones.filter(
+      (cotizacion) =>
+        cotizacion.estado === "Finalizada"
+    ).length;
+
   return (
     <div className="cotizaciones-kpis">
-      <KpiCard title="Nueva" value={18} icon={<FaFileInvoice />} variant="blue" />
-      <KpiCard title="En revisión" value={12} icon={<FaClipboardList />} variant="yellow" />
-      <KpiCard title="Contactado" value={9} icon={<FaPhoneAlt />} variant="purple" />
-      <KpiCard title="Aprobada" value={7} icon={<FaCheckCircle />} variant="green" />
-      <KpiCard title="Rechazada" value={3} icon={<FaTimesCircle />} variant="red" />
-      <KpiCard title="Finalizada" value={14} icon={<FaFlag />} variant="gray" />
+
+      <KpiCard
+        title="Nueva"
+        value={nuevas}
+        icon={<FaFileInvoice />}
+        variant="blue"
+      />
+
+      <KpiCard
+        title="En revisión"
+        value={enRevision}
+        icon={<FaClipboardList />}
+        variant="yellow"
+      />
+
+      <KpiCard
+        title="Contactado"
+        value={contactadas}
+        icon={<FaPhoneAlt />}
+        variant="purple"
+      />
+
+      <KpiCard
+        title="Aprobada"
+        value={aprobadas}
+        icon={<FaCheckCircle />}
+        variant="green"
+      />
+
+      <KpiCard
+        title="Rechazada"
+        value={rechazadas}
+        icon={<FaTimesCircle />}
+        variant="red"
+      />
+
+      <KpiCard
+        title="Finalizada"
+        value={finalizadas}
+        icon={<FaFlag />}
+        variant="gray"
+      />
+
     </div>
   );
 }

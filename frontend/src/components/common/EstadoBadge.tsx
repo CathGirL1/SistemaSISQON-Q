@@ -1,14 +1,17 @@
 import "../../styles/CommonPanel.css";
 
 type EstadoBadgeProps = {
-  estado: "Nueva" | "En revisión" | "Contactado" | "Aprobada" | "Rechazada" | "Finalizada";
+  estado: string;
 };
 
-export default function EstadoBadge({ estado }: EstadoBadgeProps) {
+export default function EstadoBadge({
+  estado,
+}: EstadoBadgeProps) {
   const clase = estado
     .toLowerCase()
-    .replace(" ", "-")
-    .replace("ó", "o");
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-");
 
   return (
     <span className={`estado-badge ${clase}`}>

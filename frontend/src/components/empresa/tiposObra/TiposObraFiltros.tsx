@@ -1,6 +1,5 @@
 import "../../../styles/empresa/tiposObra/TiposObraFiltros.css";
 
-import { FaFilter } from "react-icons/fa";
 import PanelSearchBar from "../../common/PanelSearchBar";
 
 type Props = {
@@ -44,13 +43,6 @@ export default function TiposObraFiltros({
         </option>
       </select>
 
-      <button
-        className="tipos-obra-filtros-btn"
-        type="button"
-      >
-        <FaFilter />
-        Filtros
-      </button>
     </div>
   );
 }

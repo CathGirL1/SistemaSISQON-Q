@@ -89,7 +89,7 @@ export class EmpresaService {
       empresa.textoLegal?.trim() || "",
 
     impuestos:
-      empresa.impuestos?.trim() || "",
+      empresa.impuestos ?? null,
 
     validezCotizacion:
       empresa.validezCotizacion,

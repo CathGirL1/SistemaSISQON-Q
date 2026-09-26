@@ -1,4 +1,4 @@
-import { FaEye, FaEdit, FaRegCommentDots, FaClock } from "react-icons/fa";
+import { FaEdit, FaRegCommentDots, FaClock } from "react-icons/fa";
 
 import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
 import TipoObraEstadoBadge from "./TipoObraEstadoBadge";
@@ -47,12 +47,6 @@ export default function FilaTipoObra({
       <td>{tipoObra.descripcion}</td>
 
       <td>
-        <span className="materiales-asociados">
-          {tipoObra.materialesAsociados} materiales
-        </span>
-      </td>
-
-      <td>
         <span className="tipo-obra-tiempo">
           <FaClock />
           {tipoObra.tiempoAproximado}
@@ -65,11 +59,10 @@ export default function FilaTipoObra({
 
       <td onClick={(evento) => evento.stopPropagation()}>
         <div className="tipo-obra-acciones">
-          <button title="Ver" onClick={onSeleccionar}>
-            <FaEye />
-          </button>
-
-          <button title="Editar" onClick={() => onEditar(tipoObra)}>
+          <button
+            title="Editar"
+            onClick={() => onEditar(tipoObra)}
+          >
             <FaEdit />
           </button>
 

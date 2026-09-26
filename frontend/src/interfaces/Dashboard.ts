@@ -1,3 +1,5 @@
+import type { EstadoCotizacion } from "./Cotizacion";
+
 export interface EmpresaDashboard {
   nombreEmpresa: string;
   rubro: string;
@@ -19,7 +21,7 @@ export interface CotizacionReciente {
   cliente: string;
   proyecto: string;
   totalCotizacion: number;
-  estado: string;
+  estado: EstadoCotizacion;
   fechaRealizada: string;
 }
 

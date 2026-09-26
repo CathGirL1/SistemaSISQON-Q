@@ -10,9 +10,7 @@ import {
   FaBoxes,
   FaHardHat,
   FaUserCog,
-  FaChartBar,
   FaUserCircle,
-  FaQuestionCircle,
   FaSignOutAlt,
 } from "react-icons/fa";
 
@@ -86,27 +84,11 @@ export default function SidebarEmpresa() {
 
         <p className="sidebar-section-title">Administración</p>
 
-        <NavLink to="/empresa/reportes" className="sidebar-link">
-          <FaChartBar />
-          <span>Reportes</span>
-        </NavLink>
-
         <NavLink to="/empresa/perfil" className="sidebar-link">
           <FaUserCircle />
           <span>Mi perfil</span>
         </NavLink>
       </nav>
-
-      <div className="sidebar-help">
-        <div className="help-icon">
-          <FaQuestionCircle />
-        </div>
-
-        <h4>¿Necesitás ayuda?</h4>
-        <p>Contactá al soporte de SISCON-Q.</p>
-
-        <button>Contactar</button>
-      </div>
 
       <div className="sidebar-user">
         <div className="sidebar-avatar">

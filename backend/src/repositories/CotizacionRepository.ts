@@ -13,6 +13,7 @@ import type {
 export interface ProyectoCotizacionData {
   idProyecto: number;
   idTipoObra: number;
+  idEmpresa: number;
 
   nombre: string;
 
@@ -174,6 +175,10 @@ export class CotizacionRepository {
           c.id_Cotizacion AS idCotizacion,
           c.id_Proyecto AS idProyecto,
           c.id_Empresa AS idEmpresa,
+          c.fechaRealizada,
+          c.fechaCreacion,
+          c.fechaActualizacion,
+          c.version,
 
           CONCAT(
             'COT-',
@@ -188,18 +193,22 @@ export class CotizacionRepository {
             )
           ) AS codigo,
 
-          c.fechaRealizada,
-          c.fechaCreacion,
-          c.fechaActualizacion,
-          c.version,
+            c.costoMateriales,
+            c.costoManoObra,
 
-          c.costoMateriales,
-          c.costoManoObra,
-          c.totalCotizacion,
+            c.costoManoObraAdicional,
+            c.subtotal,
+            c.porcentajeIVAAplicado,
+            c.montoIVA,
 
-          c.estado,
-          c.precioEstimado,
-          c.observaciones,
+            c.totalCotizacion,
+
+            c.tipoCambioUSD,
+            c.totalUYU,
+
+            c.estado,
+            c.precioEstimado,
+            c.observaciones,
 
     
 
@@ -369,7 +378,7 @@ export class CotizacionRepository {
         SELECT
           p.id_Proyecto AS idProyecto,
           p.id_TipoObra AS idTipoObra,
-
+          p.id_Empresa AS idEmpresa,
           p.nombre,
 
           p.alto,
@@ -496,6 +505,9 @@ export class CotizacionRepository {
             c.costoMateriales,
             c.costoManoObra,
             c.totalCotizacion,
+
+            c.tipoCambioUSD,
+            c.totalUYU,
 
             c.estado,
             c.precioEstimado,
@@ -631,6 +643,9 @@ export class CotizacionRepository {
           c.costoManoObra,
           c.totalCotizacion,
 
+          c.tipoCambioUSD,
+          c.totalUYU,
+
           c.estado,
           c.precioEstimado,
           c.observaciones,
@@ -716,7 +731,18 @@ export class CotizacionRepository {
           c.version,
           c.costoMateriales,
           c.costoManoObra,
+
+          c.costoManoObraAdicional,
+          c.subtotal,
+          c.porcentajeIVAAplicado,
+          c.montoIVA,
+
           c.totalCotizacion,
+
+          c.tipoCambioUSD,
+          c.totalUYU,
+
+
           c.estado,
           c.precioEstimado,
           c.observaciones,
@@ -937,6 +963,7 @@ export class CotizacionRepository {
           fechaActualizacion = GETDATE()
 
         WHERE id_Cotizacion = @idCotizacion
+        AND estado <> 'Finalizada'
       `);
 
     return result.rowsAffected[0] > 0;
@@ -965,6 +992,7 @@ export class CotizacionRepository {
         DELETE FROM Cotizacion
 
         WHERE id_Cotizacion = @idCotizacion
+        AND estado <> 'Finalizada'
       `);
 
     return result.rowsAffected[0] > 0;
@@ -997,6 +1025,92 @@ export class CotizacionRepository {
           fechaRealizada = GETDATE(),
           fechaActualizacion = GETDATE()
         WHERE id_Cotizacion = @idCotizacion
+        AND estado <> 'Finalizada'
+      `);
+
+    return result.rowsAffected[0] > 0;
+  }
+
+
+  public async obtenerImpuestoEmpresa(
+    idEmpresa: number
+  ): Promise<number | null> {
+
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+      .input(
+        "idEmpresa",
+        sql.Int,
+        idEmpresa
+      )
+      .query(`
+        SELECT
+          impuestos
+        FROM Empresa
+        WHERE id_Empresa = @idEmpresa
+      `);
+
+    if (result.recordset.length === 0) {
+      return null;
+    }
+
+    const impuestos = result.recordset[0].impuestos;
+
+    if (impuestos === null || impuestos === undefined) {
+      return null;
+    }
+
+    return Number(impuestos);
+  }
+
+  public async finalizarCotizacion(
+    idCotizacion: number,
+    tipoCambioUSD: number,
+    totalUYU: number
+  ): Promise<boolean> {
+
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+
+      .input(
+        "idCotizacion",
+        sql.Int,
+        idCotizacion
+      )
+
+      .input(
+        "tipoCambioUSD",
+        sql.Decimal(18, 6),
+        tipoCambioUSD
+      )
+
+      .input(
+        "totalUYU",
+        sql.Decimal(18, 2),
+        totalUYU
+      )
+
+      .query(`
+        UPDATE Cotizacion
+
+        SET
+          tipoCambioUSD = @tipoCambioUSD,
+          totalUYU = @totalUYU,
+          estado = 'Finalizada',
+          fechaActualizacion = GETDATE()
+
+        WHERE
+          id_Cotizacion = @idCotizacion
+          AND estado <> 'Finalizada'
+          AND id_Empresa IS NOT NULL
+          AND subtotal IS NOT NULL
+          AND porcentajeIVAAplicado IS NOT NULL
+          AND montoIVA IS NOT NULL
+          AND totalCotizacion IS NOT NULL
       `);
 
     return result.rowsAffected[0] > 0;
@@ -1131,7 +1245,106 @@ export class CotizacionRepository {
 
           WHERE id_Proyecto = @idProyecto
         `);
-
     return result.recordset.length > 0;
+  }
+
+  public async actualizarCotizacionDesdeEmpresa(
+    idCotizacion: number,
+    costoManoObraAdicional: number,
+    subtotal: number,
+    porcentajeIVAAplicado: number,
+    montoIVA: number,
+    totalCotizacion: number,
+    observaciones?: string | null
+  ): Promise<boolean> {
+
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+
+      .input(
+        "idCotizacion",
+        sql.Int,
+        idCotizacion
+      )
+
+      .input(
+        "costoManoObraAdicional",
+        sql.Decimal(18, 2),
+        costoManoObraAdicional
+      )
+
+      .input(
+        "subtotal",
+        sql.Decimal(18, 2),
+        subtotal
+      )
+
+      .input(
+        "porcentajeIVAAplicado",
+        sql.Decimal(5, 2),
+        porcentajeIVAAplicado
+      )
+
+      .input(
+        "montoIVA",
+        sql.Decimal(18, 2),
+        montoIVA
+      )
+
+      .input(
+        "totalCotizacion",
+        sql.Decimal(18, 2),
+        totalCotizacion
+      )
+
+      .input(
+        "observaciones",
+        sql.VarChar(1000),
+        observaciones ?? null
+      )
+
+      .input(
+        "actualizarObservaciones",
+        sql.Bit,
+        observaciones !== undefined
+      )
+
+      .query(`
+        UPDATE Cotizacion
+
+        SET
+          costoManoObraAdicional =
+            @costoManoObraAdicional,
+
+          subtotal =
+            @subtotal,
+
+          porcentajeIVAAplicado =
+            @porcentajeIVAAplicado,
+
+          montoIVA =
+            @montoIVA,
+
+          totalCotizacion =
+            @totalCotizacion,
+
+          observaciones =
+            CASE
+              WHEN @actualizarObservaciones = 1
+                THEN @observaciones
+              ELSE observaciones
+            END,
+
+          fechaActualizacion =
+            GETDATE()
+
+        WHERE
+          id_Cotizacion = @idCotizacion
+          AND estado <> 'Finalizada'
+      `);
+
+    return result.rowsAffected[0] > 0;
   }
 }

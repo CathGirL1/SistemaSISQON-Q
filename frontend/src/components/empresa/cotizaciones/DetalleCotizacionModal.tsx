@@ -11,34 +11,6 @@ type Props = {
   onCerrar: () => void;
 };
 
-const formatearUSD = (valor: number): string => {
-  return new Intl.NumberFormat("es-UY", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(valor);
-};
-
-const formatearUYU = (valor: number): string => {
-  return `UYU ${new Intl.NumberFormat("es-UY", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(valor)}`;
-};
-
-const formatearMoneda = (
-  valorUYU: number,
-  tipoCambio: number
-): string => {
-  const valorUSD =
-    tipoCambio > 0
-      ? valorUYU / tipoCambio
-      : 0;
-
-  return `${formatearUSD(valorUSD)} (${formatearUYU(valorUYU)})`;
-};
-
 export default function DetalleCotizacionModal({
   abierto,
   cotizacion,
@@ -108,6 +80,26 @@ export default function DetalleCotizacionModal({
     }
   };
   if (!cotizacion) return null;
+
+  const formatearUSD = (valor: number) => {
+    return `US$ ${Number(valor).toLocaleString(
+      "es-UY",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )}`;
+  };
+
+  const formatearUYU = (valor: number) => {
+    return `$ ${Number(valor).toLocaleString(
+      "es-UY",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )}`;
+  };
 
   return (
     <ModalBase
@@ -312,19 +304,16 @@ export default function DetalleCotizacionModal({
                           {material.cantidad}{" "}
                           {material.unidad}
                         </td>
-
                         <td>
-                          {formatearMoneda(
-                            material.costoUnitario,
-                            cotizacion.tipoCambio
+                          {formatearUSD(
+                            material.costoUnitario
                           )}
                         </td>
 
                         <td>
                           <strong>
-                            {formatearMoneda(
-                              material.subtotal,
-                              cotizacion.tipoCambio
+                            {formatearUSD(
+                              material.subtotal
                             )}
                           </strong>
                         </td>
@@ -371,9 +360,8 @@ export default function DetalleCotizacionModal({
                 <div className="costo-item">
                   <span>Materiales</span>
                   <strong>
-                    {formatearMoneda(
-                      costoMateriales,
-                      cotizacion.tipoCambio
+                    {formatearUSD(
+                      cotizacion.costoMateriales
                     )}
                   </strong>
                 </div>
@@ -381,22 +369,84 @@ export default function DetalleCotizacionModal({
                 <div className="costo-item">
                   <span>Mano de obra</span>
                   <strong>
-                    {formatearMoneda(
-                      costoManoObra,
-                      cotizacion.tipoCambio
+                    {formatearUSD(
+                      cotizacion.costoManoObra
                     )}
                   </strong>
                 </div>
 
+                {cotizacion.costoManoObraAdicional > 0 && (
+                  <div className="costo-item">
+                    <span>Mano de obra adicional</span>
+                    <strong>
+                      {formatearUSD(
+                        cotizacion.costoManoObraAdicional
+                      )}
+                    </strong>
+                  </div>
+                )}
+
+                {cotizacion.subtotal !== null && (
+                  <div className="costo-item">
+                    <span>Subtotal</span>
+                    <strong>
+                      {formatearUSD(
+                        cotizacion.subtotal
+                      )}
+                    </strong>
+                  </div>
+                )}
+
+                {cotizacion.montoIVA !== null && (
+                  <div className="costo-item">
+                    <span>
+                      IVA
+                      {cotizacion.porcentajeIVAAplicado !== null
+                        ? ` (${cotizacion.porcentajeIVAAplicado}%)`
+                        : ""}
+                    </span>
+
+                    <strong>
+                      {formatearUSD(
+                        cotizacion.montoIVA
+                      )}
+                    </strong>
+                  </div>
+                )}
+
                 <div className="costo-item costo-total">
                   <span>Total</span>
-                  <strong>
-                    {formatearMoneda(
-                      totalPropuesta,
-                      cotizacion.tipoCambio
+
+                  <strong className="detalle-total-monedas">
+                    <span>
+                      {formatearUSD(
+                        cotizacion.totalCotizacion
+                      )}
+                    </span>
+
+                    {cotizacion.totalCotizacionUYU > 0 && (
+                      <small>
+                        {formatearUYU(
+                          cotizacion.totalCotizacionUYU
+                        )}{" "}
+                        UYU
+                      </small>
                     )}
                   </strong>
                 </div>
+
+                {cotizacion.tipoCambio > 0 && (
+                  <div className="detalle-tipo-cambio">
+                    {cotizacion.conversionHistorica
+                      ? "Tipo de cambio al finalizar"
+                      : "Tipo de cambio actual"}
+                    : 1 USD ={" "}
+                    {formatearUYU(
+                      cotizacion.tipoCambio
+                    )}{" "}
+                    UYU
+                  </div>
+                )}
 
               </div>
 
@@ -419,7 +469,9 @@ export default function DetalleCotizacionModal({
                   step="0.01"
                   value={costoMateriales}
                   onChange={(e) =>
-                    setCostoMateriales(Number(e.target.value))
+                    setCostoMateriales(
+                      Number(e.target.value)
+                    )
                   }
                 />
               </div>
@@ -433,7 +485,9 @@ export default function DetalleCotizacionModal({
                   step="0.01"
                   value={costoManoObra}
                   onChange={(e) =>
-                    setCostoManoObra(Number(e.target.value))
+                    setCostoManoObra(
+                      Number(e.target.value)
+                    )
                   }
                 />
               </div>
@@ -451,12 +505,8 @@ export default function DetalleCotizacionModal({
 
               <div className="costo-item costo-total">
                 <span>Total de la propuesta</span>
-
                 <strong>
-                  {formatearMoneda(
-                    totalPropuesta,
-                    cotizacion.tipoCambio
-                  )}
+                  {formatearUSD(totalPropuesta)}
                 </strong>
               </div>
 
@@ -540,26 +590,23 @@ export default function DetalleCotizacionModal({
             </div>
 
 
-            {cotizacion.precioEstimado !==
-              null && (
-                <div className="detalle-item">
+            {cotizacion.precioEstimado !== null && (
+              <div className="detalle-item">
 
-                  <strong>
-                    Precio estimado
-                  </strong>
+                <strong>
+                  Precio estimado
+                </strong>
 
-                  <p>
-                    {formatearMoneda(
-                      cotizacion.precioEstimado,
-                      cotizacion.tipoCambio
-                    )}
-                  </p>
-                </div >
-              )
-            }
+                <p>
+                  {formatearUSD(
+                    cotizacion.precioEstimado
+                  )}
+                </p>
 
-          </div >
+              </div>
+            )}
 
+          </div>
 
           {/* OBSERVACIONES */}
 

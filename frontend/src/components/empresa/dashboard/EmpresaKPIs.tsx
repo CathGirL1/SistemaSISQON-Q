@@ -14,11 +14,13 @@ type Props = {
 };
 
 function formatearMoneda(valor: number): string {
-  return new Intl.NumberFormat("es-UY", {
-    style: "currency",
-    currency: "UYU",
-    maximumFractionDigits: 0,
-  }).format(valor);
+  return `US$ ${Number(valor).toLocaleString(
+    "es-UY",
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  )}`;
 }
 
 export default function EmpresaKPIs({
@@ -68,7 +70,7 @@ export default function EmpresaKPIs({
         </div>
 
         <div>
-          <p>Ingresos estimados</p>
+          <p>Ingresos</p>
 
           <h3>
             {formatearMoneda(
@@ -76,7 +78,7 @@ export default function EmpresaKPIs({
             )}
           </h3>
 
-          <span>Total cotizado</span>
+          <span>Cotizaciones finalizadas</span>
         </div>
       </div>
     </div>

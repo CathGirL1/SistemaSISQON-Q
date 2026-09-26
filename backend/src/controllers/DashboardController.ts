@@ -22,6 +22,11 @@ export class DashboardController {
 
     } catch (error) {
 
+      console.error(
+        "❌ ERROR DASHBOARD:",
+        error
+      );
+
       const mensaje =
         error instanceof Error
           ? error.message

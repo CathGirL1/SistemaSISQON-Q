@@ -44,3 +44,34 @@
     grid-template-columns: 1fr;
   }
 }
+
+.cotizaciones-buscador {
+  height: 46px;
+
+  border: 1px solid #e5e7eb;
+  background: white;
+
+  border-radius: 14px;
+
+  padding: 0 1rem;
+
+  color: #334155;
+
+  font-size: 0.9rem;
+
+  outline: none;
+
+  transition: 0.2s ease;
+}
+
+.cotizaciones-buscador::placeholder {
+  color: #94a3b8;
+}
+
+.cotizaciones-buscador:focus {
+  border-color: #0f4fa8;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(15, 79, 168, 0.08);
+}

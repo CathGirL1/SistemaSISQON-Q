@@ -91,8 +91,8 @@ export class DashboardRepository {
     };
   }
 
-  private async obtenerKPIs(
-  idEmpresa: number
+    private async obtenerKPIs(
+    idEmpresa: number
     ) {
     const pool = await connectDB();
 
@@ -102,33 +102,39 @@ export class DashboardRepository {
         .query(`
         SELECT
 
-        (
+            (
             SELECT COUNT(*)
             FROM Proyecto
             WHERE id_Empresa = @idEmpresa
-        ) AS proyectosActivos,
+                AND estado = 'Activo'
+            ) AS proyectosActivos,
 
-        (
-            SELECT COUNT(*)
-            FROM Cliente
-        ) AS clientes,
+            (
+            SELECT COUNT(DISTINCT p.id_Cliente)
+            FROM Proyecto p
 
-        (
+            INNER JOIN Cotizacion c
+                ON c.id_Proyecto = p.id_Proyecto
+                AND c.id_Empresa = @idEmpresa
+
+            WHERE p.id_Empresa = @idEmpresa
+            ) AS clientes,
+
+            (
             SELECT COUNT(*)
             FROM Cotizacion c
-            INNER JOIN Proyecto p
-            ON p.id_Proyecto = c.id_Proyecto
-            WHERE p.id_Empresa = @idEmpresa
-        ) AS cotizaciones,
+            WHERE c.id_Empresa = @idEmpresa
+            ) AS cotizaciones,
 
-        (
-            SELECT
-            ISNULL(SUM(c.totalCotizacion),0)
+            (
+            SELECT ISNULL(
+                SUM(c.totalCotizacion),
+                0
+            )
             FROM Cotizacion c
-            INNER JOIN Proyecto p
-            ON p.id_Proyecto = c.id_Proyecto
-            WHERE p.id_Empresa = @idEmpresa
-        ) AS ingresosEstimados
+            WHERE c.id_Empresa = @idEmpresa
+                AND c.estado = 'Finalizada'
+            ) AS ingresosEstimados
         `);
 
     return resultado.recordset[0];
@@ -137,107 +143,125 @@ export class DashboardRepository {
     private async obtenerCotizacionesRecientes(
     idEmpresa: number
     ) {
-
     const pool = await connectDB();
 
-    const resultado = await pool.request()
+    const resultado = await pool
+        .request()
         .input(
-            "idEmpresa",
-            sql.Int,
-            idEmpresa
+        "idEmpresa",
+        sql.Int,
+        idEmpresa
         )
         .query(`
-            SELECT TOP 5
+        SELECT TOP 5
+            c.id_Cotizacion,
 
-                c.id_Cotizacion,
+            c.fechaRealizada,
 
-                c.fechaRealizada,
+            c.totalCotizacion,
 
-                c.totalCotizacion,
+            c.estado,
 
-                c.estado,
+            p.nombre AS proyecto,
 
-                p.nombre AS proyecto,
+            cl.nombre + ' ' + cl.apellido AS cliente
 
-                cl.nombre + ' ' + cl.apellido AS cliente
+        FROM Cotizacion c
 
-            FROM Cotizacion c
+        INNER JOIN Proyecto p
+            ON p.id_Proyecto = c.id_Proyecto
 
-            INNER JOIN Proyecto p
+        INNER JOIN Cliente cl
+            ON cl.id_Cliente = p.id_Cliente
 
-                ON p.id_Proyecto = c.id_Proyecto
+        WHERE c.id_Empresa = @idEmpresa
 
-            INNER JOIN Cliente cl
-
-                ON cl.id_Cliente = p.id_Cliente
-
-            WHERE p.id_Empresa = @idEmpresa
-
-            ORDER BY c.fechaRealizada DESC
+        ORDER BY c.fechaRealizada DESC
         `);
 
     return resultado.recordset;
-
     }
 
     private async obtenerClientesRecientes(
         idEmpresa: number
     ) {
-        const pool = await connectDB();
+    const pool = await connectDB();
 
-        const resultado = await pool.request()
-            .input(
-                "idEmpresa",
-                sql.Int,
-                idEmpresa
-            )
-            .query(`
-                SELECT TOP 5
+    const resultado = await pool
+        .request()
+        .input(
+        "idEmpresa",
+        sql.Int,
+        idEmpresa
+        )
+        .query(`
+            WITH ClientesEmpresa AS (
+                SELECT
                     c.id_Cliente,
                     c.nombre,
                     c.apellido,
-                    p.nombre AS proyecto
-                FROM Cotizacion co
+                    p.nombre AS proyecto,
+                    p.fechaCreacion,
+
+                    ROW_NUMBER() OVER (
+                        PARTITION BY c.id_Cliente
+                        ORDER BY p.fechaCreacion DESC
+                    ) AS fila
+
+                FROM Cliente c
+
                 INNER JOIN Proyecto p
-                    ON p.id_Proyecto = co.id_Proyecto
-                INNER JOIN Cliente c
-                    ON c.id_Cliente = p.id_Cliente
-                WHERE co.id_Empresa = @idEmpresa
-                AND co.estado = 'Enviada'
-                ORDER BY co.fechaRealizada DESC
-            `);
+                    ON p.id_Cliente = c.id_Cliente
+                    AND p.id_Empresa = @idEmpresa
 
-        return resultado.recordset;
-    }
+                INNER JOIN Cotizacion co
+                    ON co.id_Proyecto = p.id_Proyecto
+                    AND co.id_Empresa = @idEmpresa
+            )
 
-    private async obtenerProyectosActivos(
-    idEmpresa:number
-    ){
-
-    const pool = await connectDB();
-
-    const resultado = await pool.request()
-        .input(
-            "idEmpresa",
-            sql.Int,
-            idEmpresa
-        )
-        .query(`
             SELECT TOP 5
-
+                id_Cliente,
                 nombre,
+                apellido,
+                proyecto
 
-                estado
+            FROM ClientesEmpresa
 
-            FROM Proyecto
-
-            WHERE id_Empresa=@idEmpresa
+            WHERE fila = 1
 
             ORDER BY fechaCreacion DESC
         `);
 
     return resultado.recordset;
 
+    }
+
+    private async obtenerProyectosActivos(
+    idEmpresa: number
+    ) {
+    const pool = await connectDB();
+
+    const resultado = await pool
+        .request()
+        .input(
+        "idEmpresa",
+        sql.Int,
+        idEmpresa
+        )
+        .query(`
+        SELECT TOP 5
+            nombre,
+            estado
+
+        FROM Proyecto
+
+        WHERE id_Empresa = @idEmpresa
+            AND estado = 'Activo'
+
+        ORDER BY fechaCreacion DESC
+        `);
+
+    return resultado.recordset;
     }
 
     private async obtenerDistribucionTiposObra(
@@ -275,38 +299,35 @@ export class DashboardRepository {
     }
 
     private async obtenerIngresosMensuales(
-    idEmpresa:number
-    ){
-
+    idEmpresa: number
+    ) {
     const pool = await connectDB();
 
-    const resultado = await pool.request()
+    const resultado = await pool
+        .request()
         .input(
-            "idEmpresa",
-            sql.Int,
-            idEmpresa
+        "idEmpresa",
+        sql.Int,
+        idEmpresa
         )
         .query(`
-            SELECT
+        SELECT
+            MONTH(c.fechaActualizacion) AS mes,
+            SUM(c.totalCotizacion) AS total
 
-                MONTH(c.fechaRealizada) mes,
+        FROM Cotizacion c
 
-                SUM(c.totalCotizacion) total
+        WHERE c.id_Empresa = @idEmpresa
+            AND c.estado = 'Finalizada'
+            AND c.fechaActualizacion IS NOT NULL
 
-            FROM Cotizacion c
+        GROUP BY
+            MONTH(c.fechaActualizacion)
 
-            INNER JOIN Proyecto p
-
-                ON p.id_Proyecto=c.id_Proyecto
-
-            WHERE p.id_Empresa=@idEmpresa
-
-            GROUP BY MONTH(c.fechaRealizada)
-
-            ORDER BY MONTH(c.fechaRealizada)
+        ORDER BY
+            MONTH(c.fechaActualizacion)
         `);
 
     return resultado.recordset;
-
     }
 }

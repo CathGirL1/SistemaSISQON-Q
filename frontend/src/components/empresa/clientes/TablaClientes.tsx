@@ -16,7 +16,7 @@ type Props = {
   ) => void;
 
   onWhatsapp: (cliente: ClienteEmpresa) => void;
-  onEditar: (cliente: ClienteEmpresa) => void;
+  onCambiarEstado: (cliente: ClienteEmpresa) => void;
   onAgregarNota: (cliente: ClienteEmpresa) => void;
   onLlamar: (cliente: ClienteEmpresa) => void;
   onVerHistorial: (cliente: ClienteEmpresa) => void;
@@ -30,7 +30,7 @@ export default function TablaClientes({
   error,
   onSeleccionarCliente,
   onWhatsapp,
-  onEditar,
+  onCambiarEstado,
   onAgregarNota,
   onLlamar,
   onVerHistorial,
@@ -90,7 +90,7 @@ export default function TablaClientes({
                     onSeleccionarCliente(cliente)
                   }
                   onWhatsapp={onWhatsapp}
-                  onEditar={onEditar}
+                  onCambiarEstado={onCambiarEstado}
                   onAgregarNota={onAgregarNota}
                   onLlamar={onLlamar}
                   onVerHistorial={onVerHistorial}

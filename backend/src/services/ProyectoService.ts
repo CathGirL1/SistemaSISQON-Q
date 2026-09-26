@@ -17,7 +17,7 @@ export class ProyectoService {
       imagenUrl: data.imagenUrl?.trim() || null,
       ubicacion: data.ubicacion?.trim() || null,
       estado: data.estado?.trim() || "Borrador",
-      idEmpresa: data.idEmpresa ?? null,
+      idEmpresa: data.idEmpresa ?? 1,
     });
   }
 

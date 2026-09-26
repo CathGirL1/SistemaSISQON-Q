@@ -23,8 +23,8 @@ router.get(
 );
 
 router.get(
-  "/empresa/:idEmpresa",
-  controller.obtenerCotizacionesPorEmpresa
+    "/empresa/:idEmpresa",
+    controller.obtenerCotizacionesPorEmpresa
 );
 
 router.get(
@@ -45,8 +45,8 @@ router.delete(
 );
 
 router.post(
-  "/generar/:idProyecto",
-  controller.generarCotizacion
+    "/generar/:idProyecto",
+    controller.generarCotizacion
 );
 
 router.get(
@@ -55,23 +55,41 @@ router.get(
 );
 
 router.post(
-  "/:idCotizacion/propuesta",
-  controller.crearPropuestaEmpresa
+    "/:idCotizacion/propuesta",
+    controller.crearPropuestaEmpresa
 );
 
 router.put(
-  "/:idCotizacion/propuesta",
-  controller.actualizarPropuestaEmpresa
+    "/:idCotizacion/propuesta",
+    controller.actualizarPropuestaEmpresa
 );
 
 router.put(
-  "/:idCotizacion/enviar",
-  controller.enviarCotizacion
+    "/:idCotizacion/enviar",
+    controller.enviarCotizacion
 );
 
 router.put(
-  "/:idCotizacion/seleccionar",
-  controller.seleccionarPropuesta
+    "/:idCotizacion/seleccionar",
+    controller.seleccionarPropuesta
+);
+
+router.put(
+    "/:idCotizacion/empresa",
+    (req, res) =>
+        controller.actualizarCotizacionDesdeEmpresa(
+            req,
+            res
+        )
+);
+
+router.put(
+    "/:idCotizacion/finalizar",
+    (req, res) =>
+        controller.finalizarCotizacion(
+            req,
+            res
+        )
 );
 
 export default router;

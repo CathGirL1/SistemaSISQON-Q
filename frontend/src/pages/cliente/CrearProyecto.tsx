@@ -27,6 +27,7 @@ interface FormularioProyecto {
   alto: string;
   ancho: string;
   largo: string;
+  imagenUrl: string;
 }
 
 interface TipoObra {
@@ -51,6 +52,7 @@ const formularioInicial: FormularioProyecto = {
   alto: "",
   ancho: "",
   largo: "",
+  imagenUrl: "",
 };
 
 export default function CrearProyecto() {
@@ -100,26 +102,10 @@ export default function CrearProyecto() {
           "El usuario autenticado no tiene un cliente asociado"
         );
       }
-
-      const usuarioGuardado =
-        localStorage.getItem("usuario");
-
-      if (!usuarioGuardado) {
-        throw new Error(
-          "No se encontró una sesión activa."
-        );
-      }
-
-      const usuario = JSON.parse(usuarioGuardado);
-
-      if (!usuario.id_Cliente) {
-        throw new Error(
-          "No se encontró el identificador del cliente."
-        );
-      }
+      
 
       const proyecto = {
-        idCliente: usuario.id_Cliente,
+        idCliente,
         idTipoObra: Number(formulario.idTipoObra),
         nombre: formulario.nombre.trim(),
         descripcion: formulario.descripcion.trim() || null,

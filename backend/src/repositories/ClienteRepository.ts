@@ -22,7 +22,6 @@ export class ClienteRepository {
         c.ciudad,
         c.estado,
         c.notas,
-        ISNULL(c.logo, '') AS logo,
 
         u.nombreUsuario,
         u.gmail,
@@ -58,7 +57,6 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
-          ISNULL(c.logo, '') AS logo,
 
           u.nombreUsuario,
           u.gmail,
@@ -89,7 +87,6 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
-          c.logo,
           u.nombreUsuario,
           u.gmail,
           u.telefono,
@@ -119,7 +116,6 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
-          ISNULL(c.logo, '') AS logo,
 
           u.nombreUsuario,
           u.gmail,
@@ -609,44 +605,69 @@ export class ClienteRepository {
     }
   }
 
-    public async obtenerHistorialCotizaciones(
-      idCliente: number,
-      idEmpresa: number
-    ) {
-      const pool = await connectDB();
+  public async obtenerHistorialCotizaciones(
+    idCliente: number,
+    idEmpresa: number
+  ) {
+    const pool = await connectDB();
 
-      const resultado = await pool
-        .request()
-        .input("idCliente", sql.Int, idCliente)
-        .input("idEmpresa", sql.Int, idEmpresa)
-        .query(`
+    const resultado = await pool
+      .request()
+      .input("idCliente", sql.Int, idCliente)
+      .input("idEmpresa", sql.Int, idEmpresa)
+      .query(`
+        WITH CotizacionesVersionadas AS (
           SELECT
             co.id_Cotizacion AS idCotizacion,
             co.fechaRealizada,
             co.totalCotizacion,
             co.estado,
             co.observaciones,
-            co.version,
+
             p.id_Proyecto AS idProyecto,
-            p.nombre AS nombreProyecto
+            p.nombre AS nombreProyecto,
+
+            ROW_NUMBER() OVER (
+              PARTITION BY co.id_Proyecto
+              ORDER BY
+                co.version DESC,
+                co.fechaCreacion DESC,
+                co.id_Cotizacion DESC
+            ) AS numeroFila
+
           FROM Cotizacion co
+
           INNER JOIN Proyecto p
             ON p.id_Proyecto = co.id_Proyecto
+
           WHERE p.id_Cliente = @idCliente
-            AND co.id_Empresa = @idEmpresa
-            AND co.estado = 'Enviada'
-          ORDER BY
-            co.fechaRealizada DESC,
-            co.version DESC,
-            co.id_Cotizacion DESC
-        `);
+            AND p.id_Empresa = @idEmpresa
+        )
 
-      return resultado.recordset;
-    }
+        SELECT
+          idCotizacion,
+          fechaRealizada,
+          totalCotizacion,
+          estado,
+          observaciones,
+          idProyecto,
+          nombreProyecto
 
-    // =========================================================
-// ACTUALIZAR LOGO DEL CLIENTE
-// =========================================================
+        FROM CotizacionesVersionadas
+
+        WHERE numeroFila = 1
+
+        ORDER BY
+          fechaRealizada DESC,
+          idCotizacion DESC
+      `);
+
+    return resultado.recordset;
+  }
+
+  // =========================================================
+  // ACTUALIZAR LOGO DEL CLIENTE
+  // =========================================================
 
   public async actualizarLogoCliente(
     idCliente: number,

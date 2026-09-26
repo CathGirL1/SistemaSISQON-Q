@@ -387,6 +387,9 @@ export default function PanelClienteContenido() {
                             ))
                         )}
                     </DashboardCard>
+
+                </section>
+
             </main >
         </div >
     );

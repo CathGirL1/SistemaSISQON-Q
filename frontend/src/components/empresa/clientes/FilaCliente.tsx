@@ -1,17 +1,39 @@
-import type { ClienteEmpresa } from "../../../interfaces/ClienteEmpresa";
+import type {
+  ClienteEmpresa,
+} from "../../../interfaces/ClienteEmpresa";
+
 import ClienteEstadoBadge from "./ClienteEstadoBadge";
 import ClienteAcciones from "./ClienteAcciones";
 
 type Props = {
   cliente: ClienteEmpresa;
   activo: boolean;
+
   onSeleccionar: () => void;
-  onWhatsapp: (cliente: ClienteEmpresa) => void;
-  onEditar: (cliente: ClienteEmpresa) => void;
-  onAgregarNota: (cliente: ClienteEmpresa) => void;
-  onLlamar: (cliente: ClienteEmpresa) => void;
-  onVerHistorial: (cliente: ClienteEmpresa) => void;
-  onEliminar: (cliente: ClienteEmpresa) => void;
+
+  onWhatsapp: (
+    cliente: ClienteEmpresa
+  ) => void;
+
+  onCambiarEstado: (
+    cliente: ClienteEmpresa
+  ) => void;
+
+  onAgregarNota: (
+    cliente: ClienteEmpresa
+  ) => void;
+
+  onLlamar: (
+    cliente: ClienteEmpresa
+  ) => void;
+
+  onVerHistorial: (
+    cliente: ClienteEmpresa
+  ) => void;
+
+  onEliminar: (
+    cliente: ClienteEmpresa
+  ) => void;
 };
 
 export default function FilaCliente({
@@ -19,17 +41,26 @@ export default function FilaCliente({
   activo,
   onSeleccionar,
   onWhatsapp,
-  onEditar,
+  onCambiarEstado,
   onAgregarNota,
   onLlamar,
   onVerHistorial,
   onEliminar,
 }: Props) {
   return (
-    <tr className={activo ? "cliente-fila-activa" : ""} onClick={onSeleccionar}>
+    <tr
+      className={
+        activo
+          ? "cliente-fila-activa"
+          : ""
+      }
+      onClick={onSeleccionar}
+    >
       <td>
         <div className="cliente-info-cell">
-          <div className="cliente-avatar">{cliente.iniciales}</div>
+          <div className="cliente-avatar">
+            {cliente.iniciales}
+          </div>
 
           <div>
             <h4>{cliente.nombre}</h4>
@@ -39,30 +70,57 @@ export default function FilaCliente({
       </td>
 
       <td>{cliente.telefono}</td>
+
       <td>{cliente.email}</td>
 
       <td>
-        <strong>{cliente.direccion}</strong>
+        <strong>
+          {cliente.direccion}
+        </strong>
+
         <p>{cliente.ciudad}</p>
       </td>
 
       <td>
-        <strong>{cliente.historial}</strong>
-        <p>Última: {cliente.ultimaCotizacion}</p>
+        <strong>
+          {cliente.historial}
+        </strong>
+
+        <p>
+          Última: {cliente.ultimaCotizacion}
+        </p>
       </td>
 
       <td>
-        <ClienteEstadoBadge estado={cliente.estado} />
+        <ClienteEstadoBadge
+          estado={cliente.estado}
+        />
       </td>
 
-      <td onClick={(e) => e.stopPropagation()}>
+      <td
+        onClick={(evento) =>
+          evento.stopPropagation()
+        }
+      >
         <ClienteAcciones
-          onWhatsapp={() => onWhatsapp(cliente)}
-          onEditar={() => onEditar(cliente)}
-          onAgregarNota={() => onAgregarNota(cliente)}
-          onLlamar={() => onLlamar(cliente)}
-          onVerHistorial={() => onVerHistorial(cliente)}
-          onEliminar={() => onEliminar(cliente)}
+          onWhatsapp={() =>
+            onWhatsapp(cliente)
+          }
+          onCambiarEstado={() =>
+            onCambiarEstado(cliente)
+          }
+          onAgregarNota={() =>
+            onAgregarNota(cliente)
+          }
+          onLlamar={() =>
+            onLlamar(cliente)
+          }
+          onVerHistorial={() =>
+            onVerHistorial(cliente)
+          }
+          onEliminar={() =>
+            onEliminar(cliente)
+          }
         />
       </td>
     </tr>
