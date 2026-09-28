@@ -1,7 +1,7 @@
 import "../styles/SidebarEmpresa.css";
 import iconoHomeMenu from "../assets/iconoHomeMenu.png";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import {
   FaHome,
@@ -10,9 +10,7 @@ import {
   FaBoxes,
   FaHardHat,
   FaUserCog,
-  FaChartBar,
   FaUserCircle,
-  FaQuestionCircle,
   FaSignOutAlt,
 } from "react-icons/fa";
 
@@ -20,6 +18,12 @@ import useEmpresa from "../hooks/useEmpresa";
 
 export default function SidebarEmpresa() {
   const { empresa } = useEmpresa();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("usuario");
+    navigate("/login", { replace: true });
+  };
 
   const nombreEmpresa =
     empresa?.nombreComercial ||
@@ -80,27 +84,11 @@ export default function SidebarEmpresa() {
 
         <p className="sidebar-section-title">Administración</p>
 
-        <NavLink to="/empresa/reportes" className="sidebar-link">
-          <FaChartBar />
-          <span>Reportes</span>
-        </NavLink>
-
         <NavLink to="/empresa/perfil" className="sidebar-link">
           <FaUserCircle />
           <span>Mi perfil</span>
         </NavLink>
       </nav>
-
-      <div className="sidebar-help">
-        <div className="help-icon">
-          <FaQuestionCircle />
-        </div>
-
-        <h4>¿Necesitás ayuda?</h4>
-        <p>Contactá al soporte de SISCON-Q.</p>
-
-        <button>Contactar</button>
-      </div>
 
       <div className="sidebar-user">
         <div className="sidebar-avatar">
@@ -120,7 +108,13 @@ export default function SidebarEmpresa() {
           <p>Administrador</p>
         </div>
 
-        <button className="sidebar-logout">
+        <button
+          type="button"
+          className="sidebar-logout"
+          onClick={handleLogout}
+          title="Cerrar sesión"
+          aria-label="Cerrar sesión"
+        >
           <FaSignOutAlt />
         </button>
       </div>

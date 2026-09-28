@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import {
- 
+
   Plus,
   FolderOpen,
   Clock3,
@@ -17,7 +17,7 @@ import {
   Eye,
   Pencil,
   FileText,
-  
+
 } from "lucide-react";
 
 
@@ -25,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import FiltrosProyecto from "./FiltrosProyecto";
 import PaginacionProyecto from "./PaginacionProyecto";
 import SidebarCliente from "../../components/cliente/SidebarCliente";
-
+import HeaderCliente from "../../components/cliente/HeaderCliente";
 
 
 import "../../styles/PanelClienteContenido.css";
@@ -60,8 +60,6 @@ export interface ProyectoAPI {
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-
-
 const PROYECTOS_POR_PAGINA = 3;
 
 
@@ -69,14 +67,14 @@ const PROYECTOS_POR_PAGINA = 3;
 const IMAGEN_PROYECTO =
   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500";
 
-  
-  export default function MisProyectos() {
+
+export default function MisProyectos() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [estado, setEstado] = useState("");
   const [tipoObra, setTipoObra] = useState("");
- 
+
   const [orden, setOrden] = useState("recientes");
   const [paginaActual, setPaginaActual] = useState(1);
 
@@ -120,7 +118,7 @@ const IMAGEN_PROYECTO =
 
         throw new Error(
           respuestaError.mensaje ||
-            "No se pudieron obtener los proyectos"
+          "No se pudieron obtener los proyectos"
         );
       }
 
@@ -139,77 +137,77 @@ const IMAGEN_PROYECTO =
     }
   };
 
-  
+
 
   const proyectosFiltrados = useMemo(() => {
-      let resultado = [...proyectos];
+    let resultado = [...proyectos];
 
-      // BUSCADOR
-      if (busqueda.trim()) {
-          const texto = busqueda.toLowerCase();
+    // BUSCADOR
+    if (busqueda.trim()) {
+      const texto = busqueda.toLowerCase();
 
-          resultado = resultado.filter((proyecto) =>
-              `
+      resultado = resultado.filter((proyecto) =>
+        `
               ${proyecto.nombre}
               ${proyecto.ubicacion ?? ""}
               ${proyecto.estado}
               ${proyecto.tipoObra}
               `
-              .toLowerCase()
-              .includes(texto)
-          );
-      }
+          .toLowerCase()
+          .includes(texto)
+      );
+    }
 
-      // ESTADO
-      if (estado) {
-          resultado = resultado.filter(
-              (proyecto) =>
-                  proyecto.estado.toLowerCase() ===
-                  estado.toLowerCase()
-          );
-      }
+    // ESTADO
+    if (estado) {
+      resultado = resultado.filter(
+        (proyecto) =>
+          proyecto.estado.toLowerCase() ===
+          estado.toLowerCase()
+      );
+    }
 
-      // TIPO DE OBRA
-      if (tipoObra) {
-        resultado = resultado.filter(
-            (proyecto) =>
-                proyecto.tipoObra?.trim().toLowerCase() ===
-                tipoObra.trim().toLowerCase()
+    // TIPO DE OBRA
+    if (tipoObra) {
+      resultado = resultado.filter(
+        (proyecto) =>
+          proyecto.tipoObra?.trim().toLowerCase() ===
+          tipoObra.trim().toLowerCase()
+      );
+    }
+
+    // ORDEN
+    switch (orden) {
+      case "recientes":
+        resultado.sort(
+          (a, b) =>
+            new Date(b.fechaCreacion).getTime() -
+            new Date(a.fechaCreacion).getTime()
         );
-      }
+        break;
 
-      // ORDEN
-      switch (orden) {
-          case "recientes":
-              resultado.sort(
-                  (a, b) =>
-                      new Date(b.fechaCreacion).getTime() -
-                      new Date(a.fechaCreacion).getTime()
-              );
-              break;
+      case "antiguos":
+        resultado.sort(
+          (a, b) =>
+            new Date(a.fechaCreacion).getTime() -
+            new Date(b.fechaCreacion).getTime()
+        );
+        break;
 
-          case "antiguos":
-              resultado.sort(
-                  (a, b) =>
-                      new Date(a.fechaCreacion).getTime() -
-                      new Date(b.fechaCreacion).getTime()
-              );
-              break;
+      case "az":
+        resultado.sort((a, b) =>
+          a.nombre.localeCompare(b.nombre)
+        );
+        break;
 
-          case "az":
-              resultado.sort((a, b) =>
-                  a.nombre.localeCompare(b.nombre)
-              );
-              break;
+      case "za":
+        resultado.sort((a, b) =>
+          b.nombre.localeCompare(a.nombre)
+        );
+        break;
+    }
 
-          case "za":
-              resultado.sort((a, b) =>
-                  b.nombre.localeCompare(a.nombre)
-              );
-              break;
-      }
-
-      return resultado;
+    return resultado;
   }, [proyectos, busqueda, estado, tipoObra, orden]);
 
 
@@ -233,7 +231,7 @@ const IMAGEN_PROYECTO =
     indiceFin
   );
 
-  
+
 
 
   const totalActivos = proyectos.filter(
@@ -252,7 +250,7 @@ const IMAGEN_PROYECTO =
       proyecto.estado.toLowerCase() === "finalizado"
   ).length;
 
-  
+
 
   return (
     <div className="cliente-panel">
@@ -262,7 +260,10 @@ const IMAGEN_PROYECTO =
       />
 
       <main className="cliente-main">
-       
+        <HeaderCliente
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen((prev) => !prev)}
+        />
 
         <section className="proyectos-heading">
           <div>
@@ -277,7 +278,7 @@ const IMAGEN_PROYECTO =
           <button
             type="button"
             className="nuevo-proyecto-button"
-            onClick={() => 
+            onClick={() =>
               navigate("/panel-cliente/proyectos/crear")
             }
           >
@@ -325,8 +326,8 @@ const IMAGEN_PROYECTO =
           setTipoObra={setTipoObra}
           orden={orden}
           setOrden={setOrden}
-          
-        
+
+
         />
 
         {cargando && (
@@ -373,7 +374,7 @@ const IMAGEN_PROYECTO =
                   key={proyecto.idProyecto}
                 >
                   <div className="proyecto-card-image">
-                    
+
                     <img
                       src={proyecto.imagenUrl?.trim() || IMAGEN_PROYECTO}
                       alt={proyecto.nombre}
@@ -386,7 +387,7 @@ const IMAGEN_PROYECTO =
                       estado={proyecto.estado}
                     />
 
-                    
+
                   </div>
 
                   <div className="proyecto-card-content">
@@ -469,9 +470,9 @@ const IMAGEN_PROYECTO =
                     </div>
                   </div>
 
-                  
+
                 </article>
-                
+
               ))}
               <PaginacionProyecto
                 paginaActual={paginaActual}

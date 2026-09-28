@@ -22,7 +22,25 @@ interface CotizacionBackend {
 
   costoMateriales: number;
   costoManoObra: number;
+
+  costoManoObraAdicional: number;
+  subtotal: number | null;
+  porcentajeIVAAplicado: number | null;
+  montoIVA: number | null;
+
   totalCotizacion: number;
+
+  // EMPRESA
+  nombreEmpresa: string;
+
+  // MONEDA
+  moneda: string;
+  tipoCambio: number;
+  precioEstimadoUYU: number | null;
+
+  costoMaterialesUYU: number;
+  costoManoObraUYU: number;
+  totalCotizacionUYU: number;
 
   estado: string;
   precioEstimado: number | null;
@@ -53,13 +71,26 @@ interface CotizacionBackend {
   resumenMateriales: string;
   materiales: string | null;
 
-  // EMPRESA
-  nombreEmpresa: string;
+  // Snapshot histórico
+  tipoCambioUSD: number | null;
+  totalUYU: number | null;
 
-  // MONEDA
-  moneda: string;
-  tipoCambio: number;
-  precioEstimadoUYU: number | null;
+  conversionHistorica: boolean;
+}
+
+export interface ManoObraCotizacionDetalle {
+  idCotizacionManoObra: number;
+  idCotizacion: number;
+  idManoObra: number;
+  nombre: string;
+  unidad: string | null;
+  cantidad: number;
+  costoUnitario: number;
+  subtotal: number;
+}
+
+export interface DetalleCotizacionEmpresa {
+  manosObra: ManoObraCotizacionDetalle[];
 }
 
 function convertirEstado(
@@ -124,180 +155,364 @@ export async function obtenerCotizacionesEmpresa(
     );
   }
 
-    const cotizaciones: CotizacionBackend[] = data;
+  const cotizaciones: CotizacionBackend[] = data;
 
-        
+  return cotizaciones.map(
+    (cotizacion) => ({
+      // ==========================================
+      // IDENTIFICACIÓN
+      // ==========================================
 
-        return cotizaciones.map(
-        (cotizacion) => ({
-            // ==========================================
-            // IDENTIFICACIÓN
-            // ==========================================
+      id: cotizacion.codigo,
 
-            id: cotizacion.codigo,
+      idCotizacion:
+        cotizacion.idCotizacion,
 
-            idCotizacion:
-            cotizacion.idCotizacion,
+      idProyecto:
+        cotizacion.idProyecto,
 
-            idProyecto:
-            cotizacion.idProyecto,
+      idEmpresa:
+        cotizacion.idEmpresa,
 
-            idEmpresa:
-            cotizacion.idEmpresa,
+      idCliente:
+        cotizacion.idCliente,
 
-            idCliente:
-            cotizacion.idCliente,
+      // ==========================================
+      // CLIENTE
+      // ==========================================
 
-            // ==========================================
-            // CLIENTE
-            // ==========================================
+      cliente:
+        cotizacion.nombreCliente,
 
-            cliente:
-            cotizacion.nombreCliente,
+      email:
+        cotizacion.emailCliente,
 
-            email:
-            cotizacion.emailCliente,
+      telefono:
+        cotizacion.telefonoCliente,
 
-            telefono:
-            cotizacion.telefonoCliente,
+      // ==========================================
+      // PROYECTO
+      // ==========================================
 
-            // ==========================================
-            // PROYECTO
-            // ==========================================
+      nombreProyecto:
+        cotizacion.nombreProyecto,
 
-            nombreProyecto:
-            cotizacion.nombreProyecto,
+      descripcionProyecto:
+        cotizacion.descripcionProyecto,
 
-            descripcionProyecto:
-            cotizacion.descripcionProyecto,
+      tipoObra:
+        cotizacion.tipoObra,
 
-            tipoObra:
-            cotizacion.tipoObra,
+      codigoTipoObra:
+        cotizacion.codigoTipoObra,
 
-            codigoTipoObra:
-            cotizacion.codigoTipoObra,
+      ubicacion:
+        cotizacion.ubicacion,
 
-            ubicacion:
-            cotizacion.ubicacion,
+      alto:
+        Number(cotizacion.alto),
 
-            alto:
-            Number(cotizacion.alto),
+      ancho:
+        Number(cotizacion.ancho),
 
-            ancho:
-            Number(cotizacion.ancho),
+      largo:
+        Number(cotizacion.largo),
 
-            largo:
-            Number(cotizacion.largo),
+      superficie:
+        Number(cotizacion.superficie),
 
-            superficie:
-            Number(cotizacion.superficie),
+      // ==========================================
+      // COTIZACIÓN
+      // ==========================================
 
-            // ==========================================
-            // COTIZACIÓN
-            // ==========================================
+      fecha:
+        cotizacion.fechaCreacion
+          ? new Date(
+            cotizacion.fechaCreacion
+          ).toLocaleDateString("es-UY")
+          : "Sin fecha",
 
-            fecha:
-            new Date(
-                cotizacion.fechaCreacion
-            ).toLocaleDateString("es-UY"),
-
-            total: (() => {
-              const totalUYU = Number(
-                cotizacion.totalCotizacion
-              );
-
-              const tipoCambio = Number(
-                cotizacion.tipoCambio
-              );
-
-              const totalUSD =
-                tipoCambio > 0
-                  ? totalUYU / tipoCambio
-                  : 0;
-
-              return `${formatearUSD(totalUSD)} (${formatearUYU(totalUYU)})`;
-            })(),
-
-            costoMateriales:
-            Number(
-                cotizacion.costoMateriales
-            ),
-
-            costoManoObra:
-            Number(
-                cotizacion.costoManoObra
-            ),
-
-            totalCotizacion:
-            Number(
-                cotizacion.totalCotizacion
-            ),
-
-            estado:
-            convertirEstado(
-                cotizacion.estado
-            ),
-
-            precioEstimado:
-            cotizacion.precioEstimado !== null
-                ? Number(cotizacion.precioEstimado)
-                : null,
-
-            observaciones:
-            cotizacion.observaciones,
-
-            version:
-            Number(cotizacion.version),
-
-            // ==========================================
-            // MATERIALES
-            // ==========================================
-
-          resumenMateriales:
-            cotizacion.resumenMateriales,
-
-          materiales:
-            cotizacion.materiales
-              ? JSON.parse(cotizacion.materiales).map(
-                  (material: {
-                    idMaterialProyecto: number;
-                    idProyecto: number;
-                    idMaterial: number;
-                    cantidad: number;
-                    nombre: string;
-                    costoUnitario: number;
-                    unidad: string | null;
-                    subtotal: number;
-                  }) => ({
-                    ...material,
-                    cantidad: Number(material.cantidad),
-                    costoUnitario: Number(material.costoUnitario),
-                    subtotal: Number(material.subtotal),
-                  })
-                )
-              : [],
-
-            // ==========================================
-            // EMPRESA
-            // ==========================================
-
-            nombreEmpresa:
-            cotizacion.nombreEmpresa,
-
-            // ==========================================
-            // MONEDA
-            // ==========================================
-
-            moneda:
-            cotizacion.moneda,
-
-            tipoCambio:
-            Number(cotizacion.tipoCambio),
-
-            precioEstimadoUYU:
-            cotizacion.precioEstimadoUYU !== null
-                ? Number(cotizacion.precioEstimadoUYU)
-                : null,
-        })
+      total: (() => {
+        const totalUYU = Number(
+          cotizacion.totalCotizacion
         );
+
+        const tipoCambio = Number(
+          cotizacion.tipoCambio
+        );
+
+        const totalUSD =
+          tipoCambio > 0
+            ? totalUYU / tipoCambio
+            : 0;
+
+        return `${formatearUSD(totalUSD)} (${formatearUYU(totalUYU)})`;
+      })(),
+
+      costoMateriales:
+        Number(
+          cotizacion.costoMateriales
+        ),
+
+      costoManoObra:
+        Number(
+          cotizacion.costoManoObra
+        ),
+
+      costoManoObraAdicional:
+        Number(
+          cotizacion.costoManoObraAdicional ?? 0
+        ),
+
+      subtotal:
+        cotizacion.subtotal !== null &&
+          cotizacion.subtotal !== undefined
+          ? Number(cotizacion.subtotal)
+          : null,
+
+      porcentajeIVAAplicado:
+        cotizacion.porcentajeIVAAplicado !== null &&
+          cotizacion.porcentajeIVAAplicado !== undefined
+          ? Number(cotizacion.porcentajeIVAAplicado)
+          : null,
+
+      montoIVA:
+        cotizacion.montoIVA !== null &&
+          cotizacion.montoIVA !== undefined
+          ? Number(cotizacion.montoIVA)
+          : null,
+
+      totalCotizacion:
+        Number(
+          cotizacion.totalCotizacion
+        ),
+
+
+      estado:
+        convertirEstado(
+          cotizacion.estado
+        ),
+
+      precioEstimado:
+        cotizacion.precioEstimado !== null
+          ? Number(cotizacion.precioEstimado)
+          : null,
+
+      observaciones:
+        cotizacion.observaciones,
+
+      version:
+        Number(cotizacion.version),
+
+      // ==========================================
+      // MATERIALES
+      // ==========================================
+
+      resumenMateriales:
+        cotizacion.resumenMateriales,
+
+      materiales:
+        cotizacion.materiales
+          ? JSON.parse(cotizacion.materiales).map(
+            (material: {
+              idMaterialProyecto: number;
+              idProyecto: number;
+              idMaterial: number;
+              cantidad: number;
+              nombre: string;
+              costoUnitario: number;
+              unidad: string | null;
+              subtotal: number;
+            }) => ({
+              ...material,
+              cantidad: Number(material.cantidad),
+              costoUnitario: Number(material.costoUnitario),
+              subtotal: Number(material.subtotal),
+            })
+          )
+          : [],
+
+      // ==========================================
+      // EMPRESA
+      // ==========================================
+
+      nombreEmpresa:
+        cotizacion.nombreEmpresa,
+
+      // ==========================================
+      // MONEDA
+      // ==========================================
+
+      moneda:
+        cotizacion.moneda,
+
+      tipoCambio:
+        Number(cotizacion.tipoCambio),
+
+      precioEstimadoUYU:
+        cotizacion.precioEstimadoUYU !== null &&
+          cotizacion.precioEstimadoUYU !== undefined
+          ? Number(cotizacion.precioEstimadoUYU)
+          : null,
+
+      costoMaterialesUYU:
+        Number(cotizacion.costoMaterialesUYU),
+
+      costoManoObraUYU:
+        Number(cotizacion.costoManoObraUYU),
+
+      tipoCambioUSD:
+        cotizacion.tipoCambioUSD !== null &&
+          cotizacion.tipoCambioUSD !== undefined
+          ? Number(cotizacion.tipoCambioUSD)
+          : null,
+
+      totalUYU:
+        cotizacion.totalUYU !== null &&
+          cotizacion.totalUYU !== undefined
+          ? Number(cotizacion.totalUYU)
+          : null,
+
+      totalCotizacionUYU:
+        Number(cotizacion.totalCotizacionUYU),
+
+      conversionHistorica:
+        Boolean(cotizacion.conversionHistorica),
+    })
+  );
+}
+
+export interface ManoObraCotizacionData {
+  idManoObra: number;
+  cantidad: number;
+}
+
+export interface ActualizarCotizacionEmpresaData {
+  manosObra: ManoObraCotizacionData[];
+  observaciones?: string | null;
+}
+
+export interface ResultadoCotizacionEmpresa {
+  idCotizacion: number;
+  precioEstimado: number;
+  costoManoObraAdicional: number;
+
+  manosObra: {
+    idManoObra: number;
+    nombre: string;
+    unidad: string | null;
+    cantidad: number;
+    costoUnitario: number;
+    subtotal: number;
+  }[];
+
+  subtotal: number;
+  porcentajeIVAAplicado: number;
+  montoIVA: number;
+  totalCotizacion: number;
+  observaciones: string | null;
+}
+
+
+// ======================================================
+// ACTUALIZAR COTIZACIÓN DESDE PANEL EMPRESA
+// ======================================================
+
+export async function actualizarCotizacionDesdeEmpresa(
+  idCotizacion: number,
+  data: ActualizarCotizacionEmpresaData
+): Promise<ResultadoCotizacionEmpresa> {
+
+  const response = await fetch(
+    `${API_URL}/api/cotizaciones/${idCotizacion}/empresa`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     }
+  );
+
+  const resultado = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      resultado.mensaje ||
+      "No se pudo actualizar la cotización"
+    );
+  }
+
+  return resultado.cotizacion;
+}
+
+
+// ======================================================
+// FINALIZAR COTIZACIÓN
+// ======================================================
+
+export async function finalizarCotizacion(
+  idCotizacion: number
+): Promise<void> {
+
+  const response = await fetch(
+    `${API_URL}/api/cotizaciones/${idCotizacion}/finalizar`,
+    {
+      method: "PUT",
+    }
+  );
+
+  const resultado = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      resultado.mensaje ||
+      "No se pudo finalizar la cotización"
+    );
+  }
+}
+
+export async function obtenerDetalleCotizacion(
+  idCotizacion: number
+): Promise<DetalleCotizacionEmpresa> {
+
+  const response = await fetch(
+    `${API_URL}/api/cotizaciones/${idCotizacion}`
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.mensaje ||
+      "No se pudo obtener el detalle de la cotización"
+    );
+  }
+
+  return {
+    manosObra:
+      (data.manosObra ?? []).map(
+        (item: ManoObraCotizacionDetalle) => ({
+          ...item,
+
+          idCotizacionManoObra:
+            Number(item.idCotizacionManoObra),
+
+          idCotizacion:
+            Number(item.idCotizacion),
+
+          idManoObra:
+            Number(item.idManoObra),
+
+          cantidad:
+            Number(item.cantidad),
+
+          costoUnitario:
+            Number(item.costoUnitario),
+
+          subtotal:
+            Number(item.subtotal),
+        })
+      ),
+  };
+}

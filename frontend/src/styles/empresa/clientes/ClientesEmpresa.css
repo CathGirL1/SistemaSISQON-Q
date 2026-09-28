@@ -1,18 +1,45 @@
 .clientes-page {
   width: 100%;
+  min-width: 0;
 }
+
+
+/* =========================================================
+   CONTENIDO PRINCIPAL
+   ========================================================= */
 
 .clientes-main-grid {
   display: grid;
-  grid-template-columns: 1fr 360px;
+
+  /*
+   * minmax(0, 1fr) permite que la columna de la tabla
+   * realmente pueda reducir su ancho sin invadir
+   * el panel lateral.
+   */
+  grid-template-columns: minmax(0, 1fr) 360px;
+
   gap: 1.5rem;
+
+  width: 100%;
+  min-width: 0;
+
+  align-items: start;
 }
 
-@media (max-width: 1200px) {
-  .clientes-main-grid {
-    grid-template-columns: 1fr;
-  }
+
+/*
+ * Muy importante:
+ * permite que los hijos del grid respeten
+ * el ancho disponible.
+ */
+.clientes-main-grid > * {
+  min-width: 0;
 }
+
+
+/* =========================================================
+   PANEL VACÍO
+   ========================================================= */
 
 .cliente-detalle-vacio {
   min-height: 280px;
@@ -25,19 +52,34 @@
   padding: 2rem;
 
   background: white;
+
   border-radius: 22px;
 
-  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.06);
 
   text-align: center;
 }
 
 .cliente-detalle-vacio h3 {
   margin: 0;
+
   color: #08255b;
 }
 
 .cliente-detalle-vacio p {
   margin: 0.6rem 0 0;
+
   color: #64748b;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .clientes-main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import "../../../styles/empresa/cotizaciones/DetalleCotizacionModal.css";
 
 import ModalBase from "../../common/ModalBase";
@@ -10,40 +11,95 @@ type Props = {
   onCerrar: () => void;
 };
 
-const formatearUSD = (valor: number): string => {
-  return new Intl.NumberFormat("es-UY", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(valor);
-};
-
-const formatearUYU = (valor: number): string => {
-  return `UYU ${new Intl.NumberFormat("es-UY", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(valor)}`;
-};
-
-const formatearMoneda = (
-  valorUYU: number,
-  tipoCambio: number
-): string => {
-  const valorUSD =
-    tipoCambio > 0
-      ? valorUYU / tipoCambio
-      : 0;
-
-  return `${formatearUSD(valorUSD)} (${formatearUYU(valorUYU)})`;
-};
-
 export default function DetalleCotizacionModal({
   abierto,
   cotizacion,
   onCerrar,
 }: Props) {
+  const [editando, setEditando] = useState(false);
+  const [costoMateriales, setCostoMateriales] = useState(0);
+  const [costoManoObra, setCostoManoObra] = useState(0);
+  const [observaciones, setObservaciones] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [mensaje, setMensaje] = useState("");
+
+  useEffect(() => {
+    if (!cotizacion) return;
+
+    setCostoMateriales(cotizacion.costoMateriales);
+    setCostoManoObra(cotizacion.costoManoObra);
+    setObservaciones(cotizacion.observaciones ?? "");
+    setEditando(false);
+    setMensaje("");
+  }, [cotizacion]);
+
+  const totalPropuesta =
+    costoMateriales + costoManoObra;
+
+  const guardarPropuesta = async () => {
+    if (!cotizacion) return;
+
+    try {
+      setGuardando(true);
+      setMensaje("");
+
+      const response = await fetch(
+        `http://localhost:3000/api/cotizaciones/${cotizacion.idCotizacion}/propuesta`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            costoMateriales,
+            costoManoObra,
+            observaciones,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.mensaje ||
+          "No se pudo actualizar la propuesta"
+        );
+      }
+
+      setMensaje("Propuesta actualizada correctamente");
+      setEditando(false);
+    } catch (error) {
+      setMensaje(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al actualizar la propuesta"
+      );
+    } finally {
+      setGuardando(false);
+    }
+  };
   if (!cotizacion) return null;
+
+  const formatearUSD = (valor: number) => {
+    return `US$ ${Number(valor).toLocaleString(
+      "es-UY",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )}`;
+  };
+
+  const formatearUYU = (valor: number) => {
+    return `$ ${Number(valor).toLocaleString(
+      "es-UY",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )}`;
+  };
 
   return (
     <ModalBase
@@ -214,7 +270,7 @@ export default function DetalleCotizacionModal({
           <h3>Materiales</h3>
 
           {cotizacion.materiales &&
-          cotizacion.materiales.length > 0 ? (
+            cotizacion.materiales.length > 0 ? (
 
             <div className="materiales-tabla-container">
 
@@ -248,19 +304,16 @@ export default function DetalleCotizacionModal({
                           {material.cantidad}{" "}
                           {material.unidad}
                         </td>
-
                         <td>
-                          {formatearMoneda(
-                            material.costoUnitario,
-                            cotizacion.tipoCambio
+                          {formatearUSD(
+                            material.costoUnitario
                           )}
                         </td>
 
                         <td>
                           <strong>
-                            {formatearMoneda(
-                              material.subtotal,
-                              cotizacion.tipoCambio
+                            {formatearUSD(
+                              material.subtotal
                             )}
                           </strong>
                         </td>
@@ -300,57 +353,189 @@ export default function DetalleCotizacionModal({
 
           <h3>Costos de la cotización</h3>
 
-          <div className="costos-cotizacion">
+          {!editando ? (
+            <>
+              <div className="costos-cotizacion">
 
-            <div className="costo-item">
+                <div className="costo-item">
+                  <span>Materiales</span>
+                  <strong>
+                    {formatearUSD(
+                      cotizacion.costoMateriales
+                    )}
+                  </strong>
+                </div>
 
-              <span>
-                Materiales
-              </span>
+                <div className="costo-item">
+                  <span>Mano de obra</span>
+                  <strong>
+                    {formatearUSD(
+                      cotizacion.costoManoObra
+                    )}
+                  </strong>
+                </div>
 
-              <strong>
-                {formatearMoneda(
-                  cotizacion.costoMateriales,
-                  cotizacion.tipoCambio
+                {cotizacion.costoManoObraAdicional > 0 && (
+                  <div className="costo-item">
+                    <span>Mano de obra adicional</span>
+                    <strong>
+                      {formatearUSD(
+                        cotizacion.costoManoObraAdicional
+                      )}
+                    </strong>
+                  </div>
                 )}
-              </strong>
+
+                {cotizacion.subtotal !== null && (
+                  <div className="costo-item">
+                    <span>Subtotal</span>
+                    <strong>
+                      {formatearUSD(
+                        cotizacion.subtotal
+                      )}
+                    </strong>
+                  </div>
+                )}
+
+                {cotizacion.montoIVA !== null && (
+                  <div className="costo-item">
+                    <span>
+                      IVA
+                      {cotizacion.porcentajeIVAAplicado !== null
+                        ? ` (${cotizacion.porcentajeIVAAplicado}%)`
+                        : ""}
+                    </span>
+
+                    <strong>
+                      {formatearUSD(
+                        cotizacion.montoIVA
+                      )}
+                    </strong>
+                  </div>
+                )}
+
+                <div className="costo-item costo-total">
+                  <span>Total</span>
+
+                  <strong className="detalle-total-monedas">
+                    <span>
+                      {formatearUSD(
+                        cotizacion.totalCotizacion
+                      )}
+                    </span>
+
+                    {cotizacion.totalCotizacionUYU > 0 && (
+                      <small>
+                        {formatearUYU(
+                          cotizacion.totalCotizacionUYU
+                        )}{" "}
+                        UYU
+                      </small>
+                    )}
+                  </strong>
+                </div>
+
+                {cotizacion.tipoCambio > 0 && (
+                  <div className="detalle-tipo-cambio">
+                    {cotizacion.conversionHistorica
+                      ? "Tipo de cambio al finalizar"
+                      : "Tipo de cambio actual"}
+                    : 1 USD ={" "}
+                    {formatearUYU(
+                      cotizacion.tipoCambio
+                    )}{" "}
+                    UYU
+                  </div>
+                )}
+
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setEditando(true)}
+              >
+                Editar propuesta
+              </button>
+            </>
+          ) : (
+            <div className="editar-propuesta">
+
+              <div className="detalle-item">
+                <strong>Costo de materiales</strong>
+
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={costoMateriales}
+                  onChange={(e) =>
+                    setCostoMateriales(
+                      Number(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="detalle-item">
+                <strong>Costo de mano de obra</strong>
+
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={costoManoObra}
+                  onChange={(e) =>
+                    setCostoManoObra(
+                      Number(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="detalle-item">
+                <strong>Observaciones</strong>
+
+                <textarea
+                  value={observaciones}
+                  onChange={(e) =>
+                    setObservaciones(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="costo-item costo-total">
+                <span>Total de la propuesta</span>
+                <strong>
+                  {formatearUSD(totalPropuesta)}
+                </strong>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setEditando(false)}
+                  disabled={guardando}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={guardarPropuesta}
+                  disabled={guardando}
+                >
+                  {guardando
+                    ? "Guardando..."
+                    : "Guardar propuesta"}
+                </button>
+              </div>
 
             </div>
+          )}
 
-
-            <div className="costo-item">
-
-              <span>
-                Mano de obra
-              </span>
-
-              <strong>
-                {formatearMoneda(
-                  cotizacion.costoManoObra,
-                  cotizacion.tipoCambio
-                )}
-              </strong>
-
-            </div>
-
-
-            <div className="costo-item costo-total">
-
-              <span>
-                Total
-              </span>
-
-              <strong>
-                {formatearMoneda(
-                  cotizacion.totalCotizacion,
-                  cotizacion.tipoCambio
-                )}
-              </strong>
-
-            </div>
-
-          </div>
-
+          {mensaje && (
+            <p>{mensaje}</p>
+          )}
         </section>
 
 
@@ -405,8 +590,7 @@ export default function DetalleCotizacionModal({
             </div>
 
 
-            {cotizacion.precioEstimado !==
-              null && (
+            {cotizacion.precioEstimado !== null && (
               <div className="detalle-item">
 
                 <strong>
@@ -414,9 +598,8 @@ export default function DetalleCotizacionModal({
                 </strong>
 
                 <p>
-                  {formatearMoneda(
-                    cotizacion.precioEstimado,
-                    cotizacion.tipoCambio
+                  {formatearUSD(
+                    cotizacion.precioEstimado
                   )}
                 </p>
 
@@ -425,26 +608,27 @@ export default function DetalleCotizacionModal({
 
           </div>
 
-
           {/* OBSERVACIONES */}
 
-          {cotizacion.observaciones && (
-            <div className="detalle-descripcion">
+          {
+            cotizacion.observaciones && (
+              <div className="detalle-descripcion">
 
-              <strong>
-                Observaciones
-              </strong>
+                <strong>
+                  Observaciones
+                </strong>
 
-              <p>
-                {cotizacion.observaciones}
-              </p>
+                <p>
+                  {cotizacion.observaciones}
+                </p>
 
-            </div>
-          )}
+              </div>
+            )
+          }
 
-        </section>
+        </section >
 
-      </div>
-    </ModalBase>
+      </div >
+    </ModalBase >
   );
 }

@@ -9,12 +9,23 @@ import type {
   ManoObraEmpresa,
 } from "../../../interfaces/ManoObraEmpresa";
 
+export type ManoObraFormulario = {
+  codigo: string;
+  nombre: string;
+  descripcion: string;
+  categoria: string;
+  unidad: string;
+  costoUnitario: number;
+  observaciones: string;
+  estado: EstadoManoObra;
+};
+
 type Props = {
   abierto: boolean;
   modo: "crear" | "editar";
   trabajo: ManoObraEmpresa | null;
   onCerrar: () => void;
-  onGuardar: (trabajo: ManoObraEmpresa) => void;
+  onGuardar: (trabajo: ManoObraFormulario) => void;
 };
 
 type FormularioTrabajo = {
@@ -96,12 +107,13 @@ export default function ManoObraModal({
     const costo = Number(formulario.costoUnitario);
 
     if (Number.isNaN(costo) || costo < 0) {
-      setError("El costo unitario debe ser un número válido.");
+      setError(
+        "El costo unitario debe ser un número válido."
+      );
       return;
     }
 
-    const trabajoGuardado: ManoObraEmpresa = {
-      id: trabajo?.id ?? String(Date.now()),
+    const trabajoGuardado: ManoObraFormulario = {
       codigo: formulario.codigo.trim(),
       nombre: formulario.nombre.trim(),
       descripcion: formulario.descripcion.trim(),
@@ -109,7 +121,6 @@ export default function ManoObraModal({
       unidad: formulario.unidad,
       costoUnitario: costo,
       observaciones: formulario.observaciones.trim(),
-      ultimaActualizacion: new Date().toLocaleDateString("es-UY"),
       estado: formulario.estado,
     };
 
@@ -139,8 +150,12 @@ export default function ManoObraModal({
             type="text"
             value={formulario.codigo}
             onChange={(e) =>
-              actualizarCampo("codigo", e.target.value)
+              actualizarCampo(
+                "codigo",
+                e.target.value
+              )
             }
+            placeholder="Ej: MO-001"
           />
         </div>
 
@@ -150,18 +165,26 @@ export default function ManoObraModal({
             type="text"
             value={formulario.nombre}
             onChange={(e) =>
-              actualizarCampo("nombre", e.target.value)
+              actualizarCampo(
+                "nombre",
+                e.target.value
+              )
             }
+            placeholder="Ej: Albañilería"
           />
         </div>
 
-        <div className="campo-mano-obra campo-completo">
+        <div className="campo-mano-obra">
           <label>Descripción *</label>
           <textarea
             value={formulario.descripcion}
             onChange={(e) =>
-              actualizarCampo("descripcion", e.target.value)
+              actualizarCampo(
+                "descripcion",
+                e.target.value
+              )
             }
+            placeholder="Descripción del trabajo"
           />
         </div>
 
@@ -171,20 +194,32 @@ export default function ManoObraModal({
             type="text"
             value={formulario.categoria}
             onChange={(e) =>
-              actualizarCampo("categoria", e.target.value)
+              actualizarCampo(
+                "categoria",
+                e.target.value
+              )
             }
+            placeholder="Ej: Construcción"
           />
         </div>
 
         <div className="campo-mano-obra">
           <label>Unidad</label>
-          <input
-            type="text"
+          <select
             value={formulario.unidad}
             onChange={(e) =>
-              actualizarCampo("unidad", e.target.value)
+              actualizarCampo(
+                "unidad",
+                e.target.value
+              )
             }
-          />
+          >
+            <option value="m²">m²</option>
+            <option value="m³">m³</option>
+            <option value="hora">Hora</option>
+            <option value="jornal">Jornal</option>
+            <option value="unidad">Unidad</option>
+          </select>
         </div>
 
         <div className="campo-mano-obra">
@@ -192,6 +227,7 @@ export default function ManoObraModal({
           <input
             type="number"
             min="0"
+            step="0.01"
             value={formulario.costoUnitario}
             onChange={(e) =>
               actualizarCampo(
@@ -199,10 +235,11 @@ export default function ManoObraModal({
                 e.target.value
               )
             }
+            placeholder="0.00"
           />
         </div>
 
-        <div className="campo-mano-obra campo-completo">
+        <div className="campo-mano-obra">
           <label>Observaciones</label>
           <textarea
             value={formulario.observaciones}
@@ -212,6 +249,7 @@ export default function ManoObraModal({
                 e.target.value
               )
             }
+            placeholder="Observaciones adicionales"
           />
         </div>
 
@@ -222,25 +260,32 @@ export default function ManoObraModal({
             onChange={(e) =>
               actualizarCampo(
                 "estado",
-                e.target.value as EstadoManoObra
+                e.target.value
               )
             }
           >
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
+            <option value="Activo">
+              Activo
+            </option>
+            <option value="Inactivo">
+              Inactivo
+            </option>
           </select>
         </div>
 
         {error && (
-          <p className="mano-obra-form-error">
+          <div
+            className="mano-obra-modal-error"
+            role="alert"
+          >
             {error}
-          </p>
+          </div>
         )}
 
         <div className="mano-obra-modal-actions">
           <button
             type="button"
-            className="mano-obra-btn-cancelar"
+            className="btn-secundario"
             onClick={onCerrar}
           >
             Cancelar
@@ -248,7 +293,7 @@ export default function ManoObraModal({
 
           <button
             type="submit"
-            className="mano-obra-btn-guardar"
+            className="btn-primario"
           >
             {modo === "crear"
               ? "Agregar trabajo"

@@ -10,6 +10,10 @@ import type {
   ManoObraEmpresa,
 } from "../interfaces/ManoObraEmpresa";
 
+import type {
+  ManoObraFormulario,
+} from "../components/empresa/manoObra/ManoObraModal";
+
 import {
   actualizarManoObra,
   crearManoObra,
@@ -192,10 +196,6 @@ export default function useManoObra() {
     };
 
   useEffect(() => {
-    if (!idEmpresa) {
-      return;
-    }
-
     void cargarManoObra();
 
     return () => {
@@ -235,7 +235,7 @@ export default function useManoObra() {
   };
 
   const guardarManoObra = async (
-    trabajoFormulario: ManoObraEmpresa
+    trabajoFormulario: ManoObraFormulario
   ): Promise<void> => {
     if (!idEmpresa) {
       mostrarToast(

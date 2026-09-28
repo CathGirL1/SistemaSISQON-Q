@@ -4,33 +4,33 @@ import type { Cotizacion } from "../../../interfaces/Cotizacion";
 
 type FilaCotizacionProps = {
   cotizacion: Cotizacion;
-  seleccionada: boolean;
-  onSeleccionar: (id: string) => void;
+
+
+
   onVerDetalle: (cotizacion: Cotizacion) => void;
+  onGestionar: (cotizacion: Cotizacion) => void;
   onEditarEstado: (cotizacion: Cotizacion) => void;
+  onFinalizar: (cotizacion: Cotizacion) => void;
   onEliminar: (cotizacion: Cotizacion) => void;
 };
 
 export default function FilaCotizacion({
   cotizacion,
-  seleccionada,
-  onSeleccionar,
   onVerDetalle,
+  onGestionar,
   onEditarEstado,
+  onFinalizar,
   onEliminar,
 }: FilaCotizacionProps) {
+
+  const finalizada =
+    cotizacion.estado === "Finalizada";
+
   return (
-    <tr className={seleccionada ? "fila-seleccionada" : ""}>
-      {/* SELECCIÓN */}
-      <td>
-        <input
-          type="checkbox"
-          checked={seleccionada}
-          onChange={() =>
-            onSeleccionar(cotizacion.id)
-          }
-        />
-      </td>
+    <tr>
+
+
+
 
       {/* ID */}
       <td>
@@ -82,9 +82,34 @@ export default function FilaCotizacion({
 
       {/* TOTAL */}
       <td>
-        <strong className="cotizacion-total">
-          {cotizacion.total}
-        </strong>
+        <div className="cotizacion-total-monedas">
+
+          <strong>
+            US${" "}
+            {cotizacion.totalCotizacion.toLocaleString(
+              "es-UY",
+              {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }
+            )}
+          </strong>
+
+          {cotizacion.totalCotizacionUYU > 0 && (
+            <span>
+              ${" "}
+              {cotizacion.totalCotizacionUYU.toLocaleString(
+                "es-UY",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}{" "}
+              UYU
+            </span>
+          )}
+
+        </div>
       </td>
 
       {/* ESTADO */}
@@ -97,17 +122,30 @@ export default function FilaCotizacion({
       {/* ACCIONES */}
       <td>
         <MenuAccionesCotizacion
+          finalizada={finalizada}
+
           onVer={() =>
             onVerDetalle(cotizacion)
           }
+
+          onGestionar={() =>
+            onGestionar(cotizacion)
+          }
+
           onEditar={() =>
             onEditarEstado(cotizacion)
           }
+
+          onFinalizar={() =>
+            onFinalizar(cotizacion)
+          }
+
           onEliminar={() =>
             onEliminar(cotizacion)
           }
         />
       </td>
+
     </tr>
   );
 }

@@ -23,51 +23,90 @@ const nombresMeses = [
 export default function EmpresaGraficoIngresos({
   ingresos,
 }: Props) {
+
   const maximo =
     ingresos.length > 0
-      ? Math.max(...ingresos.map((i) => i.total))
+      ? Math.max(
+          ...ingresos.map(
+            (ingreso) => Number(ingreso.total)
+          )
+        )
       : 1;
 
   return (
     <div className="dashboard-card">
+
       <div className="card-header">
         <div>
           <h2>Ingresos por mes</h2>
-          <p>Ingresos generados por cotizaciones.</p>
+
+          <p>
+            Ingresos por cotizaciones finalizadas.
+          </p>
         </div>
       </div>
 
       <div className="grafico-ingresos">
+
         {ingresos.length === 0 ? (
-          <p>No existen ingresos registrados.</p>
+
+          <p>
+            No existen ingresos registrados.
+          </p>
+
         ) : (
-          ingresos.map((ingreso) => (
-            <div
-              key={ingreso.mes}
-              className="barra-item"
-            >
+
+          ingresos.map((ingreso) => {
+
+            const total = Number(ingreso.total);
+
+            const altura =
+              maximo > 0
+                ? Math.max(
+                    (total / maximo) * 180,
+                    8
+                  )
+                : 8;
+
+            return (
               <div
-                className="barra"
-                style={{
-                  height: `${(ingreso.total / maximo) * 180}px`,
-                }}
-              />
+                key={ingreso.mes}
+                className="barra-item"
+              >
 
-              <span className="barra-mes">
-                {nombresMeses[ingreso.mes]}
-              </span>
+                {/* VALOR */}
+                <small className="barra-valor">
+                  US${" "}
+                  {total.toLocaleString(
+                    "es-UY",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
+                </small>
 
-              <small>
-                {new Intl.NumberFormat("es-UY", {
-                  style: "currency",
-                  currency: "UYU",
-                  maximumFractionDigits: 0,
-                }).format(ingreso.total)}
-              </small>
-            </div>
-          ))
+                {/* BARRA */}
+                <div
+                  className="barra"
+                  style={{
+                    height: `${altura}px`,
+                  }}
+                />
+
+                {/* MES */}
+                <span className="barra-mes">
+                  {nombresMeses[ingreso.mes]}
+                </span>
+
+              </div>
+            );
+          })
+
         )}
+
       </div>
+
     </div>
   );
 }

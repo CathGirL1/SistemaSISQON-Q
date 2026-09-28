@@ -149,3 +149,57 @@
 .tipo-obra-tiempo svg {
   color: #64748b;
 }
+
+/* Tiempo aproximado */
+.tabla-tipos-obra th:nth-child(3),
+.tabla-tipos-obra td:nth-child(3) {
+  text-align: center;
+  width: 180px;
+}
+
+.tipo-obra-tiempo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  color: #475569;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tipo-obra-tiempo svg {
+  color: #64748b;
+  font-size: 13px;
+}
+
+
+/* Estado */
+.tabla-tipos-obra th:nth-child(4),
+.tabla-tipos-obra td:nth-child(4) {
+  text-align: center;
+  width: 130px;
+}
+
+.tipo-obra-estado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 70px;
+}
+
+
+/* Acciones */
+.tabla-tipos-obra th:nth-child(5),
+.tabla-tipos-obra td:nth-child(5) {
+  text-align: center;
+  width: 150px;
+}
+
+.tipo-obra-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

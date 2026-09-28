@@ -61,7 +61,7 @@
 
 
   .comparador-cotizaciones-button,
-  .comparador-cotizacion-card > button,
+  .comparador-cotizacion-card>button,
   .comparador-empty button,
   .comparador-detail-button {
     display: inline-flex;
@@ -110,7 +110,7 @@
     flex: 1;
   }
 
-  .comparador-cotizacion-content > span {
+  .comparador-cotizacion-content>span {
     color: #828a99;
     font-size: 13px;
     font-weight: 700;
@@ -142,7 +142,7 @@
     font-weight: 800;
   }
 
-  .comparador-cotizacion-card > button {
+  .comparador-cotizacion-card>button {
     border: 1px solid #3767d6;
     background: #3767d6;
     color: #ffffff;
@@ -469,7 +469,7 @@
     font-size: 12px;
   }
 
-  .comparison-section-header > button {
+  .comparison-section-header>button {
     border: none;
     background: transparent;
     color: #1268dc;
@@ -511,7 +511,7 @@
     font-size: 14px;
   }
 
-  .comparison-company-info > span {
+  .comparison-company-info>span {
     display: block;
     margin-top: 4px;
     color: #506381;
@@ -533,7 +533,7 @@
     gap: 4px;
   }
 
-  .comparison-company-card > button {
+  .comparison-company-card>button {
     grid-column: 1 / -1;
     min-height: 38px;
     border: 1px solid #07835e;
@@ -561,6 +561,7 @@
   }
 
   @media (max-width: 1000px) {
+
     .comparador-stats,
     .comparison-companies-grid {
       grid-template-columns: 1fr;
@@ -838,6 +839,171 @@
     color: #465064;
   }
 
+  .comparador-planes {
+    margin-top: 24px;
+  }
+
+  .comparador-planes-heading {
+    margin-bottom: 20px;
+  }
+
+  .comparador-planes-heading h3 {
+    margin: 0 0 6px;
+    font-size: 22px;
+  }
+
+  .comparador-planes-heading p {
+    margin: 0;
+    color: #64748b;
+  }
+
+  .comparador-planes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .comparador-plan-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  .comparador-plan-card.recommended {
+    border: 2px solid #22c55e;
+    transform: translateY(-6px);
+    box-shadow: 0 14px 32px rgba(34, 197, 94, 0.14);
+  }
+
+  .comparador-plan-badge {
+    margin: -28px -28px 24px;
+    padding: 10px 14px;
+    border-radius: 16px 16px 0 0;
+    background: #16a34a;
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+
+  .comparador-plan-header {
+    padding-bottom: 22px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .comparador-plan-version {
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  .comparador-plan-header h3 {
+    margin: 8px 0 18px;
+    font-size: 21px;
+  }
+
+  .comparador-plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+  }
+
+  .comparador-plan-price span {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .comparador-plan-price strong {
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .comparador-plan-total-label {
+    display: block;
+    margin-top: 8px;
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  .comparador-plan-details {
+    flex: 1;
+    padding: 10px 0;
+  }
+
+  .comparador-plan-detail {
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .comparador-plan-detail>div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .comparador-plan-detail span {
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  .comparador-plan-detail strong {
+    font-size: 16px;
+  }
+
+  .comparador-plan-detail p {
+    margin: 2px 0 0;
+    color: #475569;
+    line-height: 1.5;
+  }
+
+  .comparador-best-value {
+    display: inline-block;
+    margin-top: 8px;
+    color: #15803d !important;
+    font-size: 12px !important;
+    font-weight: 700;
+  }
+
+  .comparador-plan-reason {
+    margin: 14px 0 18px;
+    padding: 14px;
+    border-radius: 12px;
+    background: #f0fdf4;
+  }
+
+  .comparador-plan-reason strong {
+    color: #166534;
+  }
+
+  .comparador-plan-reason p {
+    margin: 5px 0 0;
+    color: #166534;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .comparador-plan-card .select-option-button {
+    width: 100%;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 1100px) {
+    .comparador-planes-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .comparador-plan-card.recommended {
+      transform: none;
+    }
+  }
+
   @media (max-width: 1050px) {
     .comparador-stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -845,6 +1011,7 @@
   }
 
   @media (max-width: 720px) {
+
     .comparador-heading,
     .comparador-cotizacion-card,
     .comparador-filters {
@@ -853,7 +1020,7 @@
     }
 
     .comparador-cotizaciones-button,
-    .comparador-cotizacion-card > button {
+    .comparador-cotizacion-card>button {
       width: 100%;
     }
 

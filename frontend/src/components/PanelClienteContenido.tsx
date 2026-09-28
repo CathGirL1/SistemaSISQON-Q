@@ -3,6 +3,7 @@ import SidebarCliente from "./cliente/SidebarCliente";
 import HeaderCliente from "./cliente/HeaderCliente";
 import FlowCliente from "./cliente/FlowCliente";
 
+import { useNavigate } from "react-router-dom";
 
 import ProjectItem from "./cliente/ProjectItem";
 
@@ -14,18 +15,57 @@ import QuoteItem from "./cliente/QuoteItem";
 
 
 import ResponseItem from "./cliente/ResponseItem";
-import {useEffect, useState, useMemo } from "react";
 
-export default function PanelClienteContenido(){
+import { useEffect, useState, useMemo } from "react";
+
+interface ProyectoDashboard {
+    idProyecto: number;
+    nombre: string;
+    ubicacion: string | null;
+    estado: string;
+    imagenUrl: string | null;
+    fechaCreacion: string;
+}
+
+interface CotizacionDashboard {
+    idCotizacion: number;
+    idProyecto: number;
+    idEmpresa: number | null;
+    nombreEmpresa: string | null;
+    codigo: string;
+    version: number;
+    fechaCreacion: string;
+    fechaActualizacion: string | null;
+    estado: string;
+    precioEstimado: number | null;
+    moneda: string;
+    nombreProyecto: string;
+}
+
+const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+export default function PanelClienteContenido() {
 
     const [menuOpen, setMenuOpen] = useState(false);
-     const [cliente, setCliente] = useState<{
+    const [cliente, setCliente] = useState<{
         nombre: string;
         apellido: string;
     } | null>(null);
 
-    const [proyectos, setProyectos] = useState<any[]>([]);
-    const [cotizaciones, setCotizaciones] = useState<any[]>([]);
+    const [proyectos, setProyectos] =
+        useState<ProyectoDashboard[]>([]);
+
+    const [cargandoProyectos, setCargandoProyectos] =
+        useState(true);
+
+    const navigate = useNavigate();
+
+    const [cotizaciones, setCotizaciones] =
+        useState<CotizacionDashboard[]>([]);
+
+    const [cargandoCotizaciones, setCargandoCotizaciones] =
+        useState(true);
 
     useEffect(() => {
         const usuarioGuardado =
@@ -43,87 +83,93 @@ export default function PanelClienteContenido(){
 
         const obtenerDatosDashboard = async () => {
             try {
-            const idCliente = usuario.id_Cliente;
+                setCargandoProyectos(true);
+                setCargandoCotizaciones(true);
+                const idCliente = usuario.id_Cliente;
 
-            const [
-                respuestaCliente,
-                respuestaProyectos,
-                respuestaCotizaciones,
-            ] = await Promise.all([
-                fetch(
-                `http://localhost:3000/api/clientes/${idCliente}`
-                ),
+                const [
+                    respuestaCliente,
+                    respuestaProyectos,
+                    respuestaCotizaciones,
+                ] = await Promise.all([
+                    fetch(
+                        `http://localhost:3000/api/clientes/${idCliente}`
+                    ),
 
-                fetch(
-                `http://localhost:3000/api/proyectos/cliente/${idCliente}`
-                ),
+                    fetch(
+                        `http://localhost:3000/api/proyectos/cliente/${idCliente}`
+                    ),
 
-                fetch(
-                `http://localhost:3000/api/cotizaciones/cliente/${idCliente}`
-                ),
-            ]);
+                    fetch(
+                        `http://localhost:3000/api/cotizaciones/cliente/${idCliente}`
+                    ),
+                ]);
 
-            if (!respuestaCliente.ok) {
-                throw new Error(
-                "No se pudo obtener el cliente"
-                );
-            }
+                if (!respuestaCliente.ok) {
+                    throw new Error(
+                        "No se pudo obtener el cliente"
+                    );
+                }
 
-            if (!respuestaProyectos.ok) {
-                throw new Error(
-                "No se pudieron obtener los proyectos"
-                );
-            }
+                if (!respuestaProyectos.ok) {
+                    throw new Error(
+                        "No se pudieron obtener los proyectos"
+                    );
+                }
 
-            if (!respuestaCotizaciones.ok) {
-                throw new Error(
-                "No se pudieron obtener las cotizaciones"
-                );
-            }
+                if (!respuestaCotizaciones.ok) {
+                    throw new Error(
+                        "No se pudieron obtener las cotizaciones"
+                    );
+                }
 
-            const datosCliente =
-                await respuestaCliente.json();
+                const datosCliente =
+                    await respuestaCliente.json();
 
-            const datosProyectos =
-                await respuestaProyectos.json();
+                const datosProyectos =
+                    await respuestaProyectos.json();
 
-            const datosCotizaciones =
-                await respuestaCotizaciones.json();
+                const datosCotizaciones =
+                    await respuestaCotizaciones.json();
 
-            setCliente(datosCliente);
+                setCliente(datosCliente);
 
-            setProyectos(datosProyectos);
+                setProyectos(datosProyectos);
 
-            setCotizaciones(datosCotizaciones);
+                setCotizaciones(datosCotizaciones);
 
             } catch (error) {
-            console.error(
-                "Error al obtener datos de la dashboard:",
-                error
-            );
+                console.error(
+                    "Error al obtener datos de la dashboard:",
+                    error
+                );
+            } finally {
+                setCargandoProyectos(false);
+                setCargandoCotizaciones(false);
             }
-    };
-    obtenerDatosDashboard();}, []);
+        };
+        obtenerDatosDashboard();
+    }, []);
 
     const proyectosRecientes = useMemo(() => {
         return [...proyectos]
             .sort(
-            (a, b) =>
-                new Date(b.fechaCreacion).getTime() -
-                new Date(a.fechaCreacion).getTime()
+                (a, b) =>
+                    new Date(b.fechaCreacion).getTime() -
+                    new Date(a.fechaCreacion).getTime()
             )
             .slice(0, 4);
-        }, [proyectos]);
+    }, [proyectos]);
 
     const cotizacionesRecientes = useMemo(() => {
         return [...cotizaciones]
             .sort(
-            (a, b) =>
-                new Date(b.fechaCreacion).getTime() -
-                new Date(a.fechaCreacion).getTime()
+                (a, b) =>
+                    new Date(b.fechaCreacion).getTime() -
+                    new Date(a.fechaCreacion).getTime()
             )
             .slice(0, 4);
-        }, [cotizaciones]);
+    }, [cotizaciones]);
 
     function formatearFecha(fecha: string): string {
         const fechaFormateada = new Date(fecha);
@@ -141,8 +187,61 @@ export default function PanelClienteContenido(){
         }).format(fechaFormateada);
     }
 
+    const respuestasRecientes = cotizaciones
+        .filter(
+            (cotizacion) =>
+                cotizacion.idEmpresa !== null &&
+                cotizacion.nombreEmpresa !== null
+        )
+        .slice(0, 4);
 
-    return(
+    const handleEliminarProyecto = async (
+        idProyecto: number,
+        nombreProyecto: string
+    ) => {
+        const confirmado = window.confirm(
+            `¿Seguro que querés eliminar el proyecto "${nombreProyecto}"?\n\nTambién se eliminarán sus cotizaciones asociadas. Esta acción no se puede deshacer.`
+        );
+
+        if (!confirmado) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/proyectos/${idProyecto}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            if (!response.ok) {
+                const data = await response.json().catch(() => null);
+
+                throw new Error(
+                    data?.message ||
+                    data?.mensaje ||
+                    "No se pudo eliminar el proyecto"
+                );
+            }
+
+            setProyectos((prev) =>
+                prev.filter(
+                    (proyecto) => proyecto.idProyecto !== idProyecto
+                )
+            );
+        } catch (error) {
+            console.error("Error al eliminar proyecto:", error);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "No se pudo eliminar el proyecto"
+            );
+        }
+    };
+
+    return (
         <div className="cliente-panel">
             <SidebarCliente
                 menuOpen={menuOpen}
@@ -164,120 +263,134 @@ export default function PanelClienteContenido(){
                 <FlowCliente />
 
                 <section className="content-grid">
-                   <DashboardCard
+                    <DashboardCard
                         title="Mis proyectos recientes"
                         linkText="Ver todos mis proyectos"
-                        linkTo="/panel-cliente/proyectos"
-                        >
-                        {proyectosRecientes.length > 0 ? (
-                            proyectosRecientes.map((proyecto) => (
-                            <ProjectItem
-                                key={proyecto.idProyecto}
-                                image={
-                                proyecto.imagenUrl?.trim() ||
-                                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500"
-                                }
-                                name={proyecto.nombre}
-                                location={
-                                proyecto.ubicacion ||
-                                "Ubicación no especificada"
-                                }
-                                status={proyecto.estado}
-                                date={formatearFecha(
-                                proyecto.fechaCreacion
-                                )}
-                            />
-                            ))
-                        ) : (
+                        onViewAll={() => navigate("/panel-cliente/proyectos")}
+                    >
+                        {cargandoProyectos ? (
+                            <p>Cargando proyectos...</p>
+                        ) : proyectosRecientes.length === 0 ? (
                             <p className="dashboard-empty">
-                            Todavía no tenés proyectos registrados.
+                                Todavía no tenés proyectos registrados.
                             </p>
+                        ) : (
+                            proyectosRecientes.map((proyecto) => (
+                                <ProjectItem
+                                    key={proyecto.idProyecto}
+                                    image={
+                                        proyecto.imagenUrl?.trim() ||
+                                        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500"
+                                    }
+                                    name={proyecto.nombre}
+                                    location={
+                                        proyecto.ubicacion ||
+                                        "Ubicación no especificada"
+                                    }
+                                    status={proyecto.estado}
+                                    date={formatearFecha(
+                                        proyecto.fechaCreacion
+                                    )}
+                                    onView={() =>
+                                        navigate(
+                                            `/panel-cliente/proyectos/${proyecto.idProyecto}`
+                                        )
+                                    }
+                                    onEdit={() =>
+                                        navigate(
+                                            `/panel-cliente/proyectos/${proyecto.idProyecto}/editar`
+                                        )
+                                    }
+                                    onDelete={() =>
+                                        handleEliminarProyecto(
+                                            proyecto.idProyecto,
+                                            proyecto.nombre
+                                        )
+                                    }
+                                />
+                            ))
                         )}
                     </DashboardCard>
 
-                                        
                     <DashboardCard
                         title="Mis cotizaciones recientes"
-                        linkText="Ver todas mis cotizaciones"
-                        linkTo="/panel-cliente/cotizaciones"
+                        onViewAll={() =>
+                            navigate("/panel-cliente/cotizaciones")
+                        }
                     >
-                        {cotizacionesRecientes.length > 0 ? (
-                        cotizacionesRecientes.map((cotizacion) => (
-                        <QuoteItem
-                            key={cotizacion.idCotizacion}
-                            code={cotizacion.codigo}
-                            project={cotizacion.nombreProyecto}
-                            amount={
-                                cotizacion.precioEstimado !== null
-                                ? `USD ${Number(
-                                    cotizacion.precioEstimado
-                                    ).toLocaleString("es-UY")}`
-                                : "Sin precio"
-                            }
-                            amountUYU={
-                                cotizacion.precioEstimadoUYU !== null
-                                ? `$ ${Number(
-                                    cotizacion.precioEstimadoUYU
-                                    ).toLocaleString("es-UY")}`
-                                : "Sin precio"
-                            }
-                            date={formatearFecha(
-                                cotizacion.fechaCreacion
-                            )}
-                            tag={cotizacion.estado}
-                        />
-                        ))
+                        {cargandoCotizaciones ? (
+                            <p>Cargando cotizaciones...</p>
+                        ) : cotizacionesRecientes.length === 0 ? (
+                            <p className="dashboard-empty">
+                                Todavía no tenés cotizaciones registradas.
+                            </p>
                         ) : (
-                        <p className="dashboard-empty">
-                            Todavía no tenés cotizaciones registradas.
-                        </p>
+                            cotizacionesRecientes.map((cotizacion) => (
+                                <QuoteItem
+                                    key={cotizacion.idCotizacion}
+                                    code={cotizacion.codigo}
+                                    project={cotizacion.nombreProyecto}
+                                    amount={
+                                        cotizacion.precioEstimado !== null
+                                            ? `${cotizacion.moneda} ${Number(
+                                                cotizacion.precioEstimado
+                                            ).toLocaleString("es-UY", {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,
+                                            })}`
+                                            : "Sin precio"
+                                    }
+                                    date={formatearFecha(
+                                        cotizacion.fechaCreacion
+                                    )}
+                                    tag={cotizacion.estado}
+                                    onClick={() =>
+                                        navigate(
+                                            `/panel-cliente/cotizaciones/${cotizacion.idCotizacion}`
+                                        )
+                                    }
+                                />
+                            ))
                         )}
                     </DashboardCard>
 
-                
-                
-                    <section
+                    <DashboardCard
                         title="Últimas respuestas recibidas"
-                       
+                        linkText="Ver todas las respuestas"
+                        onViewAll={() =>
+                            navigate("/panel-cliente/comparador")
+                        }
                     >
-                        <ResponseItem
-                            logo="ABC"
-                            company="Constructora ABC"
-                            code="CTZ-2024-0007"
-                            status="Propuesta recibida"
-                            time="Hoy, 10:30"
-                        />
+                        {cargandoCotizaciones ? (
+                            <p>Cargando respuestas...</p>
+                        ) : respuestasRecientes.length === 0 ? (
+                            <p>No tienes respuestas de empresas todavía.</p>
+                        ) : (
+                            respuestasRecientes.map((respuesta) => (
+                                <ResponseItem
+                                    key={respuesta.idCotizacion}
+                                    logo={
+                                        respuesta.nombreEmpresa
+                                            ?.substring(0, 2)
+                                            .toUpperCase() || "EM"
+                                    }
+                                    company={
+                                        respuesta.nombreEmpresa || "Empresa"
+                                    }
+                                    code={respuesta.codigo}
+                                    status="Propuesta recibida"
+                                    time={formatearFecha(
+                                        respuesta.fechaActualizacion ||
+                                        respuesta.fechaCreacion
+                                    )}
+                                />
+                            ))
+                        )}
+                    </DashboardCard>
 
-                        <ResponseItem
-                            logo="NORTE"
-                            company="Construcciones del Norte"
-                            code="CTZ-2024-0007"
-                            status="Propuesta recibida"
-                            time="Ayer, 16:45"
-                        />
-
-                        <ResponseItem
-                            logo="HC"
-                            company="Hogar Construcciones"
-                            code="CTZ-2024-0006"
-                            status="En revisión"
-                            time="Ayer, 11:20"
-                        />
-
-                        <ResponseItem
-                            logo="OS"
-                            company="Obras y Servicios SRL"
-                            code="CTZ-2024-0005"
-                            status="Rechazada"
-                            time="20/05/2024"
-                        />
-                    </section>
                 </section>
 
-                
-                
-
-            </main>
-        </div>
-    ); 
+            </main >
+        </div >
+    );
 }

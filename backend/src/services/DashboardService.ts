@@ -6,11 +6,14 @@ export class DashboardService {
 
   private repository = new DashboardRepository();
 
-    public async obtenerDashboard(
-        idEmpresa:number
-    ):Promise<Dashboard>{
+  public async obtenerDashboard(
+    idEmpresa: number
+  ): Promise<Dashboard> {
 
-        return this.repository.obtenerDashboard(idEmpresa);
+    return this.repository.obtenerDashboard(
+      idEmpresa
+    );
 
-    }
+  }
+
 }

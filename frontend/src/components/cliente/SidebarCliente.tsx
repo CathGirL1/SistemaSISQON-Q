@@ -1,6 +1,5 @@
-
-import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import iconoHomeMenu from "../../assets/iconoHomeMenu.png";
 
@@ -9,13 +8,10 @@ interface SidebarClienteProps {
   onClose: () => void;
 }
 
-
 export default function SidebarCliente({
   menuOpen,
   onClose,
-  
 }: SidebarClienteProps) {
-
   const navigate = useNavigate();
 
   const [cliente, setCliente] = useState<{
@@ -60,10 +56,8 @@ export default function SidebarCliente({
       }
     };
 
-    // Cargar los datos al entrar
     obtenerCliente();
 
-    // Escuchar cuando se actualiza la foto
     window.addEventListener(
       "cliente-logo-actualizado",
       obtenerCliente
@@ -77,7 +71,11 @@ export default function SidebarCliente({
     };
   }, []);
 
-  
+  const handleLogout = () => {
+    localStorage.removeItem("usuario");
+    navigate("/login", { replace: true });
+  };
+
   return (
     <>
       <aside className={`cliente-sidebar ${menuOpen ? "open" : ""}`}>
@@ -94,78 +92,72 @@ export default function SidebarCliente({
           </div>
         </div>
 
-        
-          <nav className="cliente-menu">
-  <NavLink
-    to="/panel-cliente"
-    end
-    className={({ isActive }) => (isActive ? "active" : "")}
-    onClick={onClose}
-  >
-    ⌂ Dashboard / Inicio
-  </NavLink>
+        <nav className="cliente-menu">
+          <NavLink
+            to="/panel-cliente"
+            end
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={onClose}
+          >
+            ⌂ Dashboard / Inicio
+          </NavLink>
 
-  <NavLink
-    to="/panel-cliente/proyectos"
-    className={({ isActive }) => (isActive ? "active" : "")}
-    onClick={onClose}
-  >
-    ▣ Mis Proyectos
-  </NavLink>
+          <NavLink
+            to="/panel-cliente/proyectos"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={onClose}
+          >
+            ▣ Mis Proyectos
+          </NavLink>
 
-  <NavLink
-    to="/panel-cliente/cotizaciones"
-    className={({ isActive }) => (isActive ? "active" : "")}
-    onClick={onClose}
-  >
-    ▤ Mis Cotizaciones
-  </NavLink>
+          <NavLink
+            to="/panel-cliente/cotizaciones"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={onClose}
+          >
+            ▤ Mis Cotizaciones
+          </NavLink>
 
-  <NavLink
-    to="/panel-cliente/materiales"
-    className={({ isActive }) => (isActive ? "active" : "")}
-    onClick={onClose}
-  >
-    ▦ Catálogo de Materiales
-  </NavLink>
+          <NavLink
+            to="/panel-cliente/materiales"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={onClose}
+          >
+            ▦ Catálogo de Materiales
+          </NavLink>
 
-  <NavLink
-    to="/panel-cliente/comparador"
-    className={({ isActive }) => (isActive ? "active" : "")}
-    onClick={onClose}
-  >
-    ⚖ Comparador
-  </NavLink>
+          <NavLink
+            to="/panel-cliente/comparador"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={onClose}
+          >
+            ⚖ Comparador
+          </NavLink>
 
-  <NavLink
-    to="/panel-cliente/empresas"
-    className={({ isActive }) => (isActive ? "active" : "")}
-    onClick={onClose}
-  >
-    ▥ Empresas
-  </NavLink>
+          <NavLink
+            to="/panel-cliente/empresas"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={onClose}
+          >
+            ▥ Empresas
+          </NavLink>
 
-
-
-  <NavLink
-
-    to="/panel-cliente/asistente"
-    className={({ isActive }) => (isActive ? "active" : "")}
-    onClick={onClose}
-  >
-    ✦ Asistente IA
-  </NavLink>
-
-      </nav>
+          <NavLink
+            to="/panel-cliente/asistente"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={onClose}
+          >
+            ✦ Asistente IA
+          </NavLink>
+        </nav>
 
         <div className="cliente-user-container">
-
           <button
             type="button"
             className="cliente-user"
             onClick={() => setPerfilOpen((prev) => !prev)}
           >
-           <div className="avatar">
+            <div className="avatar">
               {cliente?.logo ? (
                 <img
                   src={`http://localhost:3000${cliente.logo}`}
@@ -189,6 +181,16 @@ export default function SidebarCliente({
             </div>
           </button>
 
+          <button
+            type="button"
+            className="cliente-logout"
+            onClick={handleLogout}
+            title="Cerrar sesión"
+            aria-label="Cerrar sesión"
+          >
+            ↪
+          </button>
+
           {perfilOpen && (
             <div className="perfil-dropdown">
               <button
@@ -202,18 +204,8 @@ export default function SidebarCliente({
               </button>
             </div>
           )}
-
         </div>
       </aside>
-
-      {menuOpen && (
-        <button
-          type="button"
-          className="sidebar-overlay"
-          onClick={onClose}
-          aria-label="Cerrar menú"
-        />
-      )}
     </>
   );
 }

@@ -8,6 +8,7 @@ import ClientesFiltros from "./ClientesFiltros";
 import TablaClientes from "./TablaClientes";
 import ClienteDetallePanel from "./ClienteDetallePanel";
 import PanelBottomCard from "../../common/PanelBottomCard";
+import EstadoClienteModal from "./EstadoClienteModal";
 
 import ClienteModal from "./ClienteModal";
 import NotaClienteModal from "./NotaClienteModal";
@@ -45,7 +46,7 @@ export default function ClientesEmpresaContenido() {
   const [filtroEstado, setFiltroEstado] = useState("");
   const [filtroCiudad, setFiltroCiudad] = useState("");
   const [modalCrear, setModalCrear] = useState(false);
-  const [modalEditar, setModalEditar] = useState(false);
+  const [modalEstado, setModalEstado] = useState(false);
   const [modalNota, setModalNota] = useState(false);
   const [modalHistorial, setModalHistorial] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
@@ -194,9 +195,11 @@ export default function ClientesEmpresaContenido() {
   setFiltroCiudad("");
   };
 
-  const abrirEditar = (cliente: ClienteEmpresa) => {
+  const abrirCambiarEstado = (
+    cliente: ClienteEmpresa
+  ) => {
     setClienteAccion(cliente);
-    setModalEditar(true);
+    setModalEstado(true);
   };
 
   const abrirNota = (cliente: ClienteEmpresa) => {
@@ -272,7 +275,7 @@ export default function ClientesEmpresaContenido() {
   };
 
   const cerrarModales = () => {
-    setModalEditar(false);
+    setModalEstado(false);
     setModalNota(false);
     setModalHistorial(false);
     setModalEliminar(false);
@@ -324,14 +327,46 @@ export default function ClientesEmpresaContenido() {
     setModalCrear(false);
   };
 
-  const guardarEdicionCliente = async (
-    datos: ActualizarClienteRequest
+  const guardarEstadoCliente = async (
+    nuevoEstado: ClienteEmpresa["estado"]
   ) => {
     if (!clienteAccion) {
       throw new Error(
         "No se pudo identificar el cliente."
       );
     }
+
+    const datos: ActualizarClienteRequest = {
+      nombreUsuario:
+        clienteAccion.nombreUsuario,
+
+      gmail:
+        clienteAccion.email,
+
+      telefono:
+        clienteAccion.telefono || null,
+
+      direccion:
+        clienteAccion.direccion || null,
+
+      cedula:
+        clienteAccion.cedula,
+
+      nombre:
+        clienteAccion.nombreReal,
+
+      apellido:
+        clienteAccion.apellido,
+
+      ciudad:
+        clienteAccion.ciudad || null,
+
+      estado:
+        nuevoEstado,
+
+      notas:
+        clienteAccion.notas || null,
+    };
 
     const usuario = JSON.parse(
       localStorage.getItem("usuario") || "{}"
@@ -345,14 +380,12 @@ export default function ClientesEmpresaContenido() {
       );
     }
 
-    
-
-    const clienteActualizado = await actualizarCliente(
-      clienteAccion.id,
-      idEmpresa, 
-      datos
-    );
-
+    const clienteActualizado =
+      await actualizarCliente(
+        clienteAccion.id,
+        idEmpresa,
+        datos
+      );
     setClientes((listaActual) =>
       listaActual.map((cliente) =>
         cliente.id === clienteActualizado.id
@@ -362,9 +395,12 @@ export default function ClientesEmpresaContenido() {
     );
 
     if (
-      clienteSeleccionado?.id === clienteActualizado.id
+      clienteSeleccionado?.id ===
+      clienteActualizado.id
     ) {
-      setClienteSeleccionado(clienteActualizado);
+      setClienteSeleccionado(
+        clienteActualizado
+      );
     }
 
     cerrarModales();
@@ -536,7 +572,7 @@ export default function ClientesEmpresaContenido() {
           error={error}
           onSeleccionarCliente={seleccionarCliente}
           onWhatsapp={abrirWhatsapp}
-          onEditar={abrirEditar}
+          onCambiarEstado={abrirCambiarEstado}
           onAgregarNota={abrirNota}
           onLlamar={llamarCliente}
           onVerHistorial={abrirHistorial}
@@ -578,16 +614,11 @@ export default function ClientesEmpresaContenido() {
         }
       />
 
-      <ClienteModal
-        abierto={modalEditar}
-        modo="editar"
+      <EstadoClienteModal
+        abierto={modalEstado}
         cliente={clienteAccion}
         onCerrar={cerrarModales}
-        onGuardar={(datos) =>
-          guardarEdicionCliente(
-            datos as ActualizarClienteRequest
-          )
-        }
+        onGuardar={guardarEstadoCliente}
       />
 
       <NotaClienteModal

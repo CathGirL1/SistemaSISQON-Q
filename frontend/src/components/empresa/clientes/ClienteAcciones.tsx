@@ -1,9 +1,10 @@
 import "../../../styles/empresa/clientes/ClienteAcciones.css";
 
 import { useState } from "react";
+
 import {
   FaWhatsapp,
-  FaEdit,
+  FaExchangeAlt,
   FaRegCommentDots,
   FaPhoneAlt,
   FaEllipsisV,
@@ -13,7 +14,7 @@ import {
 
 type Props = {
   onWhatsapp: () => void;
-  onEditar: () => void;
+  onCambiarEstado: () => void;
   onAgregarNota: () => void;
   onLlamar: () => void;
   onVerHistorial: () => void;
@@ -22,59 +23,97 @@ type Props = {
 
 export default function ClienteAcciones({
   onWhatsapp,
-  onEditar,
+  onCambiarEstado,
   onAgregarNota,
   onLlamar,
   onVerHistorial,
   onEliminar,
 }: Props) {
-  const [abierto, setAbierto] = useState(false);
+  const [abierto, setAbierto] =
+    useState(false);
 
-  const ejecutar = (accion: () => void) => {
+  const ejecutar = (
+    accion: () => void
+  ) => {
     accion();
     setAbierto(false);
   };
 
   return (
     <div className="cliente-acciones">
-      <button title="WhatsApp" onClick={onWhatsapp}>
+      <button
+        type="button"
+        title="WhatsApp"
+        onClick={onWhatsapp}
+      >
         <FaWhatsapp />
       </button>
 
-      <button title="Editar" onClick={onEditar}>
-        <FaEdit />
+      <button
+        type="button"
+        title="Cambiar estado"
+        onClick={onCambiarEstado}
+      >
+        <FaExchangeAlt />
       </button>
 
-      <button title="Agregar nota" onClick={onAgregarNota}>
+      <button
+        type="button"
+        title="Agregar nota"
+        onClick={onAgregarNota}
+      >
         <FaRegCommentDots />
       </button>
 
-      <button title="Llamar" onClick={onLlamar}>
+      <button
+        type="button"
+        title="Llamar"
+        onClick={onLlamar}
+      >
         <FaPhoneAlt />
       </button>
 
       <div className="cliente-menu">
         <button
+          type="button"
           title="Más opciones"
           className="cliente-menu-btn"
-          onClick={() => setAbierto(!abierto)}
+          onClick={() =>
+            setAbierto(!abierto)
+          }
         >
           <FaEllipsisV />
         </button>
 
         {abierto && (
           <div className="cliente-menu-dropdown">
-            <button onClick={() => ejecutar(onVerHistorial)}>
+            <button
+              type="button"
+              onClick={() =>
+                ejecutar(onVerHistorial)
+              }
+            >
               <FaHistory />
               Ver historial
             </button>
 
-            <button onClick={() => ejecutar(onEditar)}>
-              <FaEdit />
-              Editar cliente
+            <button
+              type="button"
+              onClick={() =>
+                ejecutar(onCambiarEstado)
+              }
+            >
+              <FaExchangeAlt />
+              Cambiar estado
             </button>
 
-            <button className="danger" onClick={() => ejecutar(onEliminar)}>
+            <button
+              type="button"
+              className="danger"
+              onClick={() =>
+                ejecutar(onEliminar)
+              }
+            >
               <FaTrashAlt />
               Eliminar
             </button>
