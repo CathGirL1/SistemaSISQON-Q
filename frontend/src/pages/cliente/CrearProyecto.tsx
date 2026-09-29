@@ -16,6 +16,10 @@ import {
 import SidebarCliente from "../../components/cliente/SidebarCliente";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
 
+import MaterialesProyectoDropList, {
+  type Material,
+} from "../../components/cliente/MaterialesProyectoDropList";
+
 import "../../styles/PanelClienteContenido.css";
 import "../../styles/CrearProyecto.css";
 
@@ -39,6 +43,7 @@ interface TipoObra {
 
 interface RespuestaError {
   mensaje?: string;
+  idProyecto?: number;
 }
 
 const API_URL =
@@ -63,6 +68,8 @@ export default function CrearProyecto() {
     useState<FormularioProyecto>(formularioInicial);
 
   const [tiposObra, setTiposObra] = useState<TipoObra[]>([]);
+  const [materialesSeleccionados, setMaterialesSeleccionados] =
+  useState<Material[]>([]);
   const [cargandoTiposObra, setCargandoTiposObra] =
     useState(true);
 
@@ -134,8 +141,38 @@ export default function CrearProyecto() {
           data.mensaje || "No se pudo crear el proyecto"
         );
       }
+       // 2. Obtener el ID del proyecto recién creado
+      const idProyecto = data.idProyecto;
 
-      navigate("/panel-cliente/proyectos");
+      // 3. Guardar los materiales seleccionados
+      for (const material of materialesSeleccionados) {
+        const responseMaterial = await fetch(
+          `${API_URL}/api/materiales-proyecto/agregarMaterialAProyecto`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              idProyecto,
+              idMaterial: material.idMaterial,
+              cantidad: material.cantidad ?? 1,
+            }),
+          }
+        );
+
+      const dataMaterial = await responseMaterial.json();
+
+      if (!responseMaterial.ok) {
+        throw new Error(
+          dataMaterial.mensaje ||
+            `No se pudo guardar el material ${material.nombre}`
+        );
+      }
+    }
+
+    // 4. Ir a la lista de proyectos
+    navigate("/panel-cliente/proyectos");
     } catch (error) {
       const mensaje =
         error instanceof Error
@@ -291,6 +328,25 @@ export default function CrearProyecto() {
                   rows={5}
                 />
               </label>
+
+              <div className="form-group">
+                <label htmlFor="imagenUrl">
+                  Imagen del proyecto
+                </label>
+
+                <input
+                  id="imagenUrl"
+                  type="text"
+                  value={formulario.imagenUrl}
+                  onChange={(e) =>
+                    setFormulario({
+                      ...formulario,
+                      imagenUrl: e.target.value,
+                    })
+                  }
+                  placeholder="URL de la imagen"
+                />
+              </div>
             </div>
           </section>
 
@@ -353,6 +409,8 @@ export default function CrearProyecto() {
             </label>
 
           </section>
+
+          
 
           <section className="crear-proyecto-card">
             <div className="crear-proyecto-card-title">
@@ -427,6 +485,14 @@ export default function CrearProyecto() {
               </label>
             </div>
           </section>
+
+          <MaterialesProyectoDropList
+            materialesSeleccionados={materialesSeleccionados}
+            onMaterialesChange={setMaterialesSeleccionados}
+            onVerDatosMaterial={(material) => {
+              console.log("Material seleccionado:", material);
+            }}
+          />
 
           {error && (
             <div className="crear-proyecto-error">

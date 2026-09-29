@@ -9,6 +9,8 @@ import {
   Eye,
 } from "lucide-react";
 
+
+import ModalDatosMaterial from "./ModalDatosMaterial";
 import "../../styles/MaterialesProyectoDropList.css";
 
 // ======================================================
@@ -83,6 +85,21 @@ export default function MaterialesProyectoDropList({
   const [cargando, setCargando] = useState(true);
 
   const [error, setError] = useState("");
+  const [materialDetalle, setMaterialDetalle] =
+  useState<Material | null>(null);
+
+  const [modalAbierto, setModalAbierto] =
+  useState(false);
+
+  const verDatosMaterial = (material: Material) => {
+    setMaterialDetalle(material);
+    setModalAbierto(true);
+  };
+
+  const cerrarModal = () => {
+    setModalAbierto(false);
+    setMaterialDetalle(null);
+  };
 
   // ====================================================
   // OBTENER MATERIALES DEL CATÁLOGO
@@ -568,9 +585,7 @@ export default function MaterialesProyectoDropList({
               type="button"
               className="material-ver-button"
               onClick={() =>
-                onVerDatosMaterial(
-                  materialSeleccionado
-                )
+                verDatosMaterial(materialSeleccionado)
               }
             >
               <Eye size={17} />
@@ -742,21 +757,17 @@ export default function MaterialesProyectoDropList({
 
                   <div className="material-item-acciones">
 
-                    <button
-                      type="button"
-                      className="material-ver-button"
-                      onClick={() =>
-                        onVerDatosMaterial(
-                          material
-                        )
-                      }
-                    >
-                      <Eye size={17} />
+                 <button
+                  type="button"
+                  className="material-ver-button"
+                  onClick={() => verDatosMaterial(material)}
+                >
+                  <Eye size={17} />
 
-                      <span>
-                        Ver datos
-                      </span>
-                    </button>
+                  <span>
+                    Ver datos
+                  </span>
+                </button>
 
                     <button
                       type="button"
@@ -786,6 +797,12 @@ export default function MaterialesProyectoDropList({
         )}
 
       </div>
+
+      <ModalDatosMaterial
+        material={materialDetalle}
+        abierto={modalAbierto}
+        onCerrar={cerrarModal}
+      />
 
     </section>
   );

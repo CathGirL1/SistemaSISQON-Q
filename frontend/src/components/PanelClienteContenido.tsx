@@ -314,6 +314,7 @@ export default function PanelClienteContenido() {
 
                     <DashboardCard
                         title="Mis cotizaciones recientes"
+                        linkText="Ver todas mis cotizaciones"
                         onViewAll={() =>
                             navigate("/panel-cliente/cotizaciones")
                         }

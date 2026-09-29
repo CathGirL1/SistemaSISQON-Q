@@ -76,7 +76,13 @@ export default function FotoPerfilCliente({
         }
       );
 
+      console.log("STATUS:", respuesta.status);
+
       const datos = await respuesta.json();
+
+      console.log("RESPUESTA FOTO:", datos)
+
+   
 
       if (!respuesta.ok) {
         throw new Error(
@@ -86,6 +92,8 @@ export default function FotoPerfilCliente({
       }
 
       onFotoActualizada(datos.logo);
+
+      console.log("LOGO DEVUELTO:", datos.logo);
 
       window.dispatchEvent(
         new Event("cliente-logo-actualizado")
