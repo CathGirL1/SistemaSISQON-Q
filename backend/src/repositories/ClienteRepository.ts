@@ -116,7 +116,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
-
+          c.logo,
           u.nombreUsuario,
           u.gmail,
           u.telefono,

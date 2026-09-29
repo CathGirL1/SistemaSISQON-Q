@@ -116,7 +116,10 @@ export class ClienteController {
           logo
         );
 
-      res.status(200).json(cliente);
+      res.status(200).json({
+        ...cliente,
+        logo,
+      });
     } catch (error) {
       this.responderError(res, error);
     }
