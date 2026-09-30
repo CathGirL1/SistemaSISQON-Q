@@ -11,10 +11,12 @@ import ProjectItem from "./cliente/ProjectItem";
 
 import DashboardCard from "./cliente/DashboardCard";
 
+import RespuestasFinalizadas from "./cliente/RespuestasFinalizadas";
+
 import QuoteItem from "./cliente/QuoteItem";
 
 
-import ResponseItem from "./cliente/ResponseItem";
+
 
 import { useEffect, useState, useMemo } from "react";
 
@@ -52,6 +54,8 @@ export default function PanelClienteContenido() {
         nombre: string;
         apellido: string;
     } | null>(null);
+
+    const [idCliente, setIdCliente] = useState<number | null>(null);
 
     const [proyectos, setProyectos] =
         useState<ProyectoDashboard[]>([]);
@@ -133,7 +137,7 @@ export default function PanelClienteContenido() {
                     await respuestaCotizaciones.json();
 
                 setCliente(datosCliente);
-
+                setIdCliente(usuario.id_Cliente);
                 setProyectos(datosProyectos);
 
                 setCotizaciones(datosCotizaciones);
@@ -355,39 +359,11 @@ export default function PanelClienteContenido() {
                         )}
                     </DashboardCard>
 
-                    <DashboardCard
-                        title="Últimas respuestas recibidas"
-                        linkText="Ver todas las respuestas"
-                        onViewAll={() =>
-                            navigate("/panel-cliente/comparador")
-                        }
-                    >
-                        {cargandoCotizaciones ? (
-                            <p>Cargando respuestas...</p>
-                        ) : respuestasRecientes.length === 0 ? (
-                            <p>No tienes respuestas de empresas todavía.</p>
-                        ) : (
-                            respuestasRecientes.map((respuesta) => (
-                                <ResponseItem
-                                    key={respuesta.idCotizacion}
-                                    logo={
-                                        respuesta.nombreEmpresa
-                                            ?.substring(0, 2)
-                                            .toUpperCase() || "EM"
-                                    }
-                                    company={
-                                        respuesta.nombreEmpresa || "Empresa"
-                                    }
-                                    code={respuesta.codigo}
-                                    status="Propuesta recibida"
-                                    time={formatearFecha(
-                                        respuesta.fechaActualizacion ||
-                                        respuesta.fechaCreacion
-                                    )}
-                                />
-                            ))
-                        )}
-                    </DashboardCard>
+                {idCliente !== null && (
+                    <RespuestasFinalizadas
+                        idCliente={idCliente}
+                    />
+                )}
 
                 </section>
 

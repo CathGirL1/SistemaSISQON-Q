@@ -1,0 +1,1398 @@
+/* =========================================================
+   SISCON-Q - RESPUESTAS FINALIZADAS
+   CSS RESPONSIVE
+========================================================= */
+
+:root {
+    --siscon-primary: #2563eb;
+    --siscon-primary-dark: #1d4ed8;
+    --siscon-primary-light: #eff6ff;
+
+    --siscon-success: #16a34a;
+    --siscon-success-light: #f0fdf4;
+
+    --siscon-text: #1f2937;
+    --siscon-text-secondary: #6b7280;
+    --siscon-text-light: #9ca3af;
+
+    --siscon-border: #e5e7eb;
+    --siscon-border-light: #f1f5f9;
+
+    --siscon-background: #f8fafc;
+    --siscon-white: #ffffff;
+
+    --siscon-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+    --siscon-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    --siscon-shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.18);
+
+    --siscon-radius-sm: 8px;
+    --siscon-radius: 12px;
+    --siscon-radius-lg: 18px;
+}
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.respuestas-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(15, 23, 42, 0.58);
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    animation: respuestasOverlayIn 0.2s ease-out;
+}
+
+@keyframes respuestasOverlayIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.respuesta-logo {
+  width: clamp(42px, 5vw, 52px);
+  height: clamp(42px, 5vw, 52px);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.respuesta-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+/* =========================================================
+   MODAL - TODAS LAS RESPUESTAS
+========================================================= */
+
+.respuestas-modal {
+    width: min(900px, 100%);
+    max-height: min(780px, 92vh);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: var(--siscon-white);
+
+    border-radius: var(--siscon-radius-lg);
+
+    box-shadow: var(--siscon-shadow-lg);
+
+    animation: modalIn 0.25s ease-out;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.respuestas-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 26px 30px 22px;
+
+    border-bottom: 1px solid var(--siscon-border);
+}
+
+.respuestas-modal-header h2 {
+    margin: 0 0 6px;
+
+    color: var(--siscon-text);
+
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.respuestas-modal-header p {
+    margin: 0;
+
+    color: var(--siscon-text-secondary);
+
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   BOTÓN CERRAR
+========================================================= */
+
+.respuestas-modal-close {
+    flex-shrink: 0;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f1f5f9;
+
+    color: #64748b;
+
+    font-size: 1.55rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.respuestas-modal-close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+    transform: rotate(90deg);
+}
+
+.respuestas-modal-close:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.25);
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   CONTENIDO
+========================================================= */
+
+.respuestas-modal-content {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: 22px 30px 26px;
+
+    background: var(--siscon-background);
+}
+
+
+/* Scroll */
+
+.respuestas-modal-content::-webkit-scrollbar,
+.cotizacion-detalle-content::-webkit-scrollbar {
+    width: 7px;
+}
+
+.respuestas-modal-content::-webkit-scrollbar-track,
+.cotizacion-detalle-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.respuestas-modal-content::-webkit-scrollbar-thumb,
+.cotizacion-detalle-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 20px;
+}
+
+.respuestas-modal-content::-webkit-scrollbar-thumb:hover,
+.cotizacion-detalle-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
+/* =========================================================
+   CARD RESPUESTA
+========================================================= */
+
+.respuesta-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    width: 100%;
+
+    padding: 20px;
+    margin-bottom: 14px;
+
+    background: var(--siscon-white);
+
+    border: 1px solid var(--siscon-border);
+    border-radius: var(--siscon-radius);
+
+    box-shadow: var(--siscon-shadow-sm);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.respuesta-card:last-child {
+    margin-bottom: 0;
+}
+
+.respuesta-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #dbeafe;
+
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.09);
+}
+
+
+/* =========================================================
+   INFORMACIÓN EMPRESA
+========================================================= */
+
+.respuesta-card-info {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+
+    flex: 1;
+}
+
+.respuesta-logo {
+    flex-shrink: 0;
+
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: var(--siscon-primary-light);
+
+    color: var(--siscon-primary);
+
+    font-size: 0.95rem;
+    font-weight: 700;
+
+    border: 1px solid #dbeafe;
+}
+
+.respuesta-company-info {
+    min-width: 0;
+}
+
+.respuesta-company-info h3 {
+    margin: 0 0 7px;
+
+    overflow: hidden;
+
+    color: var(--siscon-text);
+
+    font-size: 1rem;
+    font-weight: 700;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.respuesta-company-info p {
+    margin: 3px 0;
+
+    overflow: hidden;
+
+    color: var(--siscon-text-secondary);
+
+    font-size: 0.83rem;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.respuesta-company-info strong {
+    color: #475569;
+}
+
+
+/* =========================================================
+   PARTE DERECHA CARD
+========================================================= */
+
+.respuesta-card-right {
+    flex-shrink: 0;
+
+    min-width: 155px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    gap: 8px;
+}
+
+.respuesta-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    background: var(--siscon-success-light);
+
+    color: var(--siscon-success);
+
+    font-size: 0.73rem;
+    font-weight: 700;
+}
+
+.respuesta-total {
+    color: var(--siscon-text);
+
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.precio-valores {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+}
+
+.precio-valores strong {
+    font-size: 1rem;
+}
+
+.precio-valores small {
+    font-size: 0.82rem;
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   BOTÓN DETALLES
+========================================================= */
+
+.respuesta-detalles-button {
+    padding: 8px 14px;
+
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+
+    background: var(--siscon-primary-light);
+
+    color: var(--siscon-primary);
+
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.respuesta-detalles-button:hover {
+    background: var(--siscon-primary);
+    border-color: var(--siscon-primary);
+
+    color: white;
+}
+
+
+/* =========================================================
+   ESTADO VACÍO
+========================================================= */
+
+.respuestas-empty,
+.dashboard-empty {
+    margin: 0;
+
+    padding: 40px 20px;
+
+    text-align: center;
+
+    color: var(--siscon-text-secondary);
+
+    font-size: 0.9rem;
+}
+
+
+/* =========================================================
+   FOOTER MODAL
+========================================================= */
+
+.respuestas-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 16px 30px;
+
+    border-top: 1px solid var(--siscon-border);
+
+    background: var(--siscon-white);
+}
+
+.respuestas-volver-button {
+    padding: 10px 18px;
+
+    border: 1px solid var(--siscon-border);
+    border-radius: 9px;
+
+    background: white;
+
+    color: #475569;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.respuestas-volver-button:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: var(--siscon-text);
+}
+
+
+/* =========================================================
+   MODAL DETALLE COTIZACIÓN
+========================================================= */
+
+.cotizacion-detalle-modal {
+    width: min(720px, 100%);
+    max-height: min(820px, 94vh);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: white;
+
+    border-radius: var(--siscon-radius-lg);
+
+    box-shadow: var(--siscon-shadow-lg);
+
+    animation: modalIn 0.25s ease-out;
+}
+
+
+/* =========================================================
+   HEADER DETALLE
+========================================================= */
+
+.cotizacion-detalle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 26px;
+
+    border-bottom: 1px solid var(--siscon-border);
+
+    background: white;
+}
+
+.cotizacion-volver-lista {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 8px 12px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: var(--siscon-primary);
+
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.cotizacion-volver-lista:hover {
+    background: var(--siscon-primary-light);
+}
+
+
+/* =========================================================
+   CONTENIDO DETALLE
+========================================================= */
+
+.cotizacion-detalle-content {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: 28px 30px 32px;
+
+    background: var(--siscon-background);
+}
+
+
+/* =========================================================
+   TÍTULO
+========================================================= */
+
+.cotizacion-detalle-title {
+    margin-bottom: 22px;
+}
+
+.cotizacion-detalle-title span {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--siscon-text-secondary);
+
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.cotizacion-detalle-title h2 {
+    margin: 0;
+
+    color: var(--siscon-text);
+
+    font-size: 1.65rem;
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   EMPRESA
+========================================================= */
+
+.cotizacion-detalle-company {
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    margin-bottom: 16px;
+
+    background: white;
+
+    border: 1px solid var(--siscon-border);
+    border-radius: var(--siscon-radius);
+}
+
+.cotizacion-detalle-company > div:last-child {
+    min-width: 0;
+}
+
+.cotizacion-detalle-company span,
+.cotizacion-detalle-project > span,
+.cotizacion-observaciones > span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--siscon-text-light);
+
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.cotizacion-detalle-company h3,
+.cotizacion-detalle-project h3 {
+    margin: 0 0 4px;
+
+    color: var(--siscon-text);
+
+    font-size: 1rem;
+}
+
+.cotizacion-detalle-company p,
+.cotizacion-detalle-project p {
+    margin: 4px 0 0;
+
+    color: var(--siscon-text-secondary);
+
+    font-size: 0.82rem;
+}
+
+
+/* =========================================================
+   PROYECTO
+========================================================= */
+
+.cotizacion-detalle-project {
+    padding: 18px;
+
+    margin-bottom: 18px;
+
+    background: white;
+
+    border: 1px solid var(--siscon-border);
+    border-radius: var(--siscon-radius);
+}
+
+
+/* =========================================================
+   PRECIOS
+========================================================= */
+
+.cotizacion-detalle-prices {
+    overflow: hidden;
+
+    margin-bottom: 18px;
+
+    background: white;
+
+    border: 1px solid var(--siscon-border);
+    border-radius: var(--siscon-radius);
+}
+
+.precio-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 14px 18px;
+
+    border-bottom: 1px solid var(--siscon-border-light);
+}
+
+.precio-row:last-child {
+    border-bottom: none;
+}
+
+.precio-row span {
+    color: var(--siscon-text-secondary);
+
+    font-size: 0.86rem;
+}
+
+.precio-row strong {
+    color: var(--siscon-text);
+
+    font-size: 0.9rem;
+
+    text-align: right;
+}
+
+.precio-total {
+    padding-top: 18px;
+    padding-bottom: 18px;
+
+    background: var(--siscon-primary-light);
+}
+
+.precio-total span {
+    color: var(--siscon-primary);
+
+    font-weight: 700;
+}
+
+.precio-total strong {
+    color: var(--siscon-primary);
+
+    font-size: 1.25rem;
+}
+
+.precio-uyu {
+    background: #f8fafc;
+}
+
+.precio-uyu strong {
+    color: #475569;
+}
+
+
+/* =========================================================
+   OBSERVACIONES
+========================================================= */
+
+.cotizacion-observaciones {
+    padding: 18px;
+
+    margin-bottom: 18px;
+
+    background: white;
+
+    border: 1px solid var(--siscon-border);
+    border-radius: var(--siscon-radius);
+}
+
+.cotizacion-observaciones p {
+    margin: 8px 0 0;
+
+    color: #475569;
+
+    font-size: 0.86rem;
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+}
+
+
+/* =========================================================
+   FECHA
+========================================================= */
+
+.cotizacion-detalle-date {
+    padding: 5px 2px;
+
+    color: var(--siscon-text-light);
+
+    font-size: 0.76rem;
+
+    text-align: right;
+}
+
+
+/* =========================================================
+   FOOTER DETALLE
+========================================================= */
+
+.cotizacion-detalle-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 16px 26px;
+
+    border-top: 1px solid var(--siscon-border);
+
+    background: white;
+}
+
+
+/* =========================================================
+   CONTACTAR EMPRESA
+========================================================= */
+
+.cotizacion-contactar-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 40px;
+
+    padding: 9px 16px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: var(--siscon-primary);
+
+    color: white;
+
+    font-size: 0.84rem;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.cotizacion-contactar-button:hover:not(:disabled) {
+    background: var(--siscon-primary-dark);
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 5px 12px rgba(37, 99, 235, 0.22);
+}
+
+.cotizacion-contactar-button:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   VOLVER DASHBOARD
+========================================================= */
+
+.cotizacion-dashboard-button {
+    min-height: 40px;
+
+    padding: 9px 16px;
+
+    border: 1px solid var(--siscon-border);
+    border-radius: 9px;
+
+    background: white;
+
+    color: #475569;
+
+    font-size: 0.84rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.cotizacion-dashboard-button:hover {
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+
+    color: var(--siscon-text);
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1024px) {
+
+    .respuestas-modal {
+        width: min(850px, 100%);
+    }
+
+    .respuestas-modal-header,
+    .respuestas-modal-content {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .respuesta-card {
+        gap: 18px;
+        padding: 17px;
+    }
+
+    .respuesta-card-right {
+        min-width: 140px;
+    }
+
+    .cotizacion-detalle-content {
+        padding: 24px;
+    }
+}
+
+
+/* =========================================================
+   TABLET PEQUEÑA / MOBILE GRANDE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .respuestas-modal-overlay {
+        padding: 14px;
+    }
+
+    .respuestas-modal,
+    .cotizacion-detalle-modal {
+        max-height: 94vh;
+
+        border-radius: 15px;
+    }
+
+
+    /* Header */
+
+    .respuestas-modal-header {
+        padding: 20px;
+    }
+
+    .respuestas-modal-header h2 {
+        font-size: 1.25rem;
+    }
+
+
+    /* Contenido */
+
+    .respuestas-modal-content {
+        padding: 16px;
+    }
+
+
+    /* Cards */
+
+    .respuesta-card {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 16px;
+
+        padding: 16px;
+    }
+
+    .respuesta-card-info {
+        width: 100%;
+    }
+
+    .respuesta-card-right {
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns: auto 1fr auto;
+
+        align-items: center;
+
+        min-width: 0;
+
+        gap: 10px;
+
+        padding-top: 12px;
+
+        border-top: 1px solid var(--siscon-border-light);
+    }
+
+    .respuesta-status {
+        justify-self: start;
+    }
+
+    .respuesta-total {
+        justify-self: center;
+    }
+
+    .respuesta-detalles-button {
+        justify-self: end;
+    }
+
+
+    /* Footer */
+
+    .respuestas-modal-footer {
+        padding: 14px 16px;
+    }
+
+
+    /* Detalle */
+
+    .cotizacion-detalle-header {
+        padding: 15px 18px;
+    }
+
+    .cotizacion-detalle-content {
+        padding: 20px 18px 24px;
+    }
+
+    .cotizacion-detalle-title h2 {
+        font-size: 1.4rem;
+    }
+
+    .cotizacion-detalle-footer {
+        padding: 14px 18px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .respuestas-modal-overlay {
+        align-items: flex-end;
+
+        padding: 0;
+    }
+
+
+    /* Bottom sheet */
+
+    .respuestas-modal,
+    .cotizacion-detalle-modal {
+        width: 100%;
+
+        max-height: 94vh;
+
+        border-radius: 18px 18px 0 0;
+    }
+
+
+    /* Header */
+
+    .respuestas-modal-header {
+        padding: 18px 16px;
+
+        gap: 12px;
+    }
+
+    .respuestas-modal-header h2 {
+        font-size: 1.12rem;
+    }
+
+    .respuestas-modal-header p {
+        font-size: 0.8rem;
+    }
+
+    .respuestas-modal-close {
+        width: 34px;
+        height: 34px;
+
+        font-size: 1.35rem;
+    }
+
+
+    /* Contenido */
+
+    .respuestas-modal-content {
+        padding: 12px;
+    }
+
+
+    /* Cards */
+
+    .respuesta-card {
+        padding: 14px;
+
+        margin-bottom: 10px;
+
+        border-radius: 11px;
+    }
+
+    .respuesta-card-info {
+        gap: 12px;
+    }
+
+    .respuesta-logo {
+        width: 44px;
+        height: 44px;
+
+        border-radius: 11px;
+
+        font-size: 0.82rem;
+    }
+
+    .respuesta-company-info h3 {
+        font-size: 0.9rem;
+    }
+
+    .respuesta-company-info p {
+        font-size: 0.75rem;
+    }
+
+
+    /* Parte inferior card */
+
+    .respuesta-card-right {
+        display: flex;
+
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: 8px;
+    }
+
+    .respuesta-status {
+        align-self: flex-start;
+    }
+
+    .respuesta-total {
+        align-self: flex-start;
+
+        font-size: 1rem;
+    }
+
+    .respuesta-detalles-button {
+        width: 100%;
+
+        padding: 9px 12px;
+    }
+
+
+    /* Footer */
+
+    .respuestas-modal-footer {
+        padding: 12px;
+    }
+
+    .respuestas-volver-button {
+        width: 100%;
+    }
+
+
+    /* Detalle */
+
+    .cotizacion-detalle-header {
+        padding: 13px 14px;
+    }
+
+    .cotizacion-volver-lista {
+        padding: 7px 8px;
+
+        font-size: 0.8rem;
+    }
+
+    .cotizacion-detalle-content {
+        padding: 18px 12px 20px;
+    }
+
+    .cotizacion-detalle-title {
+        margin-bottom: 16px;
+    }
+
+    .cotizacion-detalle-title span {
+        font-size: 0.7rem;
+    }
+
+    .cotizacion-detalle-title h2 {
+        font-size: 1.25rem;
+    }
+
+
+    /* Empresa */
+
+    .cotizacion-detalle-company {
+        padding: 14px;
+
+        gap: 11px;
+    }
+
+    .cotizacion-detalle-company .respuesta-logo {
+        width: 42px;
+        height: 42px;
+    }
+
+
+    /* Proyecto */
+
+    .cotizacion-detalle-project {
+        padding: 14px;
+    }
+
+
+    /* Precios */
+
+    .cotizacion-detalle-prices {
+        border-radius: 11px;
+    }
+
+    .precio-row {
+        align-items: flex-start;
+
+        padding: 12px 14px;
+
+        gap: 12px;
+    }
+
+    .precio-row span {
+        max-width: 55%;
+
+        font-size: 0.78rem;
+    }
+
+    .precio-row strong {
+        font-size: 0.82rem;
+    }
+
+    .precio-total {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+    .precio-total strong {
+        font-size: 1.05rem;
+    }
+
+
+    /* Observaciones */
+
+    .cotizacion-observaciones {
+        padding: 14px;
+    }
+
+
+    /* Fecha */
+
+    .cotizacion-detalle-date {
+        font-size: 0.7rem;
+
+        text-align: left;
+    }
+
+
+    /* Footer */
+
+    .cotizacion-detalle-footer {
+        flex-direction: column;
+
+        padding: 12px;
+    }
+
+    .cotizacion-contactar-button,
+    .cotizacion-dashboard-button {
+        width: 100%;
+
+        min-height: 42px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE MUY PEQUEÑO
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .respuestas-modal-header {
+        padding: 15px 13px;
+    }
+
+    .respuestas-modal-content {
+        padding: 9px;
+    }
+
+    .respuesta-card {
+        padding: 12px;
+    }
+
+    .respuesta-card-info {
+        gap: 9px;
+    }
+
+    .respuesta-logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .respuesta-company-info h3 {
+        font-size: 0.84rem;
+    }
+
+    .respuesta-company-info p {
+        font-size: 0.7rem;
+    }
+
+    .cotizacion-detalle-content {
+        padding: 15px 10px;
+    }
+
+    .cotizacion-detalle-title h2 {
+        font-size: 1.12rem;
+    }
+
+    .precio-row {
+        padding: 11px 12px;
+    }
+}
+
+
+/* =========================================================
+   ACCESIBILIDAD
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .respuestas-modal-overlay,
+    .respuestas-modal,
+    .cotizacion-detalle-modal {
+        animation: none;
+    }
+
+    .respuesta-card,
+    .respuesta-detalles-button,
+    .respuestas-modal-close,
+    .cotizacion-contactar-button {
+        transition: none;
+    }
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    .respuestas-modal-overlay {
+        position: static;
+
+        padding: 0;
+
+        background: white;
+    }
+
+    .respuestas-modal,
+    .cotizacion-detalle-modal {
+        max-height: none;
+
+        box-shadow: none;
+    }
+
+    .respuestas-modal-close,
+    .respuestas-modal-footer,
+    .cotizacion-detalle-footer {
+        display: none;
+    }
+}
