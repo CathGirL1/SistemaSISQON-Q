@@ -596,6 +596,155 @@ export class CotizacionRepository {
   }
 
   // ====================================================
+  // OBTENER COTIZACIONES FINALIZADAS POR CLIENTE
+  // ====================================================
+
+  public async obtenerCotizacionesFinalizadasPorCliente(
+    idCliente: number
+  ) {
+    const pool = await connectDB();
+
+    const result = await pool
+      .request()
+      .input(
+        "idCliente",
+        sql.Int,
+        idCliente
+      )
+      .query(`
+        WITH CotizacionesVersionadas AS (
+          SELECT
+            c.id_Cotizacion AS idCotizacion,
+            c.id_Proyecto AS idProyecto,
+            c.id_Empresa AS idEmpresa,
+            e.nombreEmpresa AS nombreEmpresa,
+            e.logo AS logoEmpresa,
+            e.impuestos AS impuestos,
+            e.telefono AS telefonoEmpresa,
+
+            CONCAT(
+              'COT-',
+              YEAR(c.fechaCreacion),
+              '-',
+              RIGHT(
+                '0000' +
+                CAST(
+                  c.id_Cotizacion AS VARCHAR(10)
+                ),
+                4
+              )
+            ) AS codigo,
+
+            c.fechaRealizada,
+            c.fechaCreacion,
+            c.fechaActualizacion,
+            c.version,
+
+            c.costoMateriales,
+            c.costoManoObra,
+            c.costoManoObraAdicional,
+
+            c.subtotal,
+            c.porcentajeIVAAplicado,
+            c.montoIVA,
+
+            c.totalCotizacion,
+            c.tipoCambioUSD,
+            c.totalUYU,
+
+            c.estado,
+            c.precioEstimado,
+            c.observaciones,
+
+            p.id_Cliente AS idCliente,
+            p.id_TipoObra AS idTipoObra,
+            p.nombre AS nombreProyecto,
+            p.descripcion AS descripcionProyecto,
+            p.ubicacion,
+            p.alto,
+            p.ancho,
+            p.largo,
+
+            CAST(
+              p.ancho * p.largo
+              AS DECIMAL(18, 2)
+            ) AS superficie,
+
+            ROW_NUMBER() OVER (
+              PARTITION BY c.id_Proyecto
+              ORDER BY
+                c.version DESC,
+                c.fechaCreacion DESC,
+                c.id_Cotizacion DESC
+            ) AS numeroFila
+
+          FROM Cotizacion c
+
+          INNER JOIN Proyecto p
+            ON p.id_Proyecto = c.id_Proyecto
+
+          LEFT JOIN Empresa e
+            ON e.id_Empresa = c.id_Empresa
+
+          WHERE
+            p.id_Cliente = @idCliente
+            AND c.estado = 'Finalizada'
+        )
+
+        SELECT
+          idCotizacion,
+          idProyecto,
+          idEmpresa,
+          nombreEmpresa,
+          telefonoEmpresa,
+          logoEmpresa,
+          impuestos,
+
+          codigo,
+          fechaRealizada,
+          fechaCreacion,
+          fechaActualizacion,
+          version,
+
+          costoMateriales,
+          costoManoObra,
+          costoManoObraAdicional,
+
+          subtotal,
+          porcentajeIVAAplicado,
+          montoIVA,
+
+          totalCotizacion,
+          tipoCambioUSD,
+          totalUYU,
+
+          estado,
+          precioEstimado,
+          observaciones,
+
+          idCliente,
+          idTipoObra,
+          nombreProyecto,
+          descripcionProyecto,
+          ubicacion,
+          alto,
+          ancho,
+          largo,
+          superficie
+
+        FROM CotizacionesVersionadas
+
+        WHERE numeroFila = 1
+
+        ORDER BY
+          fechaCreacion DESC,
+          idCotizacion DESC
+      `);
+
+    return result.recordset;
+  }
+
+  // ====================================================
   // OBTENER COTIZACIONES POR PROYECTO
   // ====================================================
 

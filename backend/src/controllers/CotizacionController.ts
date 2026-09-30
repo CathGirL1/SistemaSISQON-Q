@@ -397,6 +397,37 @@ export class CotizacionController {
     }
   };
 
+  // =========================================================
+  // GET /api/cotizaciones/cliente/:idCliente/finalizadas
+  // =========================================================
+
+  public obtenerCotizacionesFinalizadasPorCliente = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idCliente = Number(req.params.idCliente);
+
+      const cotizaciones =
+        await this.service.obtenerCotizacionesFinalizadasPorCliente(
+          idCliente
+        );
+
+      res.status(200).json(cotizaciones);
+    } catch (error: unknown) {
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al obtener las cotizaciones finalizadas";
+
+      console.error(error);
+
+      res.status(400).json({
+        mensaje,
+      });
+    }
+  };
+
   public seleccionarPropuesta = async (
     req: Request,
     res: Response

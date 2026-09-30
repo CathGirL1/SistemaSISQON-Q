@@ -1555,6 +1555,30 @@ export class CotizacionService {
 
 
     // =========================================================
+    // OBTENER COTIZACIONES FINALIZADAS POR CLIENTE
+    // =========================================================
+
+    public async obtenerCotizacionesFinalizadasPorCliente(
+        idCliente: number
+    ) {
+        this.validarId(
+            idCliente,
+            "El id del cliente no es válido"
+        );
+
+        const cotizaciones =
+            await this.repository
+                .obtenerCotizacionesFinalizadasPorCliente(
+                    idCliente
+                );
+
+        return this.agregarConversionMonetaria(
+            cotizaciones
+        );
+    }
+
+
+    // =========================================================
     // VALIDAR ID
     // =========================================================
 

@@ -50,6 +50,11 @@ router.post(
 );
 
 router.get(
+  "/cliente/:idCliente/finalizadas",
+  controller.obtenerCotizacionesFinalizadasPorCliente
+);
+
+router.get(
     "/estadisticas/cliente/:idCliente",
     controller.obtenerEstadisticasCliente
 );
