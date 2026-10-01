@@ -10,7 +10,6 @@ import TipoObraDetallePanel from "./TipoObraDetallePanel";
 
 import TipoObraModal from "./TipoObraModal";
 import ObservacionesTipoObraModal from "./ObservacionesTipoObraModal";
-import ConfirmEliminarTipoObraModal from "./ConfirmEliminarTipoObraModal";
 
 import useTiposObra from "../../../hooks/useTiposObra";
 
@@ -32,7 +31,6 @@ export default function TiposObraEmpresaContenido() {
 
     modalTipoObra,
     modalObservaciones,
-    modalEliminar,
 
     cargando,
     guardando,
@@ -44,30 +42,24 @@ export default function TiposObraEmpresaContenido() {
 
     seleccionarTipoObra,
     limpiarSeleccion,
-    abrirCrear,
     abrirEditar,
     abrirObservaciones,
-    abrirEliminar,
 
     cerrarModales,
     cerrarToast,
 
     guardarTipoObra,
-    duplicarTipoObra,
     cambiarEstado,
-    eliminarTipoObra,
   } = useTiposObra();
 
   return (
     <section className="tipos-obra-page">
       <PageHeader
         title="Gestión de tipos de obra"
-        subtitle="Configura los tipos de obra que el sistema puede cotizar y sus parámetros."
-        buttonText="Agregar tipo de obra"
-        onButtonClick={abrirCrear}
+        subtitle="Consulta los tipos de obra disponibles y administra su estado."
       />
 
-    <TiposObraKPIs tiposObra={tiposObra} />
+      <TiposObraKPIs tiposObra={tiposObra} />
 
       <TiposObraFiltros
         busqueda={busqueda}
@@ -96,9 +88,7 @@ export default function TiposObraEmpresaContenido() {
             onSeleccionarTipo={seleccionarTipoObra}
             onEditar={abrirEditar}
             onObservaciones={abrirObservaciones}
-            onDuplicar={duplicarTipoObra}
             onCambiarEstado={cambiarEstado}
-            onEliminar={abrirEliminar}
           />
 
           {tipoSeleccionado &&
@@ -112,7 +102,9 @@ export default function TiposObraEmpresaContenido() {
           ) : (
             <div className="tipo-obra-detalle-vacio">
               <h3>Seleccioná un tipo de obra</h3>
-              <p>Elegí un registro de la tabla para visualizar su información.</p>
+              <p>
+                Elegí un registro de la tabla para visualizar su información.
+              </p>
             </div>
           )}
         </div>
@@ -131,13 +123,6 @@ export default function TiposObraEmpresaContenido() {
         abierto={modalObservaciones}
         tipoObra={tipoAccion}
         onCerrar={cerrarModales}
-      />
-
-      <ConfirmEliminarTipoObraModal
-        abierto={modalEliminar}
-        tipoObra={tipoAccion}
-        onCerrar={cerrarModales}
-        onConfirmar={eliminarTipoObra}
       />
 
       <Toast

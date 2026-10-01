@@ -19,27 +19,18 @@ type Props = {
     tipoObra: TipoObraEmpresa
   ) => void;
 
-  onDuplicar: (
-    tipoObra: TipoObraEmpresa
-  ) => void;
-
   onCambiarEstado: (
     tipoObra: TipoObraEmpresa
   ) => void;
-
-  onEliminar: (
-    tipoObra: TipoObraEmpresa
-  ) => void;
 };
+
 export default function TablaTiposObra({
   tiposObra,
   tipoSeleccionado,
   onSeleccionarTipo,
   onEditar,
   onObservaciones,
-  onDuplicar,
   onCambiarEstado,
-  onEliminar,
 }: Props) {
   return (
     <div className="tabla-tipos-obra-card">
@@ -64,9 +55,7 @@ export default function TablaTiposObra({
                 onSeleccionar={() => onSeleccionarTipo(tipoObra)}
                 onEditar={onEditar}
                 onObservaciones={onObservaciones}
-                onDuplicar={onDuplicar}
                 onCambiarEstado={onCambiarEstado}
-                onEliminar={onEliminar}
               />
             ))}
           </tbody>

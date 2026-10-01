@@ -32,7 +32,6 @@ type ErroresFormulario = {
   nombre?: string;
   descripcion?: string;
   tiempoAproximado?: string;
-  manoObra?: string;
   extras?: string;
   observaciones?: string;
 };
@@ -127,9 +126,6 @@ export default function TipoObraModal({
     const tiempo =
       formulario.tiempoAproximado.trim();
 
-    const manoObra =
-      formulario.manoObra.trim();
-
     const extras =
       formulario.extras.trim();
 
@@ -157,10 +153,6 @@ export default function TipoObraModal({
         "Ingresá un valor como “10 días” o “10 a 20 días”.";
     }
 
-    if (manoObra.length > 500) {
-      nuevosErrores.manoObra =
-        "La mano de obra no puede superar los 500 caracteres.";
-    }
 
     if (extras.length > 1000) {
       nuevosErrores.extras =
@@ -257,19 +249,12 @@ export default function TipoObraModal({
             Nombre
           </label>
 
-          <input
-            id="nombreTipoObra"
-            type="text"
-            value={formulario.nombre}
-            maxLength={50}
-            disabled={guardando}
-            onChange={(event) =>
-              actualizarCampo(
-                "nombre",
-                event.target.value
-              )
-            }
-          />
+        <input
+          id="nombreTipoObra"
+          type="text"
+          value={formulario.nombre}
+          disabled
+        />
 
           {errores.nombre && (
             <small className="campo-error">
@@ -410,36 +395,6 @@ export default function TipoObraModal({
           </select>
         </div>
 
-        <div className="full">
-          <label htmlFor="manoObraTipoObra">
-            Mano de obra
-          </label>
-
-          <textarea
-            id="manoObraTipoObra"
-            value={formulario.manoObra}
-            maxLength={500}
-            disabled={guardando}
-            placeholder="Describe los perfiles o la cantidad aproximada de trabajadores."
-            onChange={(event) =>
-              actualizarCampo(
-                "manoObra",
-                event.target.value
-              )
-            }
-          />
-
-          <div className="campo-contador">
-            {formulario.manoObra.length}
-            /500
-          </div>
-
-          {errores.manoObra && (
-            <small className="campo-error">
-              {errores.manoObra}
-            </small>
-          )}
-        </div>
 
         <div className="full">
           <label htmlFor="extrasTipoObra">

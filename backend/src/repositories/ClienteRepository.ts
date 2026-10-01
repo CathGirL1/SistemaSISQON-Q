@@ -22,6 +22,7 @@ export class ClienteRepository {
         c.ciudad,
         c.estado,
         c.notas,
+        c.logo,
 
         u.nombreUsuario,
         u.gmail,
@@ -57,7 +58,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
-
+          c.logo,
           u.nombreUsuario,
           u.gmail,
           u.telefono,
@@ -87,6 +88,7 @@ export class ClienteRepository {
           c.ciudad,
           c.estado,
           c.notas,
+          c.logo,
           u.nombreUsuario,
           u.gmail,
           u.telefono,

@@ -1,3 +1,4 @@
+
 .tabla-clientes-card {
   background: white;
   border-radius: 22px;
@@ -112,14 +113,11 @@
 
 .clientes-estado-tabla {
   min-height: 260px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   padding: 2rem;
-
   text-align: center;
   color: #64748b;
 }
@@ -127,11 +125,9 @@
 .clientes-spinner {
   width: 42px;
   height: 42px;
-
   border: 4px solid #e2e8f0;
   border-top-color: #42b48a;
   border-radius: 50%;
-
   animation: clientes-girar 0.8s linear infinite;
 }
 
@@ -148,7 +144,6 @@
 .clientes-estado-tabla.clientes-error {
   border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 16px;
-
   background: rgba(239, 68, 68, 0.05);
 }
 
@@ -159,15 +154,15 @@
 
 .clientes-tabla-vacia {
   height: 180px;
-
   text-align: center !important;
   color: #64748b !important;
 }
 
+/* Columna de acciones */
 .tabla-clientes th:last-child,
 .tabla-clientes td:last-child {
-  width: 230px;
-  min-width: 230px;
+  width: 250px;
+  min-width: 250px;
   white-space: nowrap;
 }
 
@@ -181,22 +176,7 @@
   align-items: center;
   justify-content: flex-start;
   flex-wrap: nowrap;
-
   width: max-content;
   min-width: max-content;
-
   gap: 0.45rem;
-}
-
-.tabla-clientes .cliente-menu {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 34px;
-  height: 34px;
-
-  flex: 0 0 34px;
-
-  position: relative;
 }

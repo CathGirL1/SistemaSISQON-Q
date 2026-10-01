@@ -1,19 +1,31 @@
-import { FaEdit, FaRegCommentDots, FaClock } from "react-icons/fa";
+import {
+  FaEdit,
+  FaRegCommentDots,
+  FaExchangeAlt,
+  FaClock,
+} from "react-icons/fa";
 
 import type { TipoObraEmpresa } from "../../../interfaces/TipoObraEmpresa";
 import TipoObraEstadoBadge from "./TipoObraEstadoBadge";
-import MenuAccionesTipoObra from "./MenuAccionesTipoObra";
 import IconoTipoObra from "./IconoTipoObra";
 
 type Props = {
   tipoObra: TipoObraEmpresa;
   activo: boolean;
+
   onSeleccionar: () => void;
-  onEditar: (tipoObra: TipoObraEmpresa) => void;
-  onObservaciones: (tipoObra: TipoObraEmpresa) => void;
-  onDuplicar: (tipoObra: TipoObraEmpresa) => void;
-  onCambiarEstado: (tipoObra: TipoObraEmpresa) => void;
-  onEliminar: (tipoObra: TipoObraEmpresa) => void;
+
+  onEditar: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
+
+  onObservaciones: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
+
+  onCambiarEstado: (
+    tipoObra: TipoObraEmpresa
+  ) => void;
 };
 
 export default function FilaTipoObra({
@@ -22,9 +34,7 @@ export default function FilaTipoObra({
   onSeleccionar,
   onEditar,
   onObservaciones,
-  onDuplicar,
   onCambiarEstado,
-  onEliminar,
 }: Props) {
   return (
     <tr
@@ -44,7 +54,9 @@ export default function FilaTipoObra({
         </div>
       </td>
 
-      <td>{tipoObra.descripcion}</td>
+      <td>
+        {tipoObra.descripcion}
+      </td>
 
       <td>
         <span className="tipo-obra-tiempo">
@@ -59,7 +71,9 @@ export default function FilaTipoObra({
 
       <td onClick={(evento) => evento.stopPropagation()}>
         <div className="tipo-obra-acciones">
+
           <button
+            type="button"
             title="Editar"
             onClick={() => onEditar(tipoObra)}
           >
@@ -67,17 +81,21 @@ export default function FilaTipoObra({
           </button>
 
           <button
+            type="button"
             title="Observaciones"
             onClick={() => onObservaciones(tipoObra)}
           >
             <FaRegCommentDots />
           </button>
 
-          <MenuAccionesTipoObra
-            onDuplicar={() => onDuplicar(tipoObra)}
-            onCambiarEstado={() => onCambiarEstado(tipoObra)}
-            onEliminar={() => onEliminar(tipoObra)}
-          />
+          <button
+            type="button"
+            title="Cambiar estado"
+            onClick={() => onCambiarEstado(tipoObra)}
+          >
+            <FaExchangeAlt />
+          </button>
+
         </div>
       </td>
     </tr>
