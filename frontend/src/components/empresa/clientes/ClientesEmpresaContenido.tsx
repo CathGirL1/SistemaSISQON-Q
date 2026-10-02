@@ -45,6 +45,8 @@ export default function ClientesEmpresaContenido() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("");
   const [filtroCiudad, setFiltroCiudad] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const CLIENTES_POR_PAGINA = 5;
   const [modalCrear, setModalCrear] = useState(false);
   const [modalEstado, setModalEstado] = useState(false);
   const [modalNota, setModalNota] = useState(false);
@@ -188,6 +190,35 @@ export default function ClientesEmpresaContenido() {
     );
     }
   );
+
+  const totalPaginas = Math.max(
+  1,
+  Math.ceil(
+    clientesFiltrados.length / CLIENTES_POR_PAGINA
+  )
+  );
+
+  const indiceInicio =
+    (paginaActual - 1) * CLIENTES_POR_PAGINA;
+
+  const indiceFin =
+    indiceInicio + CLIENTES_POR_PAGINA;
+
+  const clientesPaginados =
+    clientesFiltrados.slice(
+      indiceInicio,
+      indiceFin
+  );
+
+  useEffect(() => {
+  setPaginaActual(1);
+  }, [busqueda, filtroEstado, filtroCiudad]);
+
+  useEffect(() => {
+  if (paginaActual > totalPaginas) {
+    setPaginaActual(totalPaginas);
+  }
+  }, [paginaActual, totalPaginas]);
 
   const limpiarFiltros = () => {
   setBusqueda("");
@@ -566,10 +597,15 @@ export default function ClientesEmpresaContenido() {
 
       <div className="clientes-main-grid">
         <TablaClientes
-          clientes={clientesFiltrados}
+          clientes={clientesPaginados}
           clienteSeleccionado={clienteSeleccionado}
           cargando={cargando}
           error={error}
+          paginaActual={paginaActual}
+          clientesPorPagina={CLIENTES_POR_PAGINA}
+          totalClientes={clientesFiltrados.length}
+          totalPaginas={totalPaginas}
+          onPageChange={setPaginaActual}
           onSeleccionarCliente={seleccionarCliente}
           onWhatsapp={abrirWhatsapp}
           onCambiarEstado={abrirCambiarEstado}

@@ -3,6 +3,7 @@ import "../../../styles/empresa/clientes/TablaClientes.css";
 import FilaCliente from "./FilaCliente";
 
 import type { ClienteEmpresa } from "../../../interfaces/ClienteEmpresa";
+import PanelPagination from "../../common/PanelPagination";
 
 type Props = {
   clientes: ClienteEmpresa[];
@@ -10,6 +11,12 @@ type Props = {
 
   cargando: boolean;
   error: string;
+
+  paginaActual: number;
+  clientesPorPagina: number;
+  totalClientes: number;
+  totalPaginas: number;
+  onPageChange: (page: number) => void;
 
   onSeleccionarCliente: (
     cliente: ClienteEmpresa
@@ -28,6 +35,13 @@ export default function TablaClientes({
   clienteSeleccionado,
   cargando,
   error,
+
+  paginaActual,
+  clientesPorPagina,
+  totalClientes,
+  totalPaginas,
+  onPageChange,
+
   onSeleccionarCliente,
   onWhatsapp,
   onCambiarEstado,
@@ -35,7 +49,7 @@ export default function TablaClientes({
   onLlamar,
   onVerHistorial,
   onEliminar,
-}: Props) {
+  }: Props) {
   if (cargando) {
     return (
       <div className="tabla-clientes-card">
@@ -113,9 +127,24 @@ export default function TablaClientes({
       </div>
 
       <div className="clientes-table-footer">
-        {clientes.length === 0
-          ? "No hay clientes para mostrar"
-          : `Mostrando 1 a ${clientes.length} de ${clientes.length} clientes`}
+        <span>
+          {totalClientes === 0
+            ? "No hay clientes para mostrar"
+            : `Mostrando ${
+                (paginaActual - 1) * clientesPorPagina + 1
+              } a ${Math.min(
+                paginaActual * clientesPorPagina,
+                totalClientes
+              )} de ${totalClientes} clientes`}
+        </span>
+
+        {totalClientes > 0 && (
+          <PanelPagination
+            currentPage={paginaActual}
+            totalPages={totalPaginas}
+            onPageChange={onPageChange}
+          />
+        )}
       </div>
     </div>
   );

@@ -99,8 +99,18 @@
 
 .clientes-table-footer {
   margin-top: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
   color: #64748b;
   font-size: 0.9rem;
+}
+
+.clientes-table-footer .panel-pagination {
+  margin: 0;
 }
 
 .tabla-clientes tbody tr {
