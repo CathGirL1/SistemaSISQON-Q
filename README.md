@@ -48,6 +48,20 @@ SISCON-Q nace para automatizar y ordenar este proceso.
 - Menos consultas repetitivas gracias al asistente de IA.
 - Toda la información de clientes, materiales y cotizaciones centralizada en una sola plataforma.
 
+### Tipos de obra contemplados
+
+A lo largo del desarrollo, el sistema fue ampliando su alcance. Además de la cotización de obras de construcción y de quinchos, se incorporó la presupuestación de reformas y de requinchos.
+
+Estos tipos de obra guardan una estrecha relación entre sí; no obstante, cada estimación cuenta con su propio cálculo y responde de manera diferente al proceso de presupuestación, ya que cada tipo de obra posee características propias.
+
+¿Qué se logra con el sistema?
+Presupuestos en tiempo real, con mucho menos tiempo de espera.
+Menos errores de cálculo.
+Presupuestos más estandarizados y consistentes.
+Información más clara e inmediata para decidir y comparar opciones.
+Menos consultas repetitivas gracias al asistente de IA.
+Toda la información de clientes, materiales y cotizaciones centralizada en una sola plataforma.
+
 Esta guía explica, paso a paso, cómo instalar y poner en marcha el sistema.
 
 ---
