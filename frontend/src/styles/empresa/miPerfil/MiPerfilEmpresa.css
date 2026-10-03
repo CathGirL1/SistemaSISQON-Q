@@ -1,63 +1,73 @@
 .perfil-empresa-page {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
+
+/* =========================
+   HEADER
+========================= */
 
 .perfil-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+
+  margin-bottom: 1.5rem;
 }
 
 .perfil-header h1 {
   margin: 0;
+
   color: #08255b;
   font-size: 2rem;
 }
 
 .perfil-header p {
   margin: 0.4rem 0 0;
+
   color: #64748b;
 }
 
-.perfil-header-btn {
-  border: none;
-  background: #42b48a;
-  color: white;
-  padding: 0.9rem 1.4rem;
-  border-radius: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 8px 18px rgba(66, 180, 138, 0.25);
-}
+/* =========================
+   SECCIONES DEL PERFIL
+========================= */
 
-.perfil-grid {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 1.5rem;
-}
-
-.perfil-left,
-.perfil-right {
+.perfil-secciones {
   display: flex;
   flex-direction: column;
+
+  width: 100%;
   gap: 1.5rem;
 }
 
-@media (max-width: 1200px) {
-  .perfil-grid {
-    grid-template-columns: 1fr;
-  }
+/* Cada sección utiliza todo
+   el ancho disponible */
+.perfil-secciones > * {
+  width: 100%;
+  max-width: 100%;
+
+  box-sizing: border-box;
 }
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width: 768px) {
   .perfil-header {
     flex-direction: column;
     align-items: flex-start;
+
     gap: 1rem;
+    margin-bottom: 1.25rem;
   }
 
   .perfil-header h1 {
     font-size: 1.6rem;
+  }
+
+  .perfil-secciones {
+    gap: 1rem;
   }
 }
