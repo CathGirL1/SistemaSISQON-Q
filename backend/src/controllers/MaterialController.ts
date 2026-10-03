@@ -66,6 +66,34 @@ export class MaterialController {
     }
   };
 
+  public obtenerAlternativasMaterial = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const idMaterial = this.convertirId(
+        req.params.idMaterial
+      );
+
+      const alternativas =
+        await this.service.obtenerAlternativasMaterial(
+          idMaterial
+        );
+
+      res.status(200).json({
+        success: true,
+        alternativas,
+      });
+    } catch (error) {
+      const mensaje = this.obtenerMensajeError(error);
+
+      res.status(400).json({
+        success: false,
+        mensaje,
+      });
+    }
+  };
+
   public crearMaterial = async (
     req: Request,
     res: Response

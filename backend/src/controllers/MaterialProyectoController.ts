@@ -73,6 +73,72 @@ export class MaterialProyectoController {
         }
     }
 
+    public async obtenerComparacionMateriales(
+        req: Request,
+        res: Response
+    ) {
+        try {
+            const idProyecto =
+                Number(req.params.idProyecto);
+
+            const comparacion =
+                await service.obtenerComparacionMateriales(
+                    idProyecto
+                );
+
+            return res.status(200).json({
+                success: true,
+                idProyecto,
+                comparacion
+            });
+
+        } catch (error) {
+            const mensaje =
+                error instanceof Error
+                    ? error.message
+                    : "No se pudo obtener la comparación de materiales";
+
+            return res.status(400).json({
+                success: false,
+                mensaje
+            });
+        }
+    }
+
+    public async usarMaterialAlternativo(
+        req: Request,
+        res: Response
+    ) {
+        try {
+            const idMaterialProyecto =
+                Number(req.params.idMaterialProyecto);
+
+            const { idMaterialAlternativo } = req.body;
+
+            const resultado =
+                await service.usarMaterialAlternativo(
+                    idMaterialProyecto,
+                    Number(idMaterialAlternativo)
+                );
+
+            return res.status(200).json({
+                success: true,
+                mensaje: "Material alternativo aplicado correctamente",
+                ...resultado
+            });
+
+        } catch (error) {
+            const mensaje =
+                error instanceof Error
+                    ? error.message
+                    : "No se pudo aplicar el material alternativo";
+
+            return res.status(400).json({
+                success: false,
+                mensaje
+            });
+        }
+    }
 
     public async actualizarCantidad(
         req: Request,
