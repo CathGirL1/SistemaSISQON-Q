@@ -1,21 +1,53 @@
 import "../../../styles/empresa/manoObra/TablaManoObra.css";
 
 import type { ManoObraEmpresa } from "../../../interfaces/ManoObraEmpresa";
+
 import FilaManoObra from "./FilaManoObra";
+import PanelPagination from "../../common/PanelPagination";
 
 type Props = {
   trabajos: ManoObraEmpresa[];
+
+  paginaActual: number;
+  trabajosPorPagina: number;
+  totalTrabajos: number;
+  totalPaginas: number;
+
+  onPageChange: (page: number) => void;
+
   onEditar: (trabajo: ManoObraEmpresa) => void;
-  onCambiarEstado: (trabajo: ManoObraEmpresa) => void;
-  onEliminar: (trabajo: ManoObraEmpresa) => void;
+
+  onCambiarEstado: (
+    trabajo: ManoObraEmpresa
+  ) => void;
+
+  onEliminar: (
+    trabajo: ManoObraEmpresa
+  ) => void;
 };
 
 export default function TablaManoObra({
   trabajos,
+
+  paginaActual,
+  trabajosPorPagina,
+  totalTrabajos,
+  totalPaginas,
+
+  onPageChange,
+
   onEditar,
   onCambiarEstado,
   onEliminar,
 }: Props) {
+  const primerRegistro =
+    (paginaActual - 1) * trabajosPorPagina + 1;
+
+  const ultimoRegistro = Math.min(
+    paginaActual * trabajosPorPagina,
+    totalTrabajos
+  );
+
   return (
     <div className="tabla-mano-obra-card">
       <div className="tabla-mano-obra-wrapper">
@@ -59,23 +91,25 @@ export default function TablaManoObra({
       </div>
 
       <div className="mano-obra-table-footer">
-        {trabajos.length === 0 ? (
-          <span>No hay trabajos para mostrar.</span>
+        {totalTrabajos === 0 ? (
+          <span>
+            No hay trabajos para mostrar.
+          </span>
         ) : (
           <span>
-            Mostrando 1 a {trabajos.length} de {trabajos.length} trabajos
+            Mostrando {primerRegistro} a{" "}
+            {ultimoRegistro} de{" "}
+            {totalTrabajos} trabajos
           </span>
         )}
 
-        <div className="mano-obra-paginacion">
-          <button type="button">‹</button>
-          <button type="button" className="active">
-            1
-          </button>
-          <button type="button">2</button>
-          <button type="button">3</button>
-          <button type="button">›</button>
-        </div>
+        {totalTrabajos > 0 && (
+          <PanelPagination
+            currentPage={paginaActual}
+            totalPages={totalPaginas}
+            onPageChange={onPageChange}
+          />
+        )}
       </div>
     </div>
   );

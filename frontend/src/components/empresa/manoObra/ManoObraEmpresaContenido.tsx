@@ -1,5 +1,7 @@
 import "../../../styles/empresa/manoObra/ManoObraEmpresa.css";
 
+import { useEffect, useState } from "react";
+
 import ConfirmEliminarManoObra from "./ConfirmEliminarManoObra";
 import ManoObraFiltros from "./ManoObraFiltros";
 import ManoObraKPIs from "./ManoObraKPIs";
@@ -51,6 +53,56 @@ export default function ManoObraEmpresaContenido() {
     cerrarToast,
   } = useManoObra();
 
+  /* =========================
+     PAGINACIÓN
+  ========================= */
+
+  const [paginaActual, setPaginaActual] = useState(1);
+
+  const TRABAJOS_POR_PAGINA = 5;
+
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(
+      trabajosFiltrados.length / TRABAJOS_POR_PAGINA
+    )
+  );
+
+  const indiceInicio =
+    (paginaActual - 1) * TRABAJOS_POR_PAGINA;
+
+  const indiceFin =
+    indiceInicio + TRABAJOS_POR_PAGINA;
+
+  const trabajosPaginados =
+    trabajosFiltrados.slice(
+      indiceInicio,
+      indiceFin
+    );
+
+  /*
+   * Al cambiar algún filtro volvemos
+   * automáticamente a la primera página.
+   */
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [
+    busqueda,
+    categoriaFiltro,
+    unidadFiltro,
+    estadoFiltro,
+  ]);
+
+  /*
+   * Evita quedar en una página inexistente
+   * si disminuye la cantidad de registros.
+   */
+  useEffect(() => {
+    if (paginaActual > totalPaginas) {
+      setPaginaActual(totalPaginas);
+    }
+  }, [paginaActual, totalPaginas]);
+
   const manejarCambioEstadoFiltro = (valor: string) => {
     if (
       valor === "Todos" ||
@@ -88,7 +140,10 @@ export default function ManoObraEmpresaContenido() {
           className="mano-obra-error"
           role="alert"
         >
-          <strong>No se pudo cargar la información.</strong>
+          <strong>
+            No se pudo cargar la información.
+          </strong>
+
           <span>{error}</span>
         </div>
       )}
@@ -103,7 +158,12 @@ export default function ManoObraEmpresaContenido() {
         </div>
       ) : (
         <TablaManoObra
-          trabajos={trabajosFiltrados}
+          trabajos={trabajosPaginados}
+          paginaActual={paginaActual}
+          trabajosPorPagina={TRABAJOS_POR_PAGINA}
+          totalTrabajos={trabajosFiltrados.length}
+          totalPaginas={totalPaginas}
+          onPageChange={setPaginaActual}
           onEditar={abrirEditar}
           onCambiarEstado={cambiarEstado}
           onEliminar={abrirEliminar}
