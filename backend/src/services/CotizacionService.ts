@@ -287,8 +287,9 @@ export class CotizacionService {
                 materialesParaCotizacion
             );
 
-        let totalGeneralUSD =
-            resultado.totalGeneral;
+        let totalGeneralUSD = resultado.totalGeneral;
+        let totalMaterialesUSD = resultado.totalMateriales;
+        let manoDeObraUSD = resultado.manoDeObra;
 
         if (resultado.moneda === "UYU") {
 
@@ -297,8 +298,13 @@ export class CotizacionService {
                     .obtenerDolarAPesoUruguayo();
 
             totalGeneralUSD =
-                resultado.totalGeneral /
-                tipoCambio;
+                resultado.totalGeneral / tipoCambio;
+
+            totalMaterialesUSD =
+                resultado.totalMateriales / tipoCambio;
+
+            manoDeObraUSD =
+                resultado.manoDeObra / tipoCambio;
         }
         // =========================================
         // 7. Validar resultado
@@ -355,6 +361,22 @@ export class CotizacionService {
                 );
 
         if (borradorExistente) {
+
+            await this.repository.actualizarCotizacion(
+                borradorExistente.idCotizacion,
+                {
+                    costoMateriales: totalMaterialesUSD,
+
+                    costoManoObra: manoDeObraUSD,
+
+                    totalCotizacion:
+                        totalGeneralUSD,
+
+                    precioEstimado:
+                        totalGeneralUSD
+                }
+            );
+
             return borradorExistente.idCotizacion;
         }
 

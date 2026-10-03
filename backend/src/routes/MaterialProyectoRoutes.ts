@@ -15,6 +15,16 @@ router.get(
   controller.obtenerMaterialesPorProyecto.bind(controller)
 );
 
+router.get(
+  "/proyecto/:idProyecto/comparacion",
+  controller.obtenerComparacionMateriales.bind(controller)
+);
+
+router.put(
+  "/:idMaterialProyecto/usar-alternativa",
+  controller.usarMaterialAlternativo.bind(controller)
+);
+
 router.put(
   "/:idMaterialProyecto",
   controller.actualizarCantidad.bind(controller)

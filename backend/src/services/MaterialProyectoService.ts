@@ -2,12 +2,17 @@ import {
   type AgregarMaterialProyectoDTO,
 } from "../models/MaterialProyecto";
 
-import {MaterialProyectoRepository} from "../repositories/MaterialProyectoRepository"
+import { MaterialRepository } from "../repositories/MaterialRepository";
+import { CotizacionRepository } from "../repositories/CotizacionRepository";
+import { CotizacionService } from "./CotizacionService";
+import { MaterialProyectoRepository } from "../repositories/MaterialProyectoRepository"
 
 export class MaterialProyectoService {
   private repository = new MaterialProyectoRepository();
+  private materialRepository = new MaterialRepository();
+  private cotizacionRepository = new CotizacionRepository();
+  private cotizacionService = new CotizacionService();
 
-  
   public async agregarMaterial(
     data: AgregarMaterialProyectoDTO
   ) {
@@ -30,7 +35,7 @@ export class MaterialProyectoService {
     });
   }
 
-  
+
   public async obtenerMaterialesPorProyecto(
     idProyecto: number
   ) {
@@ -44,7 +49,113 @@ export class MaterialProyectoService {
     );
   }
 
-  
+  public async obtenerComparacionMateriales(
+    idProyecto: number
+  ) {
+    this.validarId(
+      idProyecto,
+      "El id del proyecto no es válido"
+    );
+
+    return this.repository.obtenerComparacionMateriales(
+      idProyecto
+    );
+  }
+
+  public async usarMaterialAlternativo(
+    idMaterialProyecto: number,
+    idMaterialAlternativo: number
+  ) {
+    this.validarId(
+      idMaterialProyecto,
+      "El id del material del proyecto no es válido"
+    );
+
+    this.validarId(
+      idMaterialAlternativo,
+      "El id del material alternativo no es válido"
+    );
+
+    // 1. Obtener el material actualmente utilizado
+    const materialProyecto =
+      await this.repository.obtenerMaterialProyectoPorId(
+        idMaterialProyecto
+      );
+
+    if (!materialProyecto) {
+      throw new Error(
+        "No se encontró el material dentro del proyecto"
+      );
+    }
+
+    // 2. La cotización debe continuar en Borrador
+    const borrador =
+      await this.cotizacionRepository
+        .obtenerCotizacionBorradorPorProyecto(
+          materialProyecto.idProyecto
+        );
+
+    if (!borrador) {
+      throw new Error(
+        "La cotización ya fue enviada o no existe un borrador modificable"
+      );
+    }
+
+    // 3. Obtener alternativas válidas del material actual
+    const alternativas =
+      await this.materialRepository
+        .obtenerAlternativasMaterial(
+          materialProyecto.idMaterial
+        );
+
+    const alternativaValida =
+      alternativas.find(
+        (material: any) =>
+          Number(material.id_Material) ===
+          idMaterialAlternativo
+      );
+
+    if (!alternativaValida) {
+      throw new Error(
+        "El material seleccionado no es una alternativa válida"
+      );
+    }
+
+    // 4. Aplicar alternativa al proyecto
+    const actualizado =
+      await this.repository.usarMaterialAlternativo(
+        idMaterialProyecto,
+        idMaterialAlternativo
+      );
+
+    if (!actualizado) {
+      throw new Error(
+        "No se pudo aplicar el material alternativo"
+      );
+    }
+
+    // 5. Recalcular el mismo borrador con la Strategy correspondiente
+    await this.cotizacionService.generarCotizacion(
+      materialProyecto.idProyecto
+    );
+
+    return {
+      actualizado: true,
+      idProyecto: materialProyecto.idProyecto,
+      idCotizacion: borrador.idCotizacion,
+      materialAnterior: {
+        idMaterial: materialProyecto.idMaterial,
+        nombre: materialProyecto.nombre,
+        costoUnitario: materialProyecto.costoUnitario
+      },
+      materialNuevo: {
+        idMaterial: alternativaValida.id_Material,
+        nombre: alternativaValida.nombre,
+        costoUnitario: alternativaValida.costoUnitario
+      }
+    };
+  }
+
   public async actualizarCantidad(
     idMaterialProyecto: number,
     cantidad: number
@@ -71,7 +182,7 @@ export class MaterialProyectoService {
     return actualizado;
   }
 
-  
+
   public async eliminarMaterial(
     idMaterialProyecto: number
   ) {
