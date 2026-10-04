@@ -937,24 +937,6 @@ export default function Comparador() {
                       </div>
 
 
-                      <div className="comparador-resumen-item">
-
-                        <span>
-                          Mano de obra
-                        </span>
-
-                        <strong>
-                          {formatearMoneda(
-                            Number(
-                              cotizacionBorrador
-                                .costoManoObra
-                            )
-                          )}
-                        </strong>
-
-                      </div>
-
-
                       <div className="comparador-resumen-item comparador-resumen-total">
 
                         <span>
@@ -988,7 +970,7 @@ export default function Comparador() {
                         type="button"
                         onClick={() =>
                           navigate(
-                            "/panel-cliente/mis-proyectos"
+                            "/panel-cliente/proyectos"
                           )
                         }
                       >
