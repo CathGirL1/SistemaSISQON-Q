@@ -54,7 +54,7 @@ export default function NavbarEmpresa({
             <p>Administrador</p>
           </div>
 
-          <FaChevronDown />
+         
         </div>
       </div>
     </header>

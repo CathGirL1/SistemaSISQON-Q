@@ -482,6 +482,148 @@
   animation: girar 1s linear infinite;
 }
 
+/* =====================================================
+   PAGINACIÓN DE COTIZACIONES
+   ===================================================== */
+
+.cotizaciones-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding: 16px 20px;
+
+  border-top: 1px solid #e5ebf3;
+
+  color: #60738f;
+  font-size: 13px;
+}
+
+.cotizaciones-pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  flex-shrink: 0;
+}
+
+.cotizaciones-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cotizaciones-pagination-controls button {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #0f3460;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.cotizaciones-pagination-controls button:hover:not(:disabled) {
+  background: #f3f7fc;
+  border-color: #b9cce2;
+}
+
+.cotizaciones-pagination-controls button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.cotizaciones-pagination-controls button.pagina-activa {
+  background: #0f3460;
+  border-color: #0f3460;
+  color: #ffffff;
+}
+
+.cotizaciones-pagination-controls button:disabled {
+  background: #f8fafc;
+  border-color: #e5e7eb;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   TABLETS
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .cotizaciones-pagination {
+    padding: 14px 16px;
+  }
+
+  .cotizaciones-pagination {
+    font-size: 12px;
+  }
+}
+
+/* =====================================================
+   CELULARES
+   ===================================================== */
+
+@media (max-width: 560px) {
+  .cotizaciones-pagination {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .cotizaciones-pagination-controls {
+    width: 100%;
+  }
+}
+
+/* =====================================================
+   CELULARES PEQUEÑOS
+   ===================================================== */
+
+@media (max-width: 380px) {
+  .cotizaciones-pagination {
+    padding: 12px 10px;
+  }
+
+  .cotizaciones-pagination-controls button {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+
+    font-size: 12px;
+  }
+
+  .cotizaciones-pagination-pages {
+    gap: 4px;
+  }
+}
+
 @keyframes girar {
   from {
     transform: rotate(0deg);

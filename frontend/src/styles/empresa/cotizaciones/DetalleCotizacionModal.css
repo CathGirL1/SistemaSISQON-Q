@@ -263,6 +263,304 @@
   white-space: normal;
 }
 
+
+/* =========================================================
+   EDICIÓN DE PROPUESTA
+   ========================================================= */
+
+.editar-propuesta {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.editar-propuesta .detalle-item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.editar-propuesta .detalle-item strong {
+  margin: 0;
+  color: #0f3460;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.editar-propuesta input,
+.editar-propuesta textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.editar-propuesta input {
+  min-height: 42px;
+  padding: 10px 12px;
+}
+
+.editar-propuesta textarea {
+  min-height: 100px;
+  padding: 11px 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.editar-propuesta input:focus,
+.editar-propuesta textarea:focus {
+  border-color: #0f3460;
+  box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1);
+}
+
+.editar-propuesta input:hover,
+.editar-propuesta textarea:hover {
+  border-color: #94a3b8;
+}
+
+/* Total dentro del formulario */
+
+.editar-propuesta .costo-total {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 2px;
+}
+
+/* Botones */
+
+.editar-propuesta > div:last-child {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.editar-propuesta > div:last-child button {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    opacity 0.2s ease;
+}
+
+/* =========================================================
+   BOTÓN EDITAR PROPUESTA
+   ========================================================= */
+
+.editar-propuesta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: auto;
+  max-width: 100%;
+  min-height: 42px;
+
+  padding: 10px 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #0f3460;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+
+  text-align: center;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.editar-propuesta-btn:hover {
+  background: #0b294d;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(15, 52, 96, 0.18);
+}
+
+.editar-propuesta-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.editar-propuesta-btn:focus-visible {
+  outline: 3px solid rgba(15, 52, 96, 0.2);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .editar-propuesta-btn {
+    min-height: 41px;
+    padding: 9px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 560px) {
+  .editar-propuesta-btn {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  .editar-propuesta-btn {
+    min-height: 40px;
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+}
+
+.editar-propuesta > div:last-child button:first-child {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.editar-propuesta > div:last-child button:last-child {
+  background: #0f3460;
+  color: #ffffff;
+}
+
+.editar-propuesta > div:last-child button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.editar-propuesta > div:last-child button:first-child:hover:not(:disabled) {
+  background: #cbd5e1;
+}
+
+.editar-propuesta > div:last-child button:last-child:hover:not(:disabled) {
+  background: #0b294d;
+}
+
+.editar-propuesta > div:last-child button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .editar-propuesta {
+    gap: 16px;
+  }
+
+  .editar-propuesta input {
+    min-height: 41px;
+  }
+
+  .editar-propuesta textarea {
+    min-height: 95px;
+  }
+
+  .editar-propuesta > div:last-child {
+    justify-content: stretch;
+  }
+
+  .editar-propuesta > div:last-child button {
+    flex: 1;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE - CELULAR
+   ========================================================= */
+
+@media (max-width: 560px) {
+  .editar-propuesta {
+    gap: 15px;
+  }
+
+  .editar-propuesta .detalle-item strong {
+    font-size: 12px;
+  }
+
+  .editar-propuesta input,
+  .editar-propuesta textarea {
+    font-size: 13px;
+  }
+
+  .editar-propuesta input {
+    min-height: 40px;
+    padding: 9px 10px;
+  }
+
+  .editar-propuesta textarea {
+    min-height: 90px;
+    padding: 10px;
+  }
+
+  .editar-propuesta > div:last-child {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .editar-propuesta > div:last-child button {
+    width: 100%;
+    min-height: 42px;
+  }
+}
+
+
+/* =========================================================
+   CELULAR MUY PEQUEÑO
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .editar-propuesta {
+    gap: 13px;
+  }
+
+  .editar-propuesta input,
+  .editar-propuesta textarea {
+    font-size: 12px;
+  }
+
+  .editar-propuesta > div:last-child button {
+    font-size: 12px;
+  }
+}
+
 /* =========================================================
    TOTAL
    ========================================================= */

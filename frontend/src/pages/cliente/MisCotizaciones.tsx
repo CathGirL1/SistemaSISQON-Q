@@ -27,6 +27,7 @@ import ActualizarCotizacion from "../../components/cliente/ActualizarCotizacion"
 import EnviarCotizacion from "../../components/cliente/EnviarCotizacion";
 import DescargarCotizacionPDF from "../../components/cliente/DescargarCotizacionPDF";
 import HeaderCliente from "../../components/cliente/HeaderCliente";
+import PaginacionCotizaciones from "../../pages/cliente/PaginacionCotizaicones";
 
 import {
   formatearPrecioUYU,
@@ -98,10 +99,21 @@ export default function MisCotizaciones() {
 
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const COTIZACIONES_POR_PAGINA = 4;
 
   useEffect(() => {
     obtenerCotizaciones();
   }, []);
+
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [
+    busqueda,
+    tipoSeleccionado,
+    estadoSeleccionado,
+    ordenFecha,
+  ]);
 
   const obtenerCotizaciones = async () => {
     try {
@@ -304,6 +316,38 @@ export default function MisCotizaciones() {
     cotizaciones,
     tiposObraProyectos,
   ]);
+
+  const totalPaginas = Math.ceil(
+    cotizacionesFiltradas.length / COTIZACIONES_POR_PAGINA
+  );
+
+  const indiceInicial =
+    (paginaActual - 1) * COTIZACIONES_POR_PAGINA;
+
+  const cotizacionesPaginadas =
+    cotizacionesFiltradas.slice(
+      indiceInicial,
+      indiceInicial + COTIZACIONES_POR_PAGINA
+    );
+
+  const desde =
+    cotizacionesFiltradas.length === 0
+      ? 0
+      : indiceInicial + 1;
+
+  const hasta = Math.min(
+    indiceInicial + COTIZACIONES_POR_PAGINA,
+    cotizacionesFiltradas.length
+  );
+
+  useEffect(() => {
+    if (
+      totalPaginas > 0 &&
+      paginaActual > totalPaginas
+    ) {
+      setPaginaActual(totalPaginas);
+    }
+  }, [paginaActual, totalPaginas]);
   // -----------------------------------------
   // ESTADÍSTICAS
   // -----------------------------------------
@@ -604,7 +648,7 @@ export default function MisCotizaciones() {
 
                   <tbody>
 
-                    {cotizacionesFiltradas.map(
+                    {cotizacionesPaginadas.map(
                       (cotizacion) => (
 
                         <tr
@@ -810,21 +854,14 @@ export default function MisCotizaciones() {
 
               {/* PAGINACIÓN */}
 
-              < footer className="cotizaciones-pagination" >
-
-                <span>
-
-                  Mostrando 1 a{" "}
-                  {
-                    cotizacionesFiltradas.length
-                  }{" "}
-                  de{" "}
-                  {cotizaciones.length}{" "}
-                  cotizaciones
-
-                </span>
-
-              </footer >
+              <PaginacionCotizaciones
+                paginaActual={paginaActual}
+                totalPaginas={totalPaginas}
+                totalResultados={cotizacionesFiltradas.length}
+                desde={desde}
+                hasta={hasta}
+                onCambiarPagina={setPaginaActual}
+              />
 
             </section >
 

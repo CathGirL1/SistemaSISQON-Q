@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import ProtectedRoutes from "./ProtectedRoutes";
+
 import Informacion from "../pages/Informacion";
 import Home from "../pages/Home";
 import Login from "../pages/Login"
@@ -42,6 +44,8 @@ import DetalleCotizacion from "../pages/cliente/DetalleCotizacion";
 import EditarCotizacion from "../pages/cliente/EditarCotizacion";
 
 
+
+
 export default function AppRoutes() {
   return (
     <>
@@ -49,11 +53,25 @@ export default function AppRoutes() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />}/>
-          <Route path="/panel-cliente" element={<PanelCliente />}/>
+          <Route path="/register" element={<Register />}/> 
+          <Route
+            path="/panel-cliente"
+            element={
+              <ProtectedRoutes rolPermitido="cliente">
+                <PanelCliente />
+              </ProtectedRoutes>
+            }
+          />
 
 
-          <Route path="/panel-empresa" element={<PanelEmpresa />}/>
+          <Route
+            path="/panel-empresa"
+            element={
+              <ProtectedRoutes rolPermitido="empresa">
+                <PanelEmpresa />
+              </ProtectedRoutes>
+            }
+          />
           <Route path="/recuperar-password" element={<RecuperarContrasenia />}/>
           <Route path="/informacion" element={<Informacion />} />
           <Route path="/empresa/dashboard" element={<DashboardEmpresa />} />
@@ -71,7 +89,7 @@ export default function AppRoutes() {
           <Route path="/panel-cliente/empresas" element={<Empresas />} />
           <Route path="/panel-cliente/perfil" element={<VerPerfilCliente />}/>
           
-          <Route path="/panel-cliente/asistente" element={<AsistenteIA />} />
+      
        
 
           <Route path="/panel-cliente/proyectos" element={<MisProyectos />} />
@@ -81,7 +99,7 @@ export default function AppRoutes() {
           <Route path="/panel-cliente/proyectos/:idProyecto" element={<DetalleProyecto />}/>
           <Route path="/panel-cliente/cotizaciones/:idCotizacion" element={<DetalleCotizacion />} />
           <Route path="/panel-cliente/cotizaciones/:idCotizacion/editar" element={<EditarCotizacion />}/>
-          <Route path="/panel-cliente/favoritas" element={<EmpresasFavoritas />} />
+         
           <Route path="/panel-cliente/asistente" element={<AsistenteIA />} />
 
         </Routes>

@@ -3,6 +3,10 @@ import "../../../styles/empresa/manoObra/TablaManoObra.css";
 import type { ManoObraEmpresa } from "../../../interfaces/ManoObraEmpresa";
 import FilaManoObra from "./FilaManoObra";
 
+import { useEffect, useState } from "react";
+
+import PaginacionManoObra from "./PaginacionManoObra";
+
 type Props = {
   trabajos: ManoObraEmpresa[];
   onEditar: (trabajo: ManoObraEmpresa) => void;
@@ -16,6 +20,31 @@ export default function TablaManoObra({
   onCambiarEstado,
   onEliminar,
 }: Props) {
+
+  const TRABAJOS_POR_PAGINA = 4;
+  const [paginaActual, setPaginaActual] = useState(1);
+
+  const totalPaginas = Math.ceil(trabajos.length / TRABAJOS_POR_PAGINA);
+  const trabajosPaginados = trabajos.slice(
+    (paginaActual - 1) * TRABAJOS_POR_PAGINA,
+    paginaActual * TRABAJOS_POR_PAGINA
+  );
+
+  const indiceInicial = (paginaActual - 1) * TRABAJOS_POR_PAGINA;
+
+  const desde = indiceInicial + 1;
+
+  const hasta = Math.min(
+    indiceInicial + TRABAJOS_POR_PAGINA,
+    trabajos.length
+  );
+
+    useEffect(() => {
+      if (paginaActual > totalPaginas && totalPaginas > 0) {
+        setPaginaActual(totalPaginas);
+      }
+    }, [paginaActual, totalPaginas]);
+
   return (
     <div className="tabla-mano-obra-card">
       <div className="tabla-mano-obra-wrapper">
@@ -35,7 +64,7 @@ export default function TablaManoObra({
 
           <tbody>
             {trabajos.length > 0 ? (
-              trabajos.map((trabajo) => (
+              trabajosPaginados.map((trabajo) => (
                 <FilaManoObra
                   key={trabajo.id}
                   trabajo={trabajo}
@@ -63,19 +92,15 @@ export default function TablaManoObra({
           <span>No hay trabajos para mostrar.</span>
         ) : (
           <span>
-            Mostrando 1 a {trabajos.length} de {trabajos.length} trabajos
+            Mostrando {desde} a {hasta} de {trabajos.length} trabajos
           </span>
         )}
 
-        <div className="mano-obra-paginacion">
-          <button type="button">‹</button>
-          <button type="button" className="active">
-            1
-          </button>
-          <button type="button">2</button>
-          <button type="button">3</button>
-          <button type="button">›</button>
-        </div>
+        <PaginacionManoObra
+          paginaActual={paginaActual}
+          totalPaginas={totalPaginas}
+          onCambiarPagina={setPaginaActual}
+        />
       </div>
     </div>
   );

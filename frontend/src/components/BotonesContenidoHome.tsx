@@ -13,14 +13,7 @@ export default function BotonesContenidoHome(){
 
             <div className="contenedor-botones">
 
-                <div className="boton-solicitarCotizacion">
-                    <FaClipboardList className="icono-cotizacion" />
-                    <div>
-                        <h3>Solicitar cotización</h3>
-                        <p>Cuéntanos tu proyecto</p>
-                    </div>
-                    
-                </div>
+                
                 <div className="boton-ingresarComoEmpresa" onClick={() => navegar("/login")}>
                    <FaBuilding className="icono-ingresarEmpresa" />
                     <div>

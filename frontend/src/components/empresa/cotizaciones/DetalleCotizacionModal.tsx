@@ -450,7 +450,7 @@ export default function DetalleCotizacionModal({
 
               </div>
 
-              <button
+              <button className="editar-propuesta-btn"
                 type="button"
                 onClick={() => setEditando(true)}
               >

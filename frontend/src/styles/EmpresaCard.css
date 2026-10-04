@@ -193,9 +193,9 @@
 ======================================== */
 
 .empresa-actions {
+  width: 100%;
   margin-top: 18px;
   padding-top: 14px;
-
   border-top: 1px solid #e5ebf3;
 }
 
@@ -206,11 +206,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 7px;
 
   border: 1px solid #d5e1ef;
   border-radius: 7px;
-
   background: #ffffff;
   color: #092c70;
 
@@ -344,4 +344,18 @@
     font-size: 12px;
   }
 
+}
+
+.empresa-actions {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.empresa-actions button {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
 }

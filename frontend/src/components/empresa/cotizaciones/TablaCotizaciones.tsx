@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import GestionarCotizacionModal from "./GestionarCotizacionModal";
+import ConfirmFinalizarCotizacion from "../../ConfirmarFinalizacionCotizacion";
 
 import type {
   Cotizacion,
@@ -77,6 +78,9 @@ export default function TablaCotizaciones({
     setCotizacionSeleccionada,
   ] = useState<Cotizacion | null>(null);
 
+  const [cotizacionAfinalizar, setCotizacionAfinalizar] =
+  useState<Cotizacion | null>(null);
+
 
   // =====================================================
   // ABRIR MODALES
@@ -131,41 +135,37 @@ export default function TablaCotizaciones({
   // FINALIZAR COTIZACIÓN
   // =====================================================
 
-  const finalizarCotizacionSeleccionada =
-    async (
-      cotizacion: Cotizacion
-    ) => {
-      const confirmar =
-        window.confirm(
-          "¿Seguro que querés finalizar esta cotización? Una vez finalizada no podrá volver a modificarse."
-        );
+  const finalizarCotizacionSeleccionada = (
+    cotizacion: Cotizacion
+  ) => {
+    setCotizacionAfinalizar(cotizacion);
+  };
 
-      if (!confirmar) {
-        return;
-      }
+  const confirmarFinalizacion = async () => {
+    if (!cotizacionAfinalizar) {
+      return;
+    }
 
-      try {
-        await finalizarCotizacion(
-          cotizacion.idCotizacion
-        );
+    try {
+      await finalizarCotizacion(
+        cotizacionAfinalizar.idCotizacion
+      );
 
-        // Recarga las cotizaciones desde la BDD.
-        // Al estar en el componente padre,
-        // también actualiza automáticamente los KPIs.
-        await onActualizada();
+      setCotizacionAfinalizar(null);
 
-      } catch (error: unknown) {
-        console.error(error);
+      await onActualizada();
+    } catch (error: unknown) {
+      console.error(error);
 
-        const mensaje =
-          error instanceof Error
-            ? error.message
-            : "No se pudo finalizar la cotización";
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : "No se pudo finalizar la cotización";
 
-        window.alert(mensaje);
-      }
-    };
-
+      
+      console.error(mensaje);
+    }
+  };
 
   // =====================================================
   // CAMBIAR ESTADO
@@ -432,6 +432,16 @@ export default function TablaCotizaciones({
         onConfirmar={
           eliminarCotizacion
         }
+      />
+
+
+      {/* =================================================
+          MODAL FINALIZAR COTIZACIÓN
+          ================================================= */}
+      <ConfirmFinalizarCotizacion
+        abierto={cotizacionAfinalizar !== null}
+        onCerrar={() => setCotizacionAfinalizar(null)}
+        onConfirmar={confirmarFinalizacion}
       />
 
     </div>

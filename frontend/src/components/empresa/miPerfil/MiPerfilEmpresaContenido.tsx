@@ -2,7 +2,7 @@ import "../../../styles/empresa/miPerfil/MiPerfilEmpresa.css";
 
 import PerfilEmpresaCard from "./PerfilEmpresaCard";
 import DatosEmpresaPerfil from "./DatosEmpresaPerfil";
-import PreferenciasEmpresa from "./PreferenciasEmpresa";
+
 import CuentaUsuario from "./CuentaUsuario";
 import useCuentaUsuario from "../../../hooks/useCuentaUsuario";
 
@@ -24,7 +24,7 @@ export default function MiPerfilEmpresaContenido() {
         <div className="perfil-left">
           <PerfilEmpresaCard empresa={perfilEmpresa.empresa} />
 
-          <PreferenciasEmpresa />
+         
         </div>
 
         <div className="perfil-right">

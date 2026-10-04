@@ -7,6 +7,11 @@ const materialController = new MaterialController();
 router.get("/", materialController.obtenerMateriales);
 
 router.get(
+  "/empresa/:idEmpresa",
+  materialController.obtenerMaterialesPorEmpresa
+);
+
+router.get(
   "/:idMaterial/alternativas",
   materialController.obtenerAlternativasMaterial
 );

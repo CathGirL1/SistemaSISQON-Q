@@ -11,11 +11,7 @@
   overflow-y: visible;
 }
 
-.tabla-mano-obra {
-  width: 100%;
-  min-width: 1250px;
-  border-collapse: collapse;
-}
+
 
 .tabla-mano-obra th {
   padding: 0.85rem 0.9rem;
@@ -330,30 +326,7 @@
   font-size: 0.86rem;
 }
 
-.mano-obra-paginacion {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 
-.mano-obra-paginacion button {
-  width: 34px;
-  height: 34px;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-
-  background: white;
-  color: #334155;
-
-  cursor: pointer;
-}
-
-.mano-obra-paginacion button.active {
-  border-color: #42b48a;
-  background: #42b48a;
-  color: white;
-}
 
 .tabla-mano-obra-container {
   width: 100%;
@@ -367,6 +340,41 @@
   border-collapse: collapse;
 }
 
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.mano-obra-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  margin-top: 1rem;
+
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .mano-obra-table-footer {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  
+}
 
 
 @media (max-width: 768px) {
@@ -386,3 +394,4 @@
   color: #6b7280;
   font-style: italic;
 }
+

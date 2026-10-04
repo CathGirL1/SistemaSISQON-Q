@@ -120,6 +120,189 @@
   line-height: 1.5;
 }
 
+/* =========================================================
+   BOTONES DEL MODAL
+   ========================================================= */
+
+.mano-obra-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  width: 100%;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+
+  border-top: 1px solid #eef2f7;
+}
+
+/* Botón cancelar */
+
+.mano-obra-modal-actions .btn-secundario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 110px;
+  min-height: 42px;
+
+  padding: 0.7rem 1.2rem;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #475569;
+
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.mano-obra-modal-actions .btn-secundario:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+
+  transform: translateY(-1px);
+}
+
+.mano-obra-modal-actions .btn-secundario:active {
+  transform: translateY(0);
+}
+
+.mano-obra-modal-actions .btn-secundario:focus-visible {
+  outline: 3px solid rgba(15, 52, 96, 0.15);
+  outline-offset: 2px;
+}
+
+
+/* Botón guardar / agregar */
+
+.mano-obra-modal-actions .btn-primario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 140px;
+  min-height: 42px;
+
+  padding: 0.7rem 1.25rem;
+
+  border: 1px solid #0f3460;
+  border-radius: 9px;
+
+  background: #0f3460;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.mano-obra-modal-actions .btn-primario:hover {
+  background: #0b294d;
+  border-color: #0b294d;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 4px 10px rgba(15, 52, 96, 0.18);
+}
+
+.mano-obra-modal-actions .btn-primario:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.mano-obra-modal-actions .btn-primario:focus-visible {
+  outline: 3px solid rgba(15, 52, 96, 0.2);
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .mano-obra-modal-actions {
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+    padding-top: 0.9rem;
+  }
+
+  .mano-obra-modal-actions .btn-secundario,
+  .mano-obra-modal-actions .btn-primario {
+    min-height: 41px;
+    padding: 0.65rem 1rem;
+    font-size: 0.82rem;
+  }
+
+  .mano-obra-modal-actions .btn-secundario {
+    min-width: 100px;
+  }
+
+  .mano-obra-modal-actions .btn-primario {
+    min-width: 130px;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MÓVIL
+   ========================================================= */
+
+@media (max-width: 560px) {
+  .mano-obra-modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .mano-obra-modal-actions .btn-secundario,
+  .mano-obra-modal-actions .btn-primario {
+    width: 100%;
+    min-width: 0;
+    min-height: 43px;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MÓVIL PEQUEÑO
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .mano-obra-modal-actions {
+    gap: 0.55rem;
+  }
+
+  .mano-obra-modal-actions .btn-secundario,
+  .mano-obra-modal-actions .btn-primario {
+    min-height: 42px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.8rem;
+  }
+}
+
 @media (max-width: 768px) {
   .mano-obra-modal-form {
     grid-template-columns: 1fr;
